@@ -34,10 +34,11 @@ jobs:
         if: steps.check.outputs.relevant == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           ISSUE: ${{ github.event.issue.number }}
           TITLE: ${{ github.event.issue.title }}
         run: |
-          gh issue comment "$ISSUE" --body \
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body \
             "👀 @ashrafiucse — actionable issue: **$TITLE**
 
           Handling checklist (MAINTENANCE.md §2):

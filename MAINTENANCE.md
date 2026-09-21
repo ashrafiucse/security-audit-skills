@@ -83,10 +83,15 @@ pause just accumulates open issues, nothing breaks.
 Noise knobs if it ever feels heavy: digest cron frequency, severity bar
 (CRITICAL → +HIGH), keyword filter in `critical-cve-digest.yml`.
 
-Free GitHub protections enabled on this repo (all $0 on public repos):
-Dependabot vulnerability alerts + automated security fixes, secret scanning +
-push protection, private vulnerability reporting, and Discussions (community
-Q&A lives there so Issues stay triage-only).
+Free GitHub protections on this repo (all $0 on public repos): secret scanning
++ push protection (verified active), Discussions (community Q&A lives there
+so Issues stay triage-only), and private vulnerability reporting (flip on in
+Settings → Code security — the API can't set this one).
+
+**Dependabot intentionally disabled**: the only dependency manifests in this
+repo are intentional eval fixtures (`evals/fixtures/`) — Dependabot flagged
+69 "vulnerabilities" there, all by design. The repo's real supply chain is
+stdlib-only (zero runtime dependencies), so the actual exposure is nil.
 
 ## 6. Published
 
