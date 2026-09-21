@@ -18,7 +18,7 @@ repo effective as new vulnerabilities become public, and for making it
 ## 2. Cadence
 
 ### Weekly (~30 min) — automated + triage
-- **Monday**: GitHub Action `.github/workflows/update-kev.yml` diffs the KEV catalog and opens a triage issue automatically.
+- **Monday**: GitHub Action `.github/workflows/update-kev.yml` opens a triage issue for new KEV entries not yet covered by vuln-db entries or open issues (stateless — it never commits).
 - CI (`.github/workflows/ci.yml`) runs validation and self-tests on every PR — keep it green.
 - Triage the issue: for each KEV entry affecting a covered ecosystem (npm/pypi/java/…), write a `vuln-db` entry (template: `skills/cve-research/vuln-db/entry-template.md`). Infra-only entries (network gear, Windows) → close with a note; the live KEV check still covers them at scan time.
 
@@ -70,4 +70,6 @@ gh repo edit ashrafiucse/security-audit-skills \
 ```
 
 Once after publishing: run the KEV workflow manually (Actions → Weekly CISA KEV
-triage → Run workflow) to seed `.state/`, and confirm CI is green.
+triage → Run workflow) to confirm it opens triage issues, and check CI is green.
+The workflow is stateless — it only opens issues and never commits. Keep it that
+way (least privilege, and no bot entries in the contributor graph).
