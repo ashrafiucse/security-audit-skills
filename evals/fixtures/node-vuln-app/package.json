@@ -2,7 +2,7 @@
   "name": "node-vuln-app",
   "version": "1.0.0",
   "dependencies": {
-    "express": "4.17.3",
+    "express": "4.22.0",
     "mysql2": "2.3.3",
     "lodash": "4.17.20",
     "moment": "2.29.1"
