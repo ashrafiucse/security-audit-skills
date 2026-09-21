@@ -17,6 +17,7 @@ the below (exact SEC-NN ids may differ; categories must not).
 | 9 | Secret logged to console | app.js:65 | High |
 | 10 | Missing security headers / helmet | app.js (global) | Medium |
 | 11 | Vulnerable deps (express 4.17.3, lodash 4.17.20, moment 2.29.1 — via OSV live) | package.json | High (network-dependent) |
+| 12 | A09: auth endpoint logs no success/failure audit events; raw User-Agent logged unsanitized (CWE-778 + CWE-117) | app.js:67-71 | Medium |
 
 ## Must NOT trigger (near-misses)
 

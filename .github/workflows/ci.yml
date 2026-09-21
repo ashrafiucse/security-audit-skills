@@ -41,3 +41,10 @@ jobs:
           printf '%s\n' "$out"
           grep -q 'npm:lodash' <<<"$out"
           grep -q 'fixed in' <<<"$out"
+
+      - name: OSV parser coverage (gradle/swift/conan lockfiles)
+        run: |
+          out=$(python3 skills/dependency-vulns/scripts/osv_scan.py evals/fixtures/dep-manifests)
+          printf '%s\n' "$out"
+          grep -q '6 unique package@version pairs' <<<"$out"
+          grep -q 'log4j-core@2.14.1' <<<"$out"

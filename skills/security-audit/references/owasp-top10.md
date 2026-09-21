@@ -15,7 +15,7 @@ improvement targets (see repo `COVERAGE.md`).
 | A06 | Vulnerable & Outdated Components | dependency-vulns, cve-research | live OSV scan, lockfile hygiene, KEV | strong (live data) |
 | A07 | Identification & Auth Failures | auth-review | password storage, sessions, JWT, OAuth, MFA, enumeration | strong |
 | A08 | Software & Data Integrity Failures | injection-flaws, config-hardening | unsafe deserialization, CI supply chain, curl\|sh, unpinned actions | partial |
-| A09 | Logging & Monitoring Failures | data-exposure | audit events on sensitive actions, log forging, alerting hooks | thin — minimum bar below |
+| A09 | Logging & Monitoring Failures | data-exposure | audit events, log forging (CWE-117), verbosity, monitoring hooks | partial — see `../data-exposure/references/logging-a09.md`; minimum bar below |
 | A10 | SSRF | injection-flaws | user-controlled URLs, cloud metadata, redirect bypass | partial (no egress-config review) |
 
 ## A04 design pass (run when the table shows no code-level findings for it)

@@ -13,7 +13,9 @@ Supported manifests:
   rust:     Cargo.lock
   php:      composer.lock
   go:       go.sum
-  java:     pom.xml
+  java:     pom.xml, gradle.lockfile
+  swift:    Package.resolved (v1 and v2)
+  c/c++:    conan.lock
   dotnet:   packages.config
   dart:     pubspec.lock
 
@@ -33,6 +35,7 @@ MANIFEST_NAMES = {
     "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "requirements.txt",
     "Pipfile.lock", "poetry.lock", "Gemfile.lock", "Cargo.lock",
     "composer.lock", "go.sum", "pom.xml", "packages.config", "pubspec.lock",
+    "gradle.lockfile", "Package.resolved", "conan.lock",
 }
 
 
@@ -163,6 +166,45 @@ def parse_pom_xml(path):
     return pairs_ecosystem(out, "Maven")
 
 
+def parse_gradle_lock(path):
+    # Lines: group:artifact:version=configuration(s)
+    out = set()
+    for line in read_text(path).splitlines():
+        m = re.match(r"^([^=#\s]+)=\S+", line.strip())
+        if m:
+            parts = m.group(1).split(":")
+            if len(parts) == 3:
+                out.add((f"{parts[0]}:{parts[1]}", parts[2]))
+    return pairs_ecosystem(out, "Maven")
+
+
+def parse_package_resolved(path):
+    # v1: {"object": {"pins": [{"package", "repositoryURL", "state"}]}}
+    # v2: {"pins": [{"identity", "location", "state"}]}
+    d = json.loads(read_text(path))
+    out = set()
+    pins = d.get("pins") or (d.get("object") or {}).get("pins") or []
+    for pin in pins:
+        ver = (pin.get("state") or {}).get("version")
+        name = pin.get("location") or pin.get("repositoryURL") or pin.get("package")
+        if ver and name:
+            out.add((name, ver.lstrip("v")))
+    return pairs_ecosystem(out, "SwiftURL")
+
+
+def parse_conan_lock(path):
+    # refs: name/version#revision%context or name/version@user/channel#rev
+    d = json.loads(read_text(path))
+    out = set()
+    refs = list(d.get("requires") or []) + list(d.get("build_requires") or [])
+    for ref in refs:
+        ref = ref.split("%")[0].split("#")[0].split("@")[0]
+        parts = ref.split("/")
+        if len(parts) >= 2:
+            out.add((parts[0], parts[1]))
+    return pairs_ecosystem(out, "ConanCenter")
+
+
 def parse_packages_config(path):
     text = read_text(path)
     out = {(i, v) for i, v in re.findall(r'<package\s+id="([^"]+)"\s+version="([^"]+)"', text)}
@@ -188,6 +230,9 @@ PARSERS = {
     "composer.lock": parse_composer_lock,
     "go.sum": parse_go_sum,
     "pom.xml": parse_pom_xml,
+    "gradle.lockfile": parse_gradle_lock,
+    "Package.resolved": parse_package_resolved,
+    "conan.lock": parse_conan_lock,
     "packages.config": parse_packages_config,
     "pubspec.lock": parse_pubspec_lock,
 }

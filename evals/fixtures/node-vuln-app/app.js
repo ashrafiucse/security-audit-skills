@@ -57,4 +57,10 @@ app.get('/admin/users', (req, res) => {
   );
 });
 
+app.post('/login', (req, res) => {
+  // SEC-12: no audit trail for auth events + raw header logged (log forging)
+  console.log('login attempt from UA:', req.headers['user-agent']);
+  res.json({ ok: true });
+});
+
 app.listen(3000, () => console.log('started with key', AWS_ACCESS_KEY_ID));

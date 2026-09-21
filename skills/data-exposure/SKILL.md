@@ -19,6 +19,7 @@ rg -n "console\.(log|error|info)|logger\.(info|warn|error)|logging\.|print\(" | 
 - Full request/response bodies logged (debug middleware like morgan `dev`+body, axios interceptors logging config) → HIGH if auth flows pass through
 - Stack traces with SQL → MEDIUM
 - Recommend structured logging with field-level redaction/allowlists.
+- Deep A09 checks (audit-event coverage, log forging, verbosity, monitoring): `references/logging-a09.md`.
 
 ## 3 — API responses
 
