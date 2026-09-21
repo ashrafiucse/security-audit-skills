@@ -66,6 +66,9 @@ jobs:
           NEW_COUNT: ${{ steps.kev.outputs.new }}
         run: |
           {
+            echo "👀 cc @ashrafiucse — daily KEV triage ready ($NEW_COUNT new)."
+            echo "(bot-created issues don't trigger workflows — this mention IS the notification)"
+            echo
             echo "KEV entries added in the last 10 days, not yet triaged: $NEW_COUNT"
             echo
             echo '```'
