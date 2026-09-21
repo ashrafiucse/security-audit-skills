@@ -83,6 +83,11 @@ pause just accumulates open issues, nothing breaks.
 Noise knobs if it ever feels heavy: digest cron frequency, severity bar
 (CRITICAL → +HIGH), keyword filter in `critical-cve-digest.yml`.
 
+Free GitHub protections enabled on this repo (all $0 on public repos):
+Dependabot vulnerability alerts + automated security fixes, secret scanning +
+push protection, private vulnerability reporting, and Discussions (community
+Q&A lives there so Issues stay triage-only).
+
 ## 6. Published
 
 Live at: https://github.com/ashrafiucse/security-audit-skills

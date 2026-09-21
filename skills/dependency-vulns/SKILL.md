@@ -34,7 +34,23 @@ rg --files -g 'package.json' -g 'pyproject.toml' -g 'Cargo.toml' -g 'go.mod' \
 - **Install scripts risk**: `postinstall` hooks in npm projects — list which deps have them if `package.json` shows lifecycle scripts.
 - **Deprecated/archived packages**: `request`, `node-uuid`, `colors`/`faker` (history of compromise), `querystring`, `mkdirp@0`, `moment` (maintenance mode). Check against current knowledge; see `../cve-research/SKILL.md` for live checks.
 
-## Step 3 — Prioritize output
+## Step 3 — Runtime EOL check (live, free — endoflife.date)
+
+For each runtime/framework/DB the project pins (from Phase 0 recon), check end-of-life status:
+
+```bash
+curl -s https://endoflife.date/api/nodejs.json | jq -r '.[] | "\(.cycle)  eol=\(.eol)  latest=\(.latest)"' | head -5
+```
+
+Common products: `python`, `nodejs`, `php`, `ruby`, `go`, `laravel`, `django`, `rails`,
+`ubuntu`, `debian`, `alpine`, `postgresql`, `mysql`, `redis`, `mongodb`, `nginx`,
+`kubernetes`. Compare the installed major/minor prefix against `eol` dates:
+
+- Installed version past EOL → **HIGH**: no security fixes will ever arrive — upgrade path only
+- Within 6 months of EOL → MEDIUM (plan the upgrade)
+- Note `latest` in the report so the user sees the gap concretely
+
+## Step 4 — Prioritize output
 
 Group findings: (a) fix available + reachable → do now; (b) fix available → next patch window; (c) no fix → mitigation notes (config workaround, feature flag off, WAF rule, virtual patching).
 
