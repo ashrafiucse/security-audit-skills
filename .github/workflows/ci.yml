@@ -46,5 +46,6 @@ jobs:
         run: |
           out=$(python3 skills/dependency-vulns/scripts/osv_scan.py evals/fixtures/dep-manifests)
           printf '%s\n' "$out"
-          grep -q '6 unique package@version pairs' <<<"$out"
+          grep -q '8 unique package@version pairs' <<<"$out"
           grep -q 'log4j-core@2.14.1' <<<"$out"
+          grep -q 'Hex:' <<<"$out"

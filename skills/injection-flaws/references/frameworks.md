@@ -67,6 +67,61 @@ when the stack matches. Format: dangerous → safe → grep.
 | `exec.Command("sh", "-c", userStr)` | `exec.Command(bin, args...)` | |
 | `template.HTML(userStr)` cast | omit cast | bypasses escaping |
 
+## Vue / Nuxt
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| `v-html="userHtml"` | `{{ userHtml }}` | the raw HTML sink |
+| `:href="userUrl"` / `:src="userUrl"` | scheme allowlist (`http(s):` only) | `javascript:` URLs |
+| `eval` / `new Function` on props | never | |
+
+## Angular
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| `bypassSecurityTrustHtml/Url/Style/ResourceUrl(user)` | `sanitizer.sanitize(...)` or binding as text | every bypass = review |
+| `[innerHTML]` is escaped by default | — | only dangerous with a bypass |
+| `[src]`/`[href]` with user values | DOMSanitizer | |
+
+## Svelte / SvelteKit
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| `{@html userContent}` | `{userContent}` | the only raw sink in Svelte |
+| `window.location = userUrl` | validated navigation | |
+
+## FastAPI (Python)
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| `db.execute(text(f"...{user}"))` | `text("... :u").bindparams(u=user)` | SQLAlchemy |
+| rendering user-provided template *strings* | fixed template files | SSTI |
+| JSON responses are XSS-safe | — | pydantic validators count as sanitizers |
+
+## Gin / Echo / Fiber (Go)
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| `fmt.Sprintf` into `db.Query/Exec` | placeholders | |
+| `c.HTML(200, userTemplatePath, data)` | fixed template names | template injection |
+| `template.HTML(user)` cast | omit cast | bypasses html/template escaping (which is otherwise automatic ✓) |
+
+## Symfony / Twig (PHP)
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| `{{ user|raw }}` | plain `{{ user }}` | Twig escapes by default |
+| `$conn->executeQuery("... ".$user)` | `executeQuery($sql, [$user])` | Doctrine binds |
+| `Process::fromShellCommandline("cmd ".$user)` | `new Process([$bin, $arg])` | |
+
+## ASP.NET Core (C#)
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| Razor `@Html.Raw(user)` | `@user` | |
+| `FromSqlRaw($"... {user}")` (EF Core) | `FromSqlInterpolated` or parameters | |
+| `Process.Start("cmd", "/c " + user)` | `ProcessStartInfo.ArgumentList` | |
+
 ## Adding a framework
 
 Same rules as `patterns.md`: one row = one fixture line (true positive + a

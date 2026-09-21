@@ -18,21 +18,19 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Data exposure / logging | good | A09 pack (audit events, log forging, verbosity); alerting config remains report-level |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | Insecure design (A04) | thin | guided prompts only; no systematic method |
-| Mobile (Android/iOS) | none | help wanted |
+| Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 
 ## By language/manifest (dependency parser)
 
 | Ecosystem | Parser | Notes |
 |---|---|---|
-| npm (all 3 lockfiles), pip (3), Bundler, Cargo, Composer, Go, Maven, NuGet, Pub, Gradle, Swift (SPM), Conan | ✅ | heuristic parsers |
+| npm (all 3 lockfiles), pip (3), Bundler, Cargo, Composer, Go, Maven, NuGet, Pub, Gradle, Swift (SPM), Conan, Hex (mix.lock) | ✅ | heuristic parsers |
 | Hex (mix.exs/lock), Cargo alt registries | ❌ | help wanted |
 
 ## Help wanted (priority order)
 
-1. **Mobile pack**: Android manifest (exported components, backup flags), iOS plist (ATS off, weak storage)
-2. **More framework rows** in `injection-flaws/references/frameworks.md` (Vue, Angular, Svelte, FastAPI, Gin, Echo, Symfony…)
-3. **Hex/mix lockfile parser** in `osv_scan.py`
-4. **More vuln-db entries** — start from open triage issues (KEV label)
+1. **More framework rows** in `injection-flaws/references/frameworks.md` (Ktor, NestJS, Django REST, Rails API modes…)
+2. **More vuln-db entries** — ongoing weekly via KEV triage issues
 
 ## Benchmark targets (quarterly, per evals/README.md)
 

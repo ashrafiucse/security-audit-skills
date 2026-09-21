@@ -26,6 +26,7 @@ Give it any project (any language, any stack) and it will:
 | `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
+| `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
 | `data-exposure` | PII handling, secrets in logs, over-returning APIs, git history |
 | `cve-research` | Live CVE research for the project's exact stack + versioned vuln knowledge base |
 

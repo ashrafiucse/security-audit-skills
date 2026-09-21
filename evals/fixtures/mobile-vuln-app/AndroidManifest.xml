@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixture: intentionally insecure manifest. FAKE data only. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.vulnapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:debuggable="true"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+        <!-- SEC-03: exported without permission -->
+        <activity android:name=".AdminActivity" android:exported="true" />
+
+        <!-- SEC-04: intent-filter implies exported; handles external URLs -->
+        <activity android:name=".DeepLinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="vulnapp" />
+            </intent-filter>
+        </activity>
+
+        <!-- SEC-05: exported provider granting URIs -->
+        <provider
+            android:name=".UserDataProvider"
+            android:exported="true"
+            android:grantUriPermissions="true" />
+
+        <service android:name=".SyncService" android:exported="true" />
+    </application>
+</manifest>

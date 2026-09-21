@@ -18,6 +18,7 @@ Supported manifests:
   c/c++:    conan.lock
   dotnet:   packages.config
   dart:     pubspec.lock
+  elixir:   mix.lock
 
 Heuristic parsers - some exotic manifest formats may be missed; always also
 review `dependency-vulns/SKILL.md` Step 2 (manifest hygiene).
@@ -35,7 +36,7 @@ MANIFEST_NAMES = {
     "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "requirements.txt",
     "Pipfile.lock", "poetry.lock", "Gemfile.lock", "Cargo.lock",
     "composer.lock", "go.sum", "pom.xml", "packages.config", "pubspec.lock",
-    "gradle.lockfile", "Package.resolved", "conan.lock",
+    "gradle.lockfile", "Package.resolved", "conan.lock", "mix.lock",
 }
 
 
@@ -205,6 +206,16 @@ def parse_conan_lock(path):
     return pairs_ecosystem(out, "ConanCenter")
 
 
+def parse_mix_lock(path):
+    # Erlang map: %{ "name": {:hex, :name, "version", ...} } ("=>" in older files;
+    # :path and :git deps have no version and are skipped)
+    out = set()
+    for m in re.finditer(r'"([^"]+)"\s*(?::|=>)\s*\{:hex,\s*:[\w.\-]+,\s*"([^"]+)"',
+                         read_text(path)):
+        out.add(m.groups())
+    return pairs_ecosystem(out, "Hex")
+
+
 def parse_packages_config(path):
     text = read_text(path)
     out = {(i, v) for i, v in re.findall(r'<package\s+id="([^"]+)"\s+version="([^"]+)"', text)}
@@ -233,6 +244,7 @@ PARSERS = {
     "gradle.lockfile": parse_gradle_lock,
     "Package.resolved": parse_package_resolved,
     "conan.lock": parse_conan_lock,
+    "mix.lock": parse_mix_lock,
     "packages.config": parse_packages_config,
     "pubspec.lock": parse_pubspec_lock,
 }
