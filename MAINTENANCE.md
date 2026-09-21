@@ -36,6 +36,11 @@ Automation inventory:
 Triage target: ecosystem-relevant KEV entries within 7 days (CISA due dates are short).
 Ensure your watch is "All Activity" (repo page → Watch), so bot-opened issues always notify.
 
+**Branch protection:** `main` is protected by the `protect-main` ruleset — direct
+pushes, force pushes, and deletion are all blocked; every change lands via a PR
+gated on the required CI check (`test`). Emergency override: temporarily set
+the ruleset to *disabled* (Settings → Rules → Rulesets), do the change, restore it.
+
 ### Monthly (~2 h) — pattern refresh
 - Review the month's high-profile advisories for *new bug classes or APIs* (not just CVEs). New dangerous API → new grep pattern in the relevant skill's `references/`, + fixture.
 - Re-run evals on all fixtures; fix any precision regressions (new patterns causing false positives are the #1 decay mode).
