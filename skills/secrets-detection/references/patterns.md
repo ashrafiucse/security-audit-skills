@@ -13,6 +13,7 @@ Each pattern in `patterns.txt`, what it catches, and its false-positive profile.
 | `eyJ...` | JWTs | Test tokens everywhere | Check payload (`cut -d. -f2 | base64 -d`) for real subjects/expiry |
 | `-----BEGIN ... PRIVATE KEY-----` | Private keys | Test fixtures | CRITICAL if committed for real |
 | `(db|proto)://user:pass@` | Creds in connection strings | docker-compose dev defaults | `postgres://postgres:postgres@` in compose = LOW; real host = HIGH |
+| `APP_KEY=base64:...` | Laravel application keys | Old tutorials/tutorials-committed .env | Not a provider cred, but exposure = cookie forgery → RCE chain; Critical |
 | Generic assignment | `password = "..."` style | Very noisy | Always triage; require plausible entropy + non-placeholder |
 
 ## Adding a new pattern

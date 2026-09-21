@@ -19,6 +19,7 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | Insecure design (A04) | thin | guided prompts only; no systematic method |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
+| Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |
 
 ## By language/manifest (dependency parser)
 

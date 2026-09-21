@@ -1,0 +1,9 @@
+{
+  "name": "example/laravel-vuln-app",
+  "description": "Fixture: intentionally vulnerable Laravel app",
+  "require": {
+    "php": "^8.0",
+    "laravel/framework": "8.83.1",
+    "barryvdh/laravel-debugbar": "3.6.2"
+  }
+}

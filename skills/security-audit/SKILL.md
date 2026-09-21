@@ -47,6 +47,7 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | Input handling / queries / templates / subprocesses | `../injection-flaws/SKILL.md` |
 | GraphQL server / `.graphql` schema files | `../graphql-security/SKILL.md` |
 | Android/iOS files (`AndroidManifest.xml`, `Info.plist`, mobile code) | `../mobile-security/SKILL.md` |
+| Laravel/PHP project (`composer.json` with laravel/framework, `artisan`, Blade views) | `../laravel-security/SKILL.md` |
 | Login, sessions, tokens, permissions | `../auth-review/SKILL.md` |
 | Crypto, hashing, tokens, certs | `../crypto-review/SKILL.md` |
 | HTTP servers, CORS, headers, cookies, CI configs | `../config-hardening/SKILL.md` |

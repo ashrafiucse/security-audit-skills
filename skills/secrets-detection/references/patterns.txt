@@ -30,6 +30,7 @@ hydra-[0-9a-zA-Z_\-]{30,}
 eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}
 hooks\.slack\.com/services/[A-Za-z0-9/]+
 -----BEGIN CERTIFICATE-----
+APP_KEY\s*=\s*base64:[A-Za-z0-9+/=]{10,}
 
 # --- Connection strings with embedded credentials ---
 (postgres|postgresql|mysql|mongodb(\+srv)?|redis|amqp|ftp)://[^:@/[:space:]]+:[^@/[:space:]]+@

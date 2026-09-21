@@ -27,6 +27,7 @@ Give it any project (any language, any stack) and it will:
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
+| `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
 | `data-exposure` | PII handling, secrets in logs, over-returning APIs, git history |
 | `cve-research` | Live CVE research for the project's exact stack + versioned vuln knowledge base |
 
