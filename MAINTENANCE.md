@@ -85,8 +85,8 @@ Noise knobs if it ever feels heavy: digest cron frequency, severity bar
 
 Free GitHub protections on this repo (all $0 on public repos): secret scanning
 + push protection (verified active), Discussions (community Q&A lives there
-so Issues stay triage-only), and private vulnerability reporting (flip on in
-Settings → Code security — the API can't set this one).
+so Issues stay triage-only), and private vulnerability reporting (verified
+enabled — reporters use Security → "Report a vulnerability").
 
 **Dependabot intentionally disabled**: the only dependency manifests in this
 repo are intentional eval fixtures (`evals/fixtures/`) — Dependabot flagged
