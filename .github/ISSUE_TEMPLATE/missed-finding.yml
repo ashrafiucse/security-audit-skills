@@ -1,0 +1,39 @@
+name: Missed finding
+description: Report a vulnerability the audit skills failed to detect
+title: "[miss] <one-line description>"
+labels: [miss, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Every confirmed miss becomes a fixture + detection pattern, so the
+        skills catch it forever. **Sanitize the snippet first — no real secrets.**
+  - type: textarea
+    id: code
+    attributes:
+      label: Vulnerable code (sanitized)
+      description: The code the audit should have flagged
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What's vulnerable and why
+      description: The bug class (e.g. SQLi via string concat) and the impact
+    validations:
+      required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Which skill should have caught it
+      placeholder: e.g. injection-flaws, laravel-security
+  - type: input
+    id: stack
+    attributes:
+      label: Language / framework + version
+      placeholder: e.g. Laravel 10 / PHP 8.3
+  - type: textarea
+    id: nearmiss
+    attributes:
+      label: Near-miss that must NOT trigger (optional but gold)
+      description: Similar-looking SAFE code — keeps precision high and blocks false positives

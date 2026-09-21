@@ -81,11 +81,12 @@ Also tag **Likelihood** (reachable from unauthenticated input? internal only?) a
 
 ## Phase 3 — Report
 
-Write `SECURITY-AUDIT.md` in the project root (this is the only file you create):
+Write `SECURITY-AUDIT.md` in the project root (this is the only file you create). Compute the knowledge-base header line with `ls ../cve-research/vuln-db/entries/ | wc -l` and the newest filename's date prefix — it shows the user how fresh their checkout is:
 
 ```markdown
 # Security Audit — <project>
 Date: YYYY-MM-DD | Scope: <commit hash / "working tree"> | Auditor: security-skills v<version>
+Knowledge base: <N> vuln-db entries (newest YYYY-MM-DD) | Live checks: OSV.dev + CISA KEV
 
 ## Stack
 <2–5 lines from Phase 0>

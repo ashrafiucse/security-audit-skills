@@ -1,0 +1,62 @@
+name: Notify maintainer
+
+# Fires on every new issue. If it's actionable (triage / miss / vuln-db label):
+#   Layer 1 — @mentions the maintainer in a comment → instant GitHub
+#             notification (email + web), zero configuration needed.
+#   Layer 2 — optionally posts to Slack if the SLACK_WEBHOOK_URL repo secret
+#             is set (Settings → Secrets → Actions). Skipped silently if not.
+# The maintainer should also keep Watching = "All Activity" on the repo
+# (already set via API at setup; see MAINTENANCE.md §2).
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide relevance
+        id: check
+        env:
+          LABELS: ${{ toJson(github.event.issue.labels.*.name) }}
+        run: |
+          if echo "$LABELS" | grep -Eq '"(triage|miss|vuln-db)"'; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Mention maintainer (creates GitHub notification)
+        if: steps.check.outputs.relevant == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          TITLE: ${{ github.event.issue.title }}
+        run: |
+          gh issue comment "$ISSUE" --body \
+            "👀 @ashrafiucse — actionable issue: **$TITLE**
+
+          Handling checklist (MAINTENANCE.md §2):
+          - KEV/NVD digest → add \`vuln-db\` entries for items with in-repo detection, close the rest
+          - Miss report → fixture + detection pattern + eval run
+          - vuln-db proposal → verify Detection section, then entry + fixture"
+
+      - name: Optional Slack ping
+        if: steps.check.outputs.relevant == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ISSUE: ${{ github.event.issue.number }}
+          TITLE: ${{ github.event.issue.title }}
+          URL: ${{ github.event.issue.html_url }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL not set — skipping Slack layer"
+            exit 0
+          fi
+          jq -n --arg t "security-audit-skills: issue #$ISSUE — $TITLE" --arg u "$URL" \
+            '{text: "\($t)\n\($u)"}' | curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-type: application/json' -d @-

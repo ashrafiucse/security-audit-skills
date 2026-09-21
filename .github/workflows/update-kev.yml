@@ -1,13 +1,14 @@
-name: Weekly CISA KEV triage
+name: Daily CISA KEV triage
 
 # Stateless by design: reports KEV entries from the last 10 days that are NOT
 # already triaged (no matching vuln-db entry, not in an open kev issue).
-# The workflow only ever OPENS ISSUES — it never commits — so it needs only
+# Daily cron + dedupe = issues only when something new appears. The workflow
+# only ever OPENS ISSUES — it never commits — so it needs only
 # `issues: write` and the bot never appears as a repo contributor.
 
 on:
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:

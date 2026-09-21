@@ -89,7 +89,7 @@ The agent auto-loads the right skill when your request matches its description.
 
 ## Keeping it current
 
-This repo is designed to be updated as new vulnerabilities go public. See [MAINTENANCE.md](MAINTENANCE.md) for the update pipeline (CISA KEV, NVD, OSV/GHSA feeds, weekly automation via GitHub Actions). Consumers just `git pull`.
+This repo is designed to be updated as new vulnerabilities go public. See [MAINTENANCE.md](MAINTENANCE.md) for the update pipeline — **daily automated CISA KEV + NVD critical-CVE digests** (issues with pre-drafted entries), **live OSV.dev checks at scan time**, maintainer **notifications** on every actionable issue, and community miss-reports via issue templates. Consumers just `git pull`.
 
 ## Contributing
 

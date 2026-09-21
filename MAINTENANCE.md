@@ -17,10 +17,24 @@ repo effective as new vulnerabilities become public, and for making it
 
 ## 2. Cadence
 
-### Weekly (~30 min) — automated + triage
-- **Monday**: GitHub Action `.github/workflows/update-kev.yml` opens a triage issue for new KEV entries not yet covered by vuln-db entries or open issues (stateless — it never commits).
-- CI (`.github/workflows/ci.yml`) runs validation and self-tests on every PR — keep it green.
-- Triage the issue: for each KEV entry affecting a covered ecosystem (npm/pypi/java/…), write a `vuln-db` entry (template: `skills/cve-research/vuln-db/entry-template.md`). Infra-only entries (network gear, Windows) → close with a note; the live KEV check still covers them at scan time.
+### Daily (automated, ~zero human time until an issue lands)
+- **06:00 UTC** — `update-kev.yml`: opens a triage issue only for new exploited CVEs not already covered (dedupes against vuln-db entries and open issues). Daily cron, stateless, never commits.
+- **06:15 UTC** — `critical-cve-digest.yml`: opens one digest issue with copy-paste-ready entry drafts for new CRITICAL CVEs (NVD, last 3 days).
+- `notify.yml`: when any actionable issue (triage/miss/vuln-db) opens, comments with @ashrafiucse (→ GitHub notification) and optionally pings Slack via the `SLACK_WEBHOOK_URL` secret.
+- Community inputs: `missed-finding` and `vuln-db` issue templates turn user reports into structured triage work.
+- CI (`.github/workflows/ci.yml`) runs validation and self-tests on every push/PR — keep it green.
+
+Automation inventory:
+
+| Workflow | Cadence | Output | Human action |
+|---|---|---|---|
+| `update-kev.yml` | daily 06:00 UTC | deduped KEV triage issue | vuln-db entries for ecosystem items; close infra-only |
+| `critical-cve-digest.yml` | daily 06:15 UTC | digest issue with drafts | pick items with in-repo detection |
+| `notify.yml` | on issue opened | @maintainer mention (+optional Slack) | none |
+| `ci.yml` | push / PR | quality gate | keep green |
+
+Triage target: ecosystem-relevant KEV entries within 7 days (CISA due dates are short).
+Ensure your watch is "All Activity" (repo page → Watch), so bot-opened issues always notify.
 
 ### Monthly (~2 h) — pattern refresh
 - Review the month's high-profile advisories for *new bug classes or APIs* (not just CVEs). New dangerous API → new grep pattern in the relevant skill's `references/`, + fixture.

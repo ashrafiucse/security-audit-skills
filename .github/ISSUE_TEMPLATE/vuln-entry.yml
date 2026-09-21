@@ -1,0 +1,62 @@
+name: Propose a vuln-db entry
+description: Submit a curated knowledge-base entry for a publicly known vulnerability
+title: "[vuln-db] <CVE or advisory id>"
+labels: [vuln-db, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Entries must have an **agent-executable Detection** section (greps or
+        version checks from the target repo alone). See
+        `skills/cve-research/vuln-db/entry-template.md` for the full format.
+  - type: input
+    id: cve
+    attributes:
+      label: CVE / advisory ID
+      placeholder: CVE-2026-1234 or GHSA-xxxx-xxxx-xxxx
+    validations:
+      required: true
+  - type: dropdown
+    id: ecosystem
+    attributes:
+      label: Ecosystem
+      options:
+        - npm
+        - pypi
+        - maven
+        - rubygems
+        - packagist
+        - go
+        - crates-io
+        - nuget
+        - swift
+        - conan
+        - hex
+        - infra
+        - multi
+    validations:
+      required: true
+  - type: input
+    id: affected
+    attributes:
+      label: Affected versions
+      placeholder: e.g. >=2.0.0, <2.3.32
+    validations:
+      required: true
+  - type: textarea
+    id: detection
+    attributes:
+      label: Detection (greps / version checks)
+      description: Commands an agent can run inside any repo to decide affected-or-not
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Fix + mitigation
+    validations:
+      required: true
+  - type: textarea
+    id: falsepositives
+    attributes:
+      label: Known false positives / near-misses
