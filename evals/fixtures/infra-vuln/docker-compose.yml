@@ -1,0 +1,18 @@
+version: "3"
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    privileged: true                    # SEC-05: privileged container
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # SEC-06: docker.sock mount
+      - /:/hostpath                     # SEC-07: host root mounted
+    environment:
+      - DB_PASSWORD=postgres            # SEC-08: default credential
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_PASSWORD=postgres      # SEC-08b
+    ports:
+      - "5432:5432"                     # SEC-09: DB published to host/network

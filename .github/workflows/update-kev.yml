@@ -1,0 +1,79 @@
+name: Weekly CISA KEV triage
+
+# Keeps the skills current: every Monday, diff the CISA Known Exploited
+# Vulnerabilities catalog against the last run; open a triage issue for new
+# entries so a maintainer writes vuln-db entries (see MAINTENANCE.md).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commit .state/ bookkeeping
+  issues: write     # open triage issues
+
+jobs:
+  kev-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch KEV catalog and diff against last run
+        id: kev
+        run: |
+          mkdir -p .state
+          curl -sL https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json -o /tmp/kev.json
+          python3 - <<'EOF'
+          import datetime, json, os
+          kev = json.load(open("/tmp/kev.json"))
+          date_file = ".state/kev-last-run.txt"
+          last = open(date_file).read().strip() if os.path.exists(date_file) else ""
+          entries = kev["vulnerabilities"]
+          if last:
+              fresh = [v for v in entries if (v.get("dateAdded") or "") > last]
+          else:
+              fresh = entries[:25]  # first run: seed with the 25 most recent
+          open(date_file, "w").write(datetime.date.today().isoformat())
+          lines = [
+              f"{v['cveID']} | {v['vendorProject']} {v['product']} | "
+              f"added {v.get('dateAdded', '-')} | due {v.get('dueDate', '-')}"
+              for v in fresh
+          ]
+          open("/tmp/new.txt", "w").write("\n".join(lines))
+          open("/tmp/count.txt", "w").write(str(len(fresh)))
+          EOF
+          echo "new=$(cat /tmp/count.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Open triage issue for new entries
+        if: steps.kev.outputs.new != '' && steps.kev.outputs.new != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_COUNT: ${{ steps.kev.outputs.new }}
+        run: |
+          {
+            echo "New CISA KEV entries since the last run: $NEW_COUNT"
+            echo
+            echo '```'
+            cat /tmp/new.txt
+            echo '```'
+            echo
+            echo "Triage per MAINTENANCE.md: for entries affecting covered ecosystems, add"
+            echo "\`skills/cve-research/vuln-db/entries/\` files (template: \`entry-template.md\`)."
+            echo "Infra-only entries can be closed — live KEV lookups cover them at scan time."
+          } > /tmp/issue-body.md
+          gh label create kev 2>/dev/null || true
+          gh label create triage 2>/dev/null || true
+          gh issue create \
+            --title "KEV update: $NEW_COUNT new exploited vulnerabilities to triage" \
+            --body-file /tmp/issue-body.md \
+            --label kev --label triage
+
+      - name: Persist KEV state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash || true
+          git add .state
+          git commit -m "chore: update KEV state" || echo "nothing to commit"
+          git push || echo "nothing to push"

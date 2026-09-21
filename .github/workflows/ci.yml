@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate skills, cross-references, and vuln-db entries
+        run: python3 scripts/validate.py
+
+      - name: Shell script syntax
+        run: |
+          bash -n install.sh
+          bash -n skills/secrets-detection/scripts/scan.sh
+
+      - name: Python syntax
+        run: python3 -m py_compile scripts/validate.py skills/dependency-vulns/scripts/osv_scan.py
+
+      - name: Secrets scanner self-test (planted fakes must be found)
+        run: |
+          out=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/node-vuln-app)
+          printf '%s\n' "$out"
+          grep -q 'AKIAI44QH8DHBEXAMPLE' <<<"$out"
+          grep -q 'Sup3rS3cretPr0dPass' <<<"$out"
+          out2=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/infra-vuln)
+          printf '%s\n' "$out2"
+          grep -q 'Fake4EvalsDoNotUse' <<<"$out2"
+
+      - name: OSV end-to-end (live API)
+        run: |
+          out=$(python3 skills/dependency-vulns/scripts/osv_scan.py evals/fixtures/node-vuln-app)
+          printf '%s\n' "$out"
+          grep -q 'npm:lodash' <<<"$out"
+          grep -q 'fixed in' <<<"$out"
