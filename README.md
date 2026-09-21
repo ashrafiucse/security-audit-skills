@@ -28,6 +28,9 @@ Give it any project (any language, any stack) and it will:
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
+| `django-security` | Django: `raw()`/`extra()` SQLi, `mark_safe`/`|safe` XSS, `fields='__all__'` mass assignment, settings misconfig |
+| `rails-security` | Rails: interpolated `where`, `permit!`, `raw`/`html_safe`, CSRF skips, `send_file` traversal, `secret_key_base` |
+| `spring-security` | Spring: JPQL concat, MyBatis `${}`, `th:utext`, CSRF/`permitAll`, Actuator over-exposure, Jackson defaultTyping |
 | `data-exposure` | PII handling, secrets in logs, over-returning APIs, git history |
 | `cve-research` | Live CVE research for the project's exact stack + versioned vuln knowledge base |
 

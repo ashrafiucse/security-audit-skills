@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<!-- Fixture: Thymeleaf escaping bypassed -->
+<html xmlns:th="http://www.thymeleaf.org">
+  <p th:utext="${user.bio}">bio</p>   <!-- SEC-08 -->
+  <p th:text="${user.name}">name</p>  <!-- safe counterpart -->
+</html>

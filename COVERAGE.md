@@ -20,6 +20,9 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Insecure design (A04) | thin | guided prompts only; no systematic method |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |
+| Django/Python | good | `django-security`: raw()/extra(), mark_safe, `__all__` mass assignment, settings |
+| Rails/Ruby | good | `rails-security`: interpolated where, permit!, CSRF skips, secret_key_base |
+| Spring/Java | good | `spring-security`: JPQL/MyBatis `${}`, th:utext, actuator, SecurityConfig |
 
 ## By language/manifest (dependency parser)
 

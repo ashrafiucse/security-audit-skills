@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+# Fixture: intentionally old/vulnerable stack
+gem 'rails', '5.2.3'
+gem 'devise', '4.7.1'
+gem 'pg', '1.1.4'

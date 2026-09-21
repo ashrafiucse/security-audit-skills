@@ -48,6 +48,9 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | GraphQL server / `.graphql` schema files | `../graphql-security/SKILL.md` |
 | Android/iOS files (`AndroidManifest.xml`, `Info.plist`, mobile code) | `../mobile-security/SKILL.md` |
 | Laravel/PHP project (`composer.json` with laravel/framework, `artisan`, Blade views) | `../laravel-security/SKILL.md` |
+| Django/Python project (`manage.py`, `settings.py`, Django in requirements) | `../django-security/SKILL.md` |
+| Rails project (`Gemfile` with rails, `app/controllers`) | `../rails-security/SKILL.md` |
+| Spring/Java project (`pom.xml`/`build.gradle` with spring dependencies) | `../spring-security/SKILL.md` |
 | Login, sessions, tokens, permissions | `../auth-review/SKILL.md` |
 | Crypto, hashing, tokens, certs | `../crypto-review/SKILL.md` |
 | HTTP servers, CORS, headers, cookies, CI configs | `../config-hardening/SKILL.md` |
