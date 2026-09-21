@@ -87,7 +87,7 @@ This repo is designed to be updated as new vulnerabilities go public. See [MAINT
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Every accepted detection pattern must ship with a test fixture in `evals/` so quality only goes up.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Every accepted detection pattern must ship with a test fixture in `evals/` so quality only goes up. Current gaps and roadmap: [COVERAGE.md](COVERAGE.md).
 
 ## License
 

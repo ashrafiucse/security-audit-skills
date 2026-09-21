@@ -71,6 +71,8 @@ Rate each finding:
 
 Also tag **Likelihood** (reachable from unauthenticated input? internal only?) and **Effort to fix** (S/M/L).
 
+**Completeness gate:** walk `references/owasp-top10.md` top to bottom. For any category with project surface but no recorded findings, either scan it now or mark it "not assessed" in the report — never skip silently.
+
 ## Phase 3 — Report
 
 Write `SECURITY-AUDIT.md` in the project root (this is the only file you create):

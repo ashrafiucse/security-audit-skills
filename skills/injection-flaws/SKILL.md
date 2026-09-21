@@ -8,7 +8,7 @@ license: MIT
 
 ## Method
 
-For each category: (1) grep for sink patterns — the table below and `references/patterns.md` have ready-to-run commands per language; (2) for each hit, trace backwards to the input source; (3) report only if untrusted input reaches the sink without a real sanitizer.
+For each category: (1) grep for sink patterns — the table below and `references/patterns.md` have ready-to-run commands per language, and `references/frameworks.md` has framework-specific dangerous/safe construct tables (Express, Django, Spring, Rails, Laravel, Go); (2) for each hit, trace backwards to the input source; (3) report only if untrusted input reaches the sink without a real sanitizer.
 
 **Source → sink tracing.** Untrusted sources: HTTP params/body/headers/cookies, file uploads, DB rows fed to templates, webhook payloads, environment-adjacent user data, message queues. Sanitizers that count: parameterized queries, allowlist validation, `DOMPurify` for HTML, framework auto-escaping (verify it's actually on), `shlex.quote`/argument-array subprocess calls, canonicalized + allowlisted paths. "Escaping" done by string formatting does NOT count.
 
