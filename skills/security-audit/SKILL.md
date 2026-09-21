@@ -45,6 +45,7 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | Any source code at all | `../secrets-detection/SKILL.md` |
 | Any dependency manifest | `../dependency-vulns/SKILL.md` |
 | Input handling / queries / templates / subprocesses | `../injection-flaws/SKILL.md` |
+| GraphQL server / `.graphql` schema files | `../graphql-security/SKILL.md` |
 | Login, sessions, tokens, permissions | `../auth-review/SKILL.md` |
 | Crypto, hashing, tokens, certs | `../crypto-review/SKILL.md` |
 | HTTP servers, CORS, headers, cookies, CI configs | `../config-hardening/SKILL.md` |

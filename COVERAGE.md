@@ -16,6 +16,7 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Config/headers/CORS/CI | strong | |
 | Containers & IaC | strong | Docker/compose/K8s/Terraform |
 | Data exposure / logging | good | A09 pack (audit events, log forging, verbosity); alerting config remains report-level |
+| GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | Insecure design (A04) | thin | guided prompts only; no systematic method |
 | Mobile (Android/iOS) | none | help wanted |
 
@@ -28,11 +29,10 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 
 ## Help wanted (priority order)
 
-1. **GraphQL/API-specific checks**: introspection in prod, missing depth/complexity limits, batch abuse
-2. **Mobile pack**: Android manifest (exported components, backup flags), iOS plist (ATS off, weak storage)
-3. **More framework rows** in `injection-flaws/references/frameworks.md` (Vue, Angular, Svelte, FastAPI, Gin, Echo, Symfony…)
-4. **Hex/mix lockfile parser** in `osv_scan.py`
-5. **More vuln-db entries** — start from open triage issues (KEV label)
+1. **Mobile pack**: Android manifest (exported components, backup flags), iOS plist (ATS off, weak storage)
+2. **More framework rows** in `injection-flaws/references/frameworks.md` (Vue, Angular, Svelte, FastAPI, Gin, Echo, Symfony…)
+3. **Hex/mix lockfile parser** in `osv_scan.py`
+4. **More vuln-db entries** — start from open triage issues (KEV label)
 
 ## Benchmark targets (quarterly, per evals/README.md)
 
