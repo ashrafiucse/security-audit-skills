@@ -65,7 +65,25 @@ Two decay modes to guard against:
 - Tag releases (`v1.4.0`) so consumers can pin; README states the "consume via git pull" model.
 - Changelog lives in release notes (generated from PR titles).
 
-## 5. Published
+## 5. Cost model
+
+**Money: $0.** Public repo → Actions minutes free (~20 min/month used); OSV.dev,
+CISA KEV, and NVD APIs are free at this volume (digest = 1 NVD request/day);
+no backend — skills run on each consumer's agent.
+
+**Time (solo steady state): ~1–2 h/week** — triage sessions 2–3×/week (issue →
+entry ≈ 15–20 min each; most digest items are 1-minute closes), ~2 h monthly
+pattern refresh, ½ day quarterly benchmark. Community miss-reports add
+20–30 min per accepted fix but scale to contributors via the issue templates.
+
+**Safe to pause:** the live OSV/KEV layer is the primary freshness mechanism and
+needs no maintenance; vuln-db curation improves quality, not correctness — a
+pause just accumulates open issues, nothing breaks.
+
+Noise knobs if it ever feels heavy: digest cron frequency, severity bar
+(CRITICAL → +HIGH), keyword filter in `critical-cve-digest.yml`.
+
+## 6. Published
 
 Live at: https://github.com/ashrafiucse/security-audit-skills
 
