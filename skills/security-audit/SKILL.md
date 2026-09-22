@@ -80,6 +80,7 @@ Scan hygiene:
 - Always exclude `node_modules/ vendor/ dist/ build/ target/ .git/ __pycache__/ .venv/ venv/ coverage/` and minified `*.min.js`
 - Prioritize: auth code > input handlers > data access > config > everything else
 - For repos > ~2k files, scan by category (auth files first, then routes/controllers, then DB layers) rather than exhaustively
+- **Enumeration discipline:** sampling is for prioritizing WHICH skill runs next — inside a skill's check, its grep output is a census. Count the hits (`wc -l`), disposition every line (finding / verified-safe / not-assessed), never `head`-truncate an inventory. A pattern that mixes frameworks' noise (React `!!` vs Blade `{!!`) must be globbed to the framework's file type first. An unexamined tail is an unaudited tail.
 
 ## Phase 1.5 — Optional tool bridges (skip silently if absent)
 
@@ -121,6 +122,7 @@ Individual severities understate real risk — pentest-grade reports show how fi
 |---|---|---|
 | SSRF → metadata → creds | SSRF + IMDSv1/no hop limit + instance role | Cloud account takeover |
 | XSS → session theft | any XSS + token in localStorage/sessionStorage | Account takeover |
+| Moderation-queue XSS | unprivileged-submitted content + raw render in a staff detail view | Staff/admin account takeover (the approval workflow itself is the delivery mechanism) |
 | Redirect → code theft | open redirect + OAuth/SSO callback carrying code/token in URL | Account takeover |
 | Upload → RCE | upload-to-webroot + parse gadget (image/php) | Server RCE |
 | Pollution → RCE | prototype pollution + gadget (child_process/template env) | Server RCE |
