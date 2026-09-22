@@ -39,6 +39,7 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 ## Help wanted (priority order)
 
 1. **`dotnet-security` skill** — surfaced by the 2026-09-23 GHSL extraction (Umbraco, Orchard, NanaZip advisories keep landing in .NET; detection feasible via `.csproj`/`packages.lock.json` versions + Razor/ASP.NET sink patterns) — see `cve-research/references/ghsl-lessons.md`
+1a. **LDAP authentication/injection checks** — surfaced by CodeQL catalog diff (java/python enterprise: anonymous binds, unescaped DN injection) — see methodology-mirror.md
 1b. **WebAssembly review checks** (WSTG 4.13) — niche; documented gap in `security-audit/references/methodology-mirror.md`
 2. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only, Java library sinks, Rust, Phoenix. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
 2. **More vuln-db entries** — ongoing weekly via KEV triage issues; incident-research batches (Metasploit-class waves) welcome — see `cve-research/references/notable-incidents.md`
