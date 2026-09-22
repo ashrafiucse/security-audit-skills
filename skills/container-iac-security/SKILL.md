@@ -43,8 +43,8 @@ rg --files -g '*.yaml' -g '*.yml' | xargs grep -ln "kind: Deployment\|kind: Pod\
 - `automountServiceAccountToken: true` (default) on pods that don't talk to the K8s API → MEDIUM (default creds for lateral movement)
 - Wildcard RBAC (`verbs: ["*"]`, `resources: ["*"]`), cluster-admin bindings to services → HIGH. **RBAC escalation verbs**: any Role/ClusterRole granting `escalate` (self-boost any role), `bind` (bind higher-priv roles to self), or `impersonate` (become any user/SA) → **Critical** even scoped; `verbs: ["get","list"]` on `secrets` at cluster scope → Critical (reads every credential)
 ```bash
-rg -n "escalate|impersonate" -g '*.yaml' -g '*.yml' | rg "verbs|resources" | head
-rg -n "resources:.*secrets" -g '*.yaml' -g '*.yml' | rg -v "namespace" | head
+rg -n "escalate|impersonate" -g '*.yaml' -g '*.yml' | rg "verbs|resources"   # census: every verb row dispositioned
+rg -n "resources:.*secrets" -g '*.yaml' -g '*.yml' | rg -v "namespace"   # census: every secret-reading role dispositioned
 ```
 - `imagePullPolicy: Always` with `:latest` tags / images from unknown registries → MEDIUM
 - Resource limits absent (DoS surface) → LOW

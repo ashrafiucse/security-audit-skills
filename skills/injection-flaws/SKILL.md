@@ -57,6 +57,16 @@ rg -n -i "<%=.*request|res\.send\(.*req\.(body|query|params)"
 ```
 Flag reflected user input into any of these sinks. Framework auto-escaping (Jinja2, React JSX text nodes) is a valid defense — but `dangerouslySetInnerHTML`/`v-html`/`|safe` bypass it.
 
+**Census + privilege direction — the rules every framework XSS check below points to.** Disposition every sink hit (finding / verified-safe / not-assessed); severity is set by WHO writes the value vs WHO renders it, not by the sink alone:
+
+| Author of the raw content | Viewer | Severity |
+|---|---|---|
+| Unprivileged (student/customer/guest: reviews, tickets, messages, quiz answers, display names, uploaded filenames) | Privileged (admin/moderator/staff view, support desk, HTML email render) | **Critical** — fires in the staff origin → session riding → account takeover; approval/moderation queues GUARANTEE a privileged viewer opens it |
+| Privileged-authored (admin/instructor: descriptions, embeds, templates) | Unprivileged/everyone | High (public) / Medium (authenticated) |
+| Same privilege both sides | same | Medium |
+
+Moderation/approval workflows are delivery mechanisms, not mitigations (see `../course-platform-security/SKILL.md` §6.5 and `../laravel-security/SKILL.md` Step 4).
+
 ### Path traversal
 ```bash
 rg -n "open\(|readFile|writeFile|sendFile|send_file|File\(|Path\.Combine|require\(.*\+|include\(.*\$|fopen\("

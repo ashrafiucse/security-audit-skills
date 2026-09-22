@@ -24,7 +24,7 @@ enrollment sources (order/webhook/admin-grant/subscription), cohort model
 
 The public catalog must only expose what is published AND public.
 ```bash
-rg -n "courses?\.(find|where|all|select)" -g '*.js' -g '*.ts' -g '*.py' -g '*.rb' | head
+rg -n "courses?\.(find|where|all|select)" -g '*.js' -g '*.ts' -g '*.py' -g '*.rb'   # census: disposition every read path
 ```
 - List/search endpoints returning draft/unpublished/private courses → **High**
   (hidden product roadmap + private catalog leaks; PR-sensitive)
@@ -63,7 +63,7 @@ rg -n -i "enrollment.*(create|insert|save)|grant.*access" -g '*.js' -g '*.py' | 
 ## 5 — Cohort / multi-cohort access (student persona)
 
 ```bash
-rg -n -i "cohort|batch|class_?id|group_?id" -g '*.js' -g '*.py' -g '*.rb' | head
+rg -n -i "cohort|batch|class_?id|group_?id" -g '*.js' -g '*.py' -g '*.rb'   # census: disposition every cohort-touching read
 ```
 - Materials/lessons/live-sessions fetched by courseId WITHOUT the student's
   cohort scope → **High/Critical** (cross-cohort read; per-object authz is not
