@@ -20,11 +20,11 @@ Give it any project (any language, any stack) and it will:
 | `security-audit` | Master orchestrator: full-project audit workflow, fix-verification (re-audit) mode, report format, optional tool bridges (gitleaks/semgrep/checkov… when installed) |
 | `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
 | `dependency-vulns` | Dependency risk: live OSV CVE scanning + reachability (used vs dormant), supply-chain hygiene (dependency confusion, typosquats, provenance), and beyond-CVEs — discontinued/unfixable packages, compromised-release history, dangerous usage of safe packages, vendored copies invisible to manifest scanners |
-| `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF, deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads, query-builder raw sinks |
+| `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF (incl. deferred/registered-callback), deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads + archive extraction, C/C++ native memory-safety sinks |
 | `auth-review` | Authn/authz, route census (incl. gRPC/MQ/scheduled handlers), password storage, sessions, JWT (confusion/kid/PKCE), OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
 | `config-hardening` | Headers (incl. weak-CSP review), cookie prefixes, SRI, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers, API resource & consumption (API4/API10) |
-| `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
+| `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation + AWS IAM privilege-escalation paths |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
 | `llm-security` | LLM/AI apps: prompt injection & data exfil, unsafe model deserialization (pickle/torch.load/LangChain), hardcoded LLM keys, over-powered agent tools, prompt/PII logging & telemetry |
 | `flow-security` | Cross-endpoint business flows: state-machine violations (skip/replay/disorder), client-supplied data at terminal steps, association/chained IDOR, webhook replay, step-skipping via direct access, post-payment mutation, amount drift, privilege transitions between hops |

@@ -214,6 +214,16 @@ RULES = [
     ("host-substring-allowlist",
      r"host\.includes\(h\)",
      "gaps3-vuln-app/app.js", "host.includes(h)"),
+    # --- C/C++ native pack (c-vuln-app) ---
+    ("c-format-string",
+     r"(printf|fprintf|syslog)\s*\(\s*\w+\s*[,)]|fprintf\s*\(\s*\w+,\s*[a-z_]",
+     "c-vuln-app/service.c", "fprintf(stderr, user_agent)"),
+    ("c-strcpy",
+     r"\b(strcpy|strcat|gets|sprintf)\s*\(",
+     "c-vuln-app/service.c", "strcpy(name, input)"),
+    ("c-system-cmd",
+     r"\bsystem\s*\(",
+     "c-vuln-app/service.c", "system(cmd)"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -296,6 +306,12 @@ MUST_NOT_MATCH = [
     ("host-substring-safe",
      r"host\.includes\(h\)",
      "gaps3-vuln-app/safe-gaps3.js"),
+    ("c-format-string-safe",
+     r"fprintf\s*\(\s*\w+,\s*[a-z_]",
+     "c-vuln-app/safe_service.c"),
+    ("c-strcpy-safe",
+     r"\b(strcpy|strcat|gets)\s*\(",
+     "c-vuln-app/safe_service.c"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —
