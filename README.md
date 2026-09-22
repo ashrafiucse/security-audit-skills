@@ -86,7 +86,7 @@ The agent auto-loads the right skill when your request matches its description.
 
 ## Principles
 
-- **Read-only by default.** Audit skills never modify, delete, or exploit anything — they read code and produce evidence-backed findings.
+- **Read-only by default.** Audit skills never modify, delete, or exploit anything — they read code and produce evidence-backed findings. Verified three ways: `scripts/audit_readonly.py` (CI-gated static gate over all executables + skill bash blocks), empirical sha256 hash-diff audits (scanners leave the tree byte-identical; the audit's only write is `SECURITY-AUDIT.md`), and a full external-source egress inventory at `skills/security-audit/references/external-sources.md` (the one real egress: OSV receives package@version pairs; offline mode avoids it).
 - **Evidence over guesses.** Every finding cites `file:line` and is verified against surrounding context to suppress false positives.
 - **Mapped to standards.** Findings reference CWE / CVE / OWASP Top 10 / CIS where applicable.
 - **Progressive disclosure.** SKILL.md files stay lean; deep pattern databases live in `references/` and load only when needed.
