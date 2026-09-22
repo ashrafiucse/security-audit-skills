@@ -18,6 +18,8 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Data exposure / logging | strong | A09 pack: audit events, log forging, verbosity; alerting-config checks (in-repo evidence first, "not assessed" fallback) |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | LLM / AI apps | good | `llm-security`: prompt injection/exfil, model deserialization, LLM keys, agent tools, telemetry; measured by `llm-vuln-app` fixture |
+| Course/e-learning platforms | good | `course-platform-security`: gating truth, preview leaks, enrollment state machine, cohort scoping — persona-driven (public/student/admin); fixture `course-vuln-app` |
+| Skill authoring | — | `skill-forge`: scaffold + authoring laws + blind-test protocol for building NEW custom skills without external dependencies |
 | Insecure design (A04) | good | grep-anchored checklist + `flow-security` skill for flow-wise analysis (F1–F8 classes, flow-vuln-app fixture) |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |

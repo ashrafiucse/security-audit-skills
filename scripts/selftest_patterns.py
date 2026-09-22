@@ -224,6 +224,22 @@ RULES = [
     ("c-system-cmd",
      r"\bsystem\s*\(",
      "c-vuln-app/service.c", "system(cmd)"),
+    # --- course-platform-security (course-vuln-app) ---
+    ("catalog-unfiltered",
+     r"res\.json\(db\.courses\)",
+     "course-vuln-app/app.js", "res.json(db.courses)"),
+    ("preview-full-content",
+     r"lessons:\s*course\.content",
+     "course-vuln-app/app.js", "lessons: course.content"),
+    ("self-enrollment",
+     r"userId:\s*req\.body\.userId",
+     "course-vuln-app/app.js", "req.body.userId"),
+    ("cohort-from-query",
+     r"cohortId:\s*req\.query\.cohort_id",
+     "course-vuln-app/app.js", "req.query.cohort_id"),
+    ("admin-no-role",
+     r"app\.post\(\s*['\"]\S*admin",
+     "course-vuln-app/app.js", "app.post('/api/admin/courses'"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -312,6 +328,12 @@ MUST_NOT_MATCH = [
     ("c-strcpy-safe",
      r"\b(strcpy|strcat|gets)\s*\(",
      "c-vuln-app/safe_service.c"),
+    ("catalog-unfiltered-safe",
+     r"res\.json\(db\.courses\)",
+     "course-vuln-app/safe-platform.js"),
+    ("self-enrollment-safe",
+     r"userId:\s*req\.body\.userId",
+     "course-vuln-app/safe-platform.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

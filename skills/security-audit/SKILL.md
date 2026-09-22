@@ -68,6 +68,7 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | Spring/Java project (`pom.xml`/`build.gradle` with spring dependencies) | `../spring-security/SKILL.md` |
 | Login, sessions, tokens, permissions | `../auth-review/SKILL.md` |
 | Stateful business flows (order/payment/invoice, checkout, submit/approve/publish, signup/verify, refunds, provisioning) | `../flow-security/SKILL.md` — load it BEFORE route-level grepping for transactional apps |
+| Course/e-learning platform (courses, lessons, enrollments, cohorts, previews, subscriptions) | `../course-platform-security/SKILL.md` — persona-driven (public/student/admin) |
 | Crypto, hashing, tokens, certs | `../crypto-review/SKILL.md` |
 | HTTP servers, CORS, headers, cookies, CI configs | `../config-hardening/SKILL.md` |
 | Dockerfile / compose / K8s / Terraform | `../container-iac-security/SKILL.md` |

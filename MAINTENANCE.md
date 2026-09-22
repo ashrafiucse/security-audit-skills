@@ -12,6 +12,8 @@ repo effective as new vulnerabilities become public, and for making it
 | OSV.dev | Aggregated CVE/GHSA/PYSA/RUSTSEC/Go advisories — powers the dependency skill live | osv.dev |
 | GitHub Security Advisories | Ecosystem advisories + affected-version ranges | github.com/advisories |
 | NVD 2.0 API | Canonical CVE data, CVSS | nvd.nist.gov/developers/vulnerabilities |
+| Project Zero 0days-in-the-wild tracker | 0-days actually exploited in the wild — severity ceiling (automated below) | github.com/googleprojectzero/0days-in-the-wild |
+| rapid7/metasploit-framework modules | Public exploit availability — weaponization status (automated below) | github.com/rapid7/metasploit-framework |
 | Project Zero / PortSwigger research | New *classes* of bugs → new detection patterns | googleprojectzero.blogspot.com, portswigger.net/daily-swig |
 | Snyk/Palo Alto unit42 blogs | Exploitation trends, patterns worth grepping for | — |
 
@@ -29,7 +31,9 @@ Automation inventory:
 | Workflow | Cadence | Output | Human action |
 |---|---|---|---|
 | `update-kev.yml` | daily 06:00 UTC | deduped KEV triage issue | vuln-db entries for ecosystem items; close infra-only; record every batch in `vuln-db/kev-triage-log.md` |
+| `watch-0days.yml` | weekly Mon 06:30 UTC | in-the-wild 0-day digest issue | entries with repo-detection get vuln-db entries tagged exploited-wild; product-only close live-only + log |
 | `critical-cve-digest.yml` | daily 06:15 UTC | digest issue with drafts | pick items with in-repo detection |
+| `watch-metasploit.yml` | weekly Mon 06:45 UTC | new CVE-backed exploit-module digest | add 'public Metasploit module' to matching entries' Summary (severity ammo); draft entries if repo-detectable |
 | `notify.yml` | on issue opened | @maintainer mention (+optional Slack) | none |
 | `ci.yml` | push / PR | quality gate | keep green |
 

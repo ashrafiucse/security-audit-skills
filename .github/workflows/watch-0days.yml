@@ -1,0 +1,100 @@
+name: Weekly in-the-wild 0-day watch (Project Zero tracker)
+
+# Stateless, same contract as update-kev.yml: opens ONE digest issue per week
+# only when the Project Zero 0days-in-the-wild tracker gains CVE files not yet
+# triaged (no matching vuln-db entry, not in an open 0day-labeled issue).
+# The tracker stores each 0-day as 0day-RCAs/<year>/CVE-YYYY-NNNN.md — we
+# watch commits on that path for newly added files. Never commits.
+
+on:
+  schedule:
+    - cron: "30 6 * * 1" # Mondays 06:30 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  zeroday-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find new, untriaged in-the-wild 0-days
+        id: zday
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SINCE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh api --paginate "repos/googleprojectzero/0days-in-the-wild/commits?path=0day-RCAs&since=$SINCE&per_page=100" \
+            --jq '.[].sha' > /tmp/shas.txt || true
+          python3 - <<'EOF'
+          import json, os, re, subprocess
+
+          triaged = ""
+          for name in os.listdir("skills/cve-research/vuln-db/entries"):
+              triaged += open(os.path.join("skills/cve-research/vuln-db/entries", name),
+                              encoding="utf-8", errors="replace").read()
+          reported = ""
+          try:
+              reported = subprocess.run(
+                  ["gh", "issue", "list", "--label", "0day", "--state", "open",
+                   "--json", "body", "-L", "50"],
+                  capture_output=True, text=True, check=True).stdout
+          except subprocess.CalledProcessError:
+              pass
+
+          rx = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
+          seen, lines = set(), []
+          for sha in open("/tmp/shas.txt").read().split():
+              try:
+                  detail = subprocess.run(
+                      ["gh", "api", f"repos/googleprojectzero/0days-in-the-wild/commits/{sha}"],
+                      capture_output=True, text=True, check=True, timeout=30).stdout
+              except subprocess.CalledProcessError:
+                  continue
+              for f in json.loads(detail).get("files", []):
+                  if f.get("status") not in ("added",):
+                      continue
+                  m = rx.search(f["filename"])
+                  if not m:
+                      continue
+                  cve = m.group(0).upper()
+                  if cve in seen or cve in triaged or cve in reported:
+                      continue
+                  seen.add(cve)
+                  lines.append(f"{cve} | {f['filename']}")
+
+          open("/tmp/new.txt", "w").write("\n".join(sorted(lines)))
+          open("/tmp/count.txt", "w").write(str(len(lines)))
+          EOF
+          echo "new=$(cat /tmp/count.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Open triage issue for new entries
+        if: steps.zday.outputs.new != '' && steps.zday.outputs.new != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_COUNT: ${{ steps.zday.outputs.new }}
+        run: |
+          {
+            echo "👀 cc @ashrafiucse — weekly in-the-wild 0-day digest ($NEW_COUNT new)."
+            echo "(bot-created issues don't trigger workflows — this mention IS the notification)"
+            echo
+            echo "Project Zero 0days-in-the-wild tracker additions not yet in vuln-db: $NEW_COUNT"
+            echo "These are 0-days EXPLOITED IN THE WILD — highest severity ammunition."
+            echo
+            echo '```'
+            cat /tmp/new.txt
+            echo '```'
+            echo
+            echo "Triage per MAINTENANCE.md: entries with in-repo detection (version pin,"
+            echo "config, manifest) become vuln-db entries tagged kev/exploited-wild."
+            echo "Product-only entries close as live-only; log the batch in"
+            echo "\`skills/cve-research/vuln-db/kev-triage-log.md\`."
+          } > /tmp/issue-body.md
+          gh label create 0day 2>/dev/null || true
+          gh label create triage 2>/dev/null || true
+          gh issue create \
+            --title "0-day watch: $NEW_COUNT in-the-wild entries to triage" \
+            --body-file /tmp/issue-body.md \
+            --label 0day --label triage
