@@ -77,6 +77,7 @@ Find object access points, then check each for an ownership/scope test:
 rg -n "req\.params\.id|findById\(|get\(|\.filter\(.*userId|user\.id|currentUser|req\.user"
 ```
 - `Model.findById(req.params.id)` returned directly with no `where userId` / post-fetch ownership check → **IDOR**, HIGH (CRITICAL for sensitive objects: invoices, messages, PII)
+- **Association (chained) IDOR** — downstream handlers fetch by a related id (`?order_id=`, `payment_id`) without verifying ownership THROUGH the join: each endpoint guards its own object, the chain leaks. Systematic method in `../flow-security/SKILL.md` (class F3) — audit flows, not just routes |
 - Admin routes: how are they guarded? Missing middleware → CRITICAL. Note *function-level* checks too (regular user hitting `/admin/*` handlers).
 - Horizontal vs vertical: test reasoning for both — same-role users touching each other's data, and low-role → admin.
 - Trusting client-side hints: `is_admin` from request body/cookie-in-JWT-without-verify, hidden-but-served admin UI → HIGH

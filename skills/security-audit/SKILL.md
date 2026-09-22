@@ -67,6 +67,7 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | Rails project (`Gemfile` with rails, `app/controllers`) | `../rails-security/SKILL.md` |
 | Spring/Java project (`pom.xml`/`build.gradle` with spring dependencies) | `../spring-security/SKILL.md` |
 | Login, sessions, tokens, permissions | `../auth-review/SKILL.md` |
+| Stateful business flows (order/payment/invoice, checkout, submit/approve/publish, signup/verify, refunds, provisioning) | `../flow-security/SKILL.md` — load it BEFORE route-level grepping for transactional apps |
 | Crypto, hashing, tokens, certs | `../crypto-review/SKILL.md` |
 | HTTP servers, CORS, headers, cookies, CI configs | `../config-hardening/SKILL.md` |
 | Dockerfile / compose / K8s / Terraform | `../container-iac-security/SKILL.md` |
@@ -125,6 +126,8 @@ Individual severities understate real risk — pentest-grade reports show how fi
 | Enumeration → stuffing | user enumeration + no rate limit + weak policy | Mass compromise |
 | CI → supply chain | PR-title injection / pull_request_target + secrets | Repo/package takeover |
 | IDOR → privesc | IDOR + mass assignment (role/isAdmin) | Admin access |
+| Flow-state confusion | unguarded transition (F1/F5) + terminal artifact (invoice/refund/credit) | Money theft, cross-user invoicing |
+| Webhook spoof → paid | unverified callback (F8) + status write | Free goods/services |
 | TLS-off + spoof | verify=False + trusted-header authz on internal hop | Auth bypass |
 | Log forging → cover | CWE-117 + audit-gap findings | Undetectable attacks |
 

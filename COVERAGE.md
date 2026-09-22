@@ -18,7 +18,7 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Data exposure / logging | strong | A09 pack: audit events, log forging, verbosity; alerting-config checks (in-repo evidence first, "not assessed" fallback) |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | LLM / AI apps | good | `llm-security`: prompt injection/exfil, model deserialization, LLM keys, agent tools, telemetry; measured by `llm-vuln-app` fixture |
-| Insecure design (A04) | good | grep-anchored checklist (replay/idempotency, client-controlled money/scope, negative values, step-skipping) in `security-audit/references/owasp-top10.md`; judgment still required |
+| Insecure design (A04) | good | grep-anchored checklist + `flow-security` skill for flow-wise analysis (F1–F8 classes, flow-vuln-app fixture) |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |
 | Django/Python | good | `django-security`: raw()/extra(), mark_safe, `__all__` mass assignment, settings |

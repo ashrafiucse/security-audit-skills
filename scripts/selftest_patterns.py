@@ -169,6 +169,19 @@ RULES = [
     ("android-exported-activity",
      r"<activity[^>]*android:exported=\"true\"",
      "mobile-vuln-app/AndroidManifest.xml", 'AdminActivity'),
+    # --- flow-security (flow-vuln-app) ---
+    ("flow-client-total",
+     r"req\.(body|query)\.(total|amount|price)",
+     "flow-vuln-app/app.js", "req.body.total"),
+    ("flow-order-id-fetch",
+     r"req\.(body|query)\.order_id",
+     "flow-vuln-app/app.js", "req.body.order_id"),
+    ("flow-post-boundary-put",
+     r"app\.put\(\s*['\"]\S*orders",
+     "flow-vuln-app/app.js", "app.put('/orders/:id'"),
+    ("flow-float-money",
+     r"price\s*\*",
+     "flow-vuln-app/app.js", "i.price * i.qty"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -227,6 +240,12 @@ MUST_NOT_MATCH = [
     ("crypto-ecb-tls-off-safe",
      r"MODE_ECB|verify\s*=\s*False",
      "crypto-vuln-app/safe_app.py"),
+    ("flow-client-total-safe",
+     r"req\.(body|query)\.(total|amount|price)",
+     "flow-vuln-app/safe-flow.js"),
+    ("flow-unguarded-assign-safe",
+     r"Object\.assign\(order,\s*req\.body\)",
+     "flow-vuln-app/safe-flow.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

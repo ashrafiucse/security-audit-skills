@@ -27,3 +27,4 @@ column.
 | 2026-09-22 | graphql-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round (post ground-truth fixes) |
 | 2026-09-22 | mobile-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round (post ground-truth fixes) |
 | 2026-09-22 | rails-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round — BLIND-EVAL COMPROMISED (rg scan printed 3 ground-truth lines into tool output; findings re-verified independently) |
+| 2026-09-22 | flow-vuln-app | 100.00% | 100.00% | 0 | 10/10 | e2e flow-security round (new skill first run; blind hygiene honored) |
