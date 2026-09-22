@@ -55,6 +55,9 @@ jobs:
           grep -q 'npm:lodash' <<<"$out"
           grep -q 'fixed in' <<<"$out"
 
+      - name: Workflow YAML validity
+        run: python3 -c "import yaml, glob; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]; print('workflows OK')"
+
       - name: Detection-pattern self-test (planted lines must match)
         run: python3 scripts/selftest_patterns.py
 
