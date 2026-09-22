@@ -69,6 +69,18 @@ user reports a miss or a FALSE POSITIVE (issue templates)
    → PR merged → version tag → MISSES.md row closed
 ```
 
+### 3.1 Proactive real-world intake (misses are reactive — feed the loop before it's bitten)
+
+The loop above fires when something was MISSED. Recall maximization also needs
+proactive intake of real-world scenarios. Sources and the conversion decision
+live in `skills/cve-research/references/real-world-sources.md`; the automated
+feeds (KEV, NVD digest, 0-days, Metasploit, community semgrep rules) open
+labeled triage issues on schedule. Per scenario, decide: covered → close;
+repo-detectable → pattern (2-file micro-fixture test) + plant + safe
+counterpart + selftest rule + ledger row; runtime-only → notable-incidents.
+Weekly cadence, ~20 min manual sweep + triage queue. Every conversion still
+passes the precision gate — recall without precision is noise.
+
 Two decay modes to guard against:
 1. **False positives creep** — every new pattern slightly noisier. Eval precision ≥ 80% is the gate.
 2. **Stale knowledge** — entries older than 18 months with no detection signal get pruned; the live OSV/KEV lookups are the always-fresh layer, the vuln-db is the *curation* layer.

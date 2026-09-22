@@ -1,0 +1,109 @@
+name: Weekly community detection-rule watch (semgrep registry)
+
+# Stateless: lists rule files ADDED or MODIFIED under rules/ in semgrep/semgrep-rules
+# in the last 7 days, grouped by language, deduped against open semgrep-labeled
+# issues. Opens ONE digest issue. Community detection rules are real-world
+# scenarios WITH detection logic attached — each new rule is a candidate
+# conversion into a skill pattern + fixture (MAINTENANCE.md §3.1).
+# Shape guard: if the repo renames rules/ the contents call fails LOUDLY.
+# First scheduled/dispatch run doubles as the shape smoke test.
+# Never commits.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Mondays 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  semgrep-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find new/changed community rules
+        id: rules
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SINCE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          # guard: fail loudly if the rules path was renamed
+          gh api "repos/semgrep/semgrep-rules/contents/rules" --jq 'length' >/dev/null
+          gh api --paginate "repos/semgrep/semgrep-rules/commits?path=rules%2F&since=$SINCE&per_page=100" \
+            --jq '.[].sha' > /tmp/shas.txt || true
+          python3 - <<'EOF'
+          import json, os, subprocess
+
+          reported = ""
+          try:
+              reported = subprocess.run(
+                  ["gh", "issue", "list", "--label", "semgrep", "--state", "open",
+                   "--json", "body", "-L", "50"],
+                  capture_output=True, text=True, check=True).stdout
+          except subprocess.CalledProcessError:
+              pass
+
+          seen, by_lang = set(), {}
+          for sha in open("/tmp/shas.txt").read().split():
+              try:
+                  detail = subprocess.run(
+                      ["gh", "api", f"repos/semgrep/semgrep-rules/commits/{sha}"],
+                      capture_output=True, text=True, check=True, timeout=30).stdout
+              except subprocess.CalledProcessError:
+                  continue
+              for f in json.loads(detail).get("files", []):
+                  fn = f.get("filename", "")
+                  if (f.get("status") not in ("added", "modified")
+                          or not fn.startswith("rules/")
+                          or not fn.endswith(".yaml")
+                          or "/tests/" in fn):
+                      continue
+                  if fn in seen or fn in reported:
+                      continue
+                  seen.add(fn)
+                  lang = fn.split("/")[1] if fn.count("/") >= 2 else "other"
+                  by_lang.setdefault(lang, []).append(fn.split("/")[-1])
+
+          lines = [f"### {lang} ({len(files)})" for lang, files in
+                   sorted(by_lang.items(), key=lambda kv: -len(kv[1]))
+                   for files in [kv[1]]]
+          body = []
+          for lang in sorted(by_lang, key=lambda k: -len(by_lang[k])):
+              body.append(f"### {lang} ({len(by_lang[lang])})")
+              body.extend(f"- {n}" for n in sorted(by_lang[lang]))
+              body.append("")
+          open("/tmp/new.txt", "w").write("\n".join(body))
+          open("/tmp/count.txt", "w").write(str(len(seen)))
+          EOF
+          echo "new=$(cat /tmp/count.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Open digest issue for new/changed rules
+        if: steps.rules.outputs.new != '' && steps.rules.outputs.new != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_COUNT: ${{ steps.rules.outputs.new }}
+        run: |
+          {
+            echo "👀 cc @ashrafiucse — weekly community-rule digest ($NEW_COUNT changed)."
+            echo "(bot-created issues don't trigger workflows — this mention IS the notification)"
+            echo
+            echo "New/modified community detection rules in semgrep/semgrep-rules: $NEW_COUNT"
+            echo
+            cat /tmp/new.txt
+            echo
+            echo "Triage per MAINTENANCE.md §3.1 (real-world intake): for each rule that maps"
+            echo "to a stack the skills cover — open the rule, read its pattern + message,"
+            echo "and decide: (a) skill already detects it → note as covered, close;"
+            echo "(b) novel scenario → convert: pattern (tested on a 2-file micro-fixture)"
+            echo "+ fixture plant + safe counterpart + selftest rule + MISSES row;"
+            echo "(c) product-only/not repo-detectable → close as live-only."
+            echo "Batch-close the rest with a one-line triage log."
+          } > /tmp/issue-body.md
+          gh label create semgrep 2>/dev/null || true
+          gh label create triage 2>/dev/null || true
+          gh issue create \
+            --title "Community-rule watch: $NEW_COUNT new/changed detection rules" \
+            --body-file /tmp/issue-body.md \
+            --label semgrep --label triage

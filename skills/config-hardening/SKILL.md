@@ -26,7 +26,7 @@ rg -n -i "content-security-policy|script-src|default-src" -g '*.conf' -g '*.yml'
   - **Cookie prefixes** absent on auth/session cookies (`__Host-`/`__Secure-` prefixed names pin Secure + no subdomain shadowing) → MEDIUM: `__Host-session` not `session`
   - **SRI**: third-party `<script src="https://...">` without `integrity=` → MEDIUM (script supply-chain injection); same-origin scripts exempt
 ```bash
-rg -n "script[^>]+src=["']https?://" -g '*.html' -g '*.ejs' -g '*.php' | rg -v integrity | head
+rg -n "script[^>]+src=["']https?://" -g '*.html' -g '*.ejs' -g '*.php' | rg -v integrity   # census: every SRI-less script dispositioned
 ```
   - `Referrer-Policy`, `Permissions-Policy` → LOW
 - **TLS**: `ssl_protocols` still includes TLSv1/TLSv1.1 → HIGH; self-signed or expired certs referenced → HIGH; HTTP→HTTPS redirect missing → MEDIUM

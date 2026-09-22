@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const db = { courses: [], cohorts: [], enrollments: [], orders: [] };
+const db = { courses: [], cohorts: [], enrollments: [], orders: [], reviews: [] };
 
 function requireAuth(req, res, next) {
   if (!req.headers.authorization) return res.status(401).end();
@@ -50,4 +50,14 @@ app.get('/api/courses/:id/materials', requireAuth, (req, res) => {
 app.post('/api/admin/courses', requireAuth, requireAdmin, (req, res) => {
   db.courses.push({ ...req.body, status: 'draft' });
   res.status(201).end();
+});
+
+// SAFE (vs SEC-06): moderation detail escapes the student body before render
+const escapeHtml = (s) =>
+  String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+app.get('/api/admin/reviews/:id', requireAuth, requireAdmin, (req, res) => {
+  const r = db.reviews.find((x) => x.id === req.params.id);
+  if (!r) return res.status(404).end();
+  res.set('Content-Type', 'text/html');
+  res.send(`<div class="mod-review">${escapeHtml(r.body)}</div>`);
 });

@@ -29,7 +29,8 @@ BARE_TOKEN = re.compile(r"(?<![\w:./-])(\d+)(?:-(\d+))?(?![\w.])")
 # a file mentioned WITHOUT a line — how agents cite global/absence findings
 FILE_MENTION = re.compile(rf"(?<![\w./-])({FILE_RE})(?![\w.:])")
 ROW_RE = re.compile(r"^\|\s*\w[\w.a-z]*\s*\|.*\|.*\|", re.I)  # 3+ col table row
-SEC_RE = re.compile(r"^###\s+(SEC-\d+)", re.I)
+SEV_RE = re.compile(r"\b(critical|high|medium|low)\b", re.I)
+SEC_RE = re.compile(r"^###\s+((?:SEC|T)-\d+)", re.I)
 
 
 def scan_tokens(text):
@@ -80,21 +81,26 @@ def parse_expected(fixture_dir: Path):
             continue
         tokens = scan_tokens(line)
         if tokens:
-            rows.append((line.strip()[:110], tokens))
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            m = SEV_RE.search(cells[-1]) if cells else None
+            sev = m.group(1).lower() if m else None
+            rows.append((line.strip()[:110], tokens, sev))
     return rows
 
 
 def parse_report(report_path: Path):
-    """{SEC-id: (tokens, bare_files)} per findings section."""
-    sections, current = {}, None
+    """{SEC-id: (tokens, bare_files, severity)} per findings section."""
+    sections, sevs, current = {}, {}, None
     for line in report_path.read_text(encoding="utf-8").splitlines():
         m = SEC_RE.match(line)
         if m:
             current = m.group(1).upper()
             sections[current] = []
+            sm = SEV_RE.search(line)
+            sevs[current] = sm.group(1).lower() if sm else None
         elif current:
             sections[current].append(line)
-    return {sec: (scan_tokens("\n".join(ls)), scan_bare_files("\n".join(ls)))
+    return {sec: (scan_tokens("\n".join(ls)), scan_bare_files("\n".join(ls)), sevs[sec])
             for sec, ls in sections.items()}
 
 
@@ -124,29 +130,43 @@ def main():
                     help="append the round row to evals/SCOREBOARD.md (or given path)")
     ap.add_argument("--label", default="manual round",
                     help="change trigger / PR ref recorded with the row")
+    ap.add_argument("--check-severity", action="store_true",
+                    help="compare report section severities against ground truth; "
+                         "mismatches are printed and fail the round")
     args = ap.parse_args()
 
     expected = parse_expected(Path(args.fixture_dir))
     report = parse_report(Path(args.report))
-    all_report_toks = [t for toks, _ in report.values() for t in toks]
+    all_report_toks = [t for toks, _, _ in report.values() for t in toks]
 
-    matched, missed = 0, []
-    all_bare = set().union(*(bare for _, bare in report.values())) if report else set()
-    for label, toks in expected:
+    matched, missed, sev_mismatch = 0, [], []
+    all_bare = set().union(*(bare for _, bare, _ in report.values())) if report else set()
+    for label, toks, esev in expected:
         hit = any(token_matches(t, all_report_toks) for t in toks)
         if not hit:
             # file-level rows are satisfied by ANY bare-file citation of that basename
             hit = any(lo == 0 and basename(f) in all_bare for f, lo, _ in toks)
         if hit:
             matched += 1
+            if args.check_severity and esev:
+                backing = [s for s, (rt, _, rsev) in report.items()
+                           if rsev and rsev != esev
+                           and any(token_matches(t, rt) for t in toks)]
+                if backing:  # every backing section rates it differently
+                    agreeing = [s for s, (rt, _, rsev) in report.items()
+                                if rsev == esev and any(token_matches(t, rt) for t in toks)]
+                    if not agreeing:
+                        sev_mismatch.append(
+                            f"{label[:90]} :: expected {esev}, report says "
+                            + ", ".join(f"{s}={report[s][2]}" for s in backing))
         else:
             missed.append(label)
 
     supported, phantoms = 0, []
-    file_level_basenames = {basename(f) for _, etoks in expected
+    file_level_basenames = {basename(f) for _, etoks, _ in expected
                             for f, lo, _ in etoks if lo == 0}
-    for sec, (toks, bare) in report.items():
-        ok = any(token_matches(t, toks) for _, etoks in expected for t in etoks)
+    for sec, (toks, bare, _) in report.items():
+        ok = any(token_matches(t, toks) for _, etoks, _ in expected for t in etoks)
         if not ok:
             # file-level support: a bare-file citation backs a `file:-` row of
             # the same basename (global/absence findings, e.g. "no lockfile")
@@ -165,9 +185,14 @@ def main():
     print(f"phantoms={len(phantoms)} {phantoms}")
     for m in missed:
         print(f"  missed: {m}")
+    if args.check_severity:
+        print(f"severity mismatches={len(sev_mismatch)}")
+        for s in sev_mismatch:
+            print(f"  sev: {s}")
 
     ok = (recall >= args.min_recall and precision >= args.min_precision
-          and len(phantoms) <= args.max_phantoms)
+          and len(phantoms) <= args.max_phantoms
+          and (not args.check_severity or not sev_mismatch))
     print("RESULT: PASS" if ok else "RESULT: FAIL (thresholds not met)")
 
     if args.append:

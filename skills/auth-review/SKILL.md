@@ -100,8 +100,8 @@ Using `X-User-Id` / `X-Email` / `X-Admin` / `X-Forwarded-For` as the **identity 
 
 Per-object IDOR checks miss the systematic version: in a multi-tenant app, EVERY data access must carry the tenant filter — one query without it leaks a whole tenant's data to another tenant's users (often via list/export/report endpoints that feel "shared").
 ```bash
-rg -n "tenant|org_?id|account_?id|customer_?id|workspace" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*.rb' -g '*.php' | head -15   # is there a tenant model at all?
-rg -n "\.(find|where|filter|all|select|query|get)(All)?\(" -g '*.js' -g '*.py' | rg -v "tenant|org_|account_|customer_|user" | head -15   # unscoped reads
+rg -n "tenant|org_?id|account_?id|customer_?id|workspace" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*.rb' -g '*.php'   # tenant model census — size it (wc -l), then read
+rg -n "\.(find|where|filter|all|select|query|get)(All)?\(" -g '*.js' -g '*.py' | rg -v "tenant|org_|account_|customer_|user"   # unscoped reads — census: disposition EVERY line
 ```
 Method: list every model access, mark each SCOPED (tenant filter present) / UNSCOPED / GLOBAL-BY-DESIGN (shared catalog). Every UNSCOPED access to tenant-owned data → **Critical**. Stronger defenses to note when present: DB-level row-level security (RLS), ORM global scopes (Laravel global scope, Django manager), middleware-injected tenant context that queries MUST use. Also check: tenant taken from request body/header instead of session (`req.body.tenantId` — attacker-controlled scope switch → cross-tenant, Critical), and cache keys missing the tenant prefix (cross-tenant cache bleed).
 ### Check-then-act races (TOCTOU)
@@ -141,7 +141,21 @@ rg -n -i "x-api-key|api[_-]?key" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*
 - Token in URL fragment vs query (query leaks via logs/referrers) → MEDIUM
 - `id_token` validated: signature, `nonce`, `aud` → skipping any = CRITICAL
 
-## 6 — Realtime channels (WebSocket / SSE)
+## 6 — SAML (if present)
+
+```bash
+rg -n -i "saml|assertion|NameID|acs[ _-]?url|AudienceRecipient|samlp" -g '*.py' -g '*.java' -g '*.rb' -g '*.php' -g '*.js' -g '*.xml' | head -15
+```
+
+The four classic SAML bugs, in observed frequency order:
+- **Signature wrapping (SWA/XSW)**: the response's Signature element covers one assertion but the app reads a DIFFERENT one (attacker-injected). Defense: validate the signature over the exact node you consume (`response.get_assertion().validate_signature? no — one_assertion_only + signature-verified read`). Grep for `one_assertion_only` / `want_assertions_signed` settings — absent → HIGH/Critical.
+- **Comment injection in NameID**: `admin@corp.com<!--atk-->@evil.com` parses as admin@corp.com to the IdP-signed value but the SP extracts differently — mitigated by library versions and `NameID` format checks; flag any custom NameID string handling → HIGH.
+- **Unvalidated recipients**: `Destination`/`AudienceRestriction`/ACS URL not enforced (or ACS taken from the assertion!) → assertion replay across SPs. Config keys: `expected_audience`, `acs_url` pinned server-side → absent → Critical.
+- **Loose validation knobs**: `want_response_signed=False` + `want_assertions_signed=False`, clock skew ±24h (`not_before`/`not_on_or_after` neutered), `allow_unsolicited` in prod → each HIGH.
+
+Safe shapes: pinned ACS + audience, both signed flags true, one-assertion-only, tight skew (≤5m), library current (python3-saml / OneLogin / passport-saml families each had historic CVEs — version-check via vuln-db/OSV).
+
+## 7 — Realtime channels (WebSocket / SSE)
 
 ```bash
 rg -n "io\.on\(|socket\.on\(|new WebSocket|WebSocketServer|@MessageMapping|@SubscribeMapping|STOMP|EventSource|ActionCable|cable\.|channel\.subscribe"

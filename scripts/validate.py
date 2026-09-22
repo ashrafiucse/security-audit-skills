@@ -89,6 +89,24 @@ def check_skills():
                 warnings.append(f"{skill.name}: mentions scripts/{script} but file not found")
 
 
+def check_fixture_guards():
+    """Warn when a fixture has expected-findings.md but zero selftest rules
+    referencing it (pattern-rot exposure). Exempt: judgment-based fixtures
+    and fixtures covered by explicit CI assertions."""
+    st = (ROOT / "scripts" / "selftest_patterns.py").read_text(encoding="utf-8")
+    exempt = {"design-threat-review-vuln-app": "judgment-based (LEARNINGS)",
+              "dep-manifests": "CI-covered (osv parser step in ci.yml)"}
+    fixtures = ROOT / "evals" / "fixtures"
+    for d in sorted(p for p in fixtures.iterdir() if p.is_dir()):
+        if not (d / "expected-findings.md").exists():
+            continue
+        if d.name in exempt:
+            continue
+        if f'"{d.name}/' not in st:
+            warnings.append(f"fixture {d.name}: no selftest rule references it "
+                            "(add a match rule for its primary sink)")
+
+
 def check_entries():
     ids = {}
     for entry in sorted(ENTRIES.glob("*.md")):
@@ -119,6 +137,7 @@ def check_entries():
 def main():
     check_skills()
     check_entries()
+    check_fixture_guards()
     for w in warnings:
         print(f"  warn:  {w}")
     for e in errors:

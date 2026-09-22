@@ -1,0 +1,4 @@
+<%# Fixture: staff moderation view — student review body. %>
+<%# SEC-12: raw on student-authored body rendered in the staff origin %>
+<%# (privilege direction: unprivileged -> privileged = Critical). %>
+<blockquote><%= raw @review.body %></blockquote>

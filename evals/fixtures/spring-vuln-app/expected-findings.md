@@ -12,8 +12,10 @@
 | 8 | XSS via `th:utext` | user.html:4 | High |
 | 9 | EOL Spring Boot 2.2.5 + Spring 5.2.x (Spring4Shell-range via vuln-db) | pom.xml:9 | High |
 | 10 | Security config likely inert — `WebSecurityConfigurerAdapter` subclass without `@Configuration`/`@EnableWebSecurity` annotation (defaults apply, chain may not register) | SecurityConfig.java:7 | High |
+| 11 | Moderation-view XSS — `th:utext` on student review body in the staff view (privilege direction: unprivileged→privileged = Critical) | src/main/resources/templates/reviews/moderation.html:5 | Critical |
 
 ## Must NOT trigger
 
 - `th:text` (escaped counterpart)
+- `th:text="${review.body}"` in src/main/resources/templates/reviews/safe-moderation.html:4 (escaped moderation counterpart)
 - `new UserController(EntityManager)` constructor injection (good practice)

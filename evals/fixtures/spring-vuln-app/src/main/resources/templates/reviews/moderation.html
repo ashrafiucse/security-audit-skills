@@ -1,0 +1,6 @@
+<!-- Fixture: staff moderation view — student-submitted review body. -->
+<!-- SEC-11: th:utext on student-authored body in the staff origin -->
+<!-- (privilege direction: unprivileged -> privileged = Critical). -->
+<div class="mod-queue">
+  <p th:utext="${review.body}">body</p>
+</div>

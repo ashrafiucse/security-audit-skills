@@ -17,6 +17,7 @@ const db = {
   ],
   enrollments: [{ id: 'e1', userId: 'u1', courseId: 'c1', cohortId: 'ch1' }],
   orders: [],
+  reviews: [],
 };
 
 function requireAuth(req, res, next) {
@@ -63,6 +64,26 @@ app.post('/api/admin/courses', (req, res) => {
   const course = { id: 'c' + (db.courses.length + 1), ...req.body, status: 'published', visibility: 'public' };
   db.courses.push(course);
   res.status(201).json(course);
+});
+
+// ---------- MODERATION queue (student writes, admin reads — §6.5) ----------
+app.post('/api/courses/:id/reviews', requireAuth, (req, res) => {
+  // write path of SEC-06: length check only — raw HTML persists as-is
+  if (typeof req.body.body !== 'string' || req.body.body.length < 10) {
+    return res.status(422).end();
+  }
+  db.reviews.push({ id: 'r' + (db.reviews.length + 1), courseId: req.params.id, userId: req.user.id, body: req.body.body, status: 'pending' });
+  res.status(201).end();
+});
+
+app.get('/api/admin/reviews/:id', (req, res) => {
+  const r = db.reviews.find((x) => x.id === req.params.id);
+  if (!r) return res.status(404).end();
+  // SEC-06: staff DETAIL view renders student HTML unescaped into the admin
+  // origin — student→admin XSS => staff session riding / account takeover.
+  // 'pending' moderation guarantees a privileged viewer opens it.
+  res.set('Content-Type', 'text/html');
+  res.send(`<div class="mod-review">${r.body}</div>`);
 });
 
 app.listen(3000);

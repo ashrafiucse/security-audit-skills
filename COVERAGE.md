@@ -8,21 +8,23 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 
 | Domain | Coverage | Notes |
 |---|---|---|
-| Secrets detection | strong | regex set + triage; grows with provider patterns |
+| Secrets detection | strong | regex set + triage; + **dev-artifact leak surface (Postman/Insomnia, .vscode/.idea, .http, devcontainer, swagger examples)**; grows with provider patterns |
 | Dependency CVEs | strong (live) | OSV API; + reachability analysis (present→used→dormant), Step 2.5 supply-chain hygiene, Step 2.7 beyond-CVEs (discontinued/compromised-history/dangerous-usage/vendored packs); measured by `supply-chain-vuln` + `dep-risk-vuln-app` fixtures |
 | Injection (SQLi/XSS/cmd/path/SSTI/deser) | strong | Node/Python/Java/Ruby/PHP/Go packs + **C/C++ native (format strings, strcpy, system, overflow-to-alloc, TOCTOU)**; XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, upload abuse, second-order flows, builder raw, multi-line |
-| Auth/authz | strong | sessions, JWT (confusion/kid/PKCE), OAuth, IDOR; + route census (HTTP + gRPC/MQ/scheduled), mass assignment, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
+| Auth/authz | strong | sessions, JWT (confusion/kid/PKCE), OAuth, **SAML (SWA/XSW, comment injection, recipients, loose knobs)**, IDOR; + route census (HTTP + gRPC/MQ/scheduled), mass assignment, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | Crypto | strong | usage-context judgment table; measured end-to-end by `crypto-vuln-app` fixture (ECB/DES/MD5/non-CSPRNG/TLS-off/weak-KDF + safe forms) |
 | Config/headers/CORS/CI | strong | + postMessage/client-side handlers, weak-CSP/cookie-prefix/SRI review, CRLF, API4/API10 (`web-hardening-vuln` fixture) | |
-| Containers & IaC | strong | Docker/compose/K8s/Terraform; + **AWS IAM escalation-path pack (PassRole+compute, broken trust, ExternalId)**, egress/NetworkPolicy + IMDSv2; fixtures: infra-vuln, iac-vuln-app |
+| Containers & IaC | strong | Docker/compose/K8s (incl. **RBAC escalation verbs**) /Terraform; + **serverless/FaaS**; AWS IAM escalation-path pack; egress/NetworkPolicy + IMDSv2; fixtures: infra-vuln, iac-vuln-app, surface-vuln-app |
 | Data exposure / logging | strong | A09 pack: audit events, log forging, verbosity; alerting-config checks (in-repo evidence first, "not assessed" fallback) |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | LLM / AI apps | good | `llm-security`: prompt injection/exfil, model deserialization, LLM keys, agent tools, telemetry; measured by `llm-vuln-app` fixture |
-| Course/e-learning platforms | good | `course-platform-security`: gating truth, preview leaks, enrollment state machine, cohort scoping — persona-driven (public/student/admin); fixture `course-vuln-app` |
+| Course/e-learning platforms | good | `course-platform-security`: gating truth, preview leaks, enrollment state machine, cohort scoping, moderation-queue student→admin XSS — persona-driven (public/student/admin); fixture `course-vuln-app` |
 | Skill authoring | — | `skill-forge`: scaffold + authoring laws + blind-test protocol for building NEW custom skills without external dependencies |
 | Insecure design (A04) | good | grep-anchored checklist + `flow-security` skill for flow-wise analysis (F1–F8 classes, flow-vuln-app fixture) |
+| **Design-phase threat modeling (pre-code)** | good | `design-threat-review`: spec in → THREAT-MODEL.md out (actor×asset matrix, trust boundaries, STRIDE→detector mapping, audit contract); fixture `design-threat-review-vuln-app`; audit-time consumption via security-audit Phase 0 THREAT-MODEL.md hook |
+| **Audit completeness enforcement** | good | security-audit Completeness gate v2 (actor×surface matrix, every cell ✅/🟢/⬜ dispositioned, NOT-ASSESSED listed by name) + census receipts (`hits=N dispositioned=N`) + enumeration discipline; incremental PR/diff audit mode (`pr_diff_scope.sh`) for early-stage delta audits |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
-| Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |
+| Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade raw-output census (glob + disposition + privilege-direction triage), CSRF except; fixture `laravel-vuln-app` |
 | Django/Python | good | `django-security`: raw()/extra(), mark_safe, `__all__` mass assignment, settings |
 | Rails/Ruby | good | `rails-security`: interpolated where, permit!, CSRF skips, secret_key_base |
 | Spring/Java | good | `spring-security`: JPQL/MyBatis `${}`, th:utext, actuator, SecurityConfig |
