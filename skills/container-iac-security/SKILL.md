@@ -65,4 +65,6 @@ rg -n -i "hardcoded|access_key|secret_key|aws_secret" -g '*.tf'
 
 ## Reporting
 
+**Optional bridge:** if `checkov`/`kube-linter`/`tfsec` is installed (probe: `../security-audit/scripts/probe_tools.sh`), run it and map its findings onto the categories above — tools catch rule-library items greps miss (e.g. new CIS checks); you add the context triage they can't.
+
 Group by layer (image → runtime → cluster → cloud). For each finding: the exact resource + file:line, blast radius sentence, and the hardened config snippet (e.g. the corrected `securityContext` block). Cross-reference CRITICAL secrets findings with `../secrets-detection/SKILL.md`.

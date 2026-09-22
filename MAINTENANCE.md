@@ -54,10 +54,11 @@ the ruleset to *disabled* (Settings → Rules → Rulesets), do the change, rest
 
 ```
 user reports a miss (issue)
+   → maintainer LOGS it in evals/MISSES.md the same session (open row — no miss untracked)
    → maintainer writes a fixture reproducing it (evals/)
    → adds/updates detection guidance (references/ or vuln-db/)
    → re-runs eval round (all fixtures must still pass)
-   → PR merged → version tag
+   → PR merged → version tag → MISSES.md row closed
 ```
 
 Two decay modes to guard against:

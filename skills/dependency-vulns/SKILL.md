@@ -60,4 +60,5 @@ For each finding give: `package@installed_version`, advisory ID + CVE aliases, s
 
 - If there's no network, skip Step 1, do Steps 2–3, and say so in the report.
 - If OSV returns errors for one ecosystem, continue with the others — don't abort the whole scan.
+- **Optional bridge:** if `osv-scanner`/`npm audit`/`pip-audit` is installed (probe: `../security-audit/scripts/probe_tools.sh`), run it and merge results with the OSV API output — dedupe on `package@version` + advisory ID.
 - Language-version vulnerabilities (e.g. outdated Python/OpenSSL) are out of scope here; note runtime versions in the report's Stack section if obviously EOL.

@@ -17,11 +17,11 @@ Give it any project (any language, any stack) and it will:
 
 | Skill | Purpose |
 |---|---|
-| `security-audit` | Master orchestrator: full-project audit workflow + report format |
+| `security-audit` | Master orchestrator: full-project audit workflow + report format + optional tool bridges (gitleaks/semgrep/checkov… when installed) |
 | `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
 | `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) |
-| `injection-flaws` | SQLi, command injection, XSS, path traversal, SSRF, deserialization, SSTI |
-| `auth-review` | Authn/authz, password storage, sessions, JWT, OAuth, IDOR, CSRF |
+| `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF, deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads, query-builder raw sinks |
+| `auth-review` | Authn/authz, route census for unguarded endpoints, password storage, sessions, JWT, OAuth, IDOR, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
 | `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
@@ -93,7 +93,7 @@ This repo is designed to be updated as new vulnerabilities go public. See [MAINT
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Every accepted detection pattern must ship with a test fixture in `evals/` so quality only goes up. Current gaps and roadmap: [COVERAGE.md](COVERAGE.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Every accepted detection pattern must ship with a test fixture in `evals/` so quality only goes up. Misses (user-reported or benchmark-found) are tracked in [evals/MISSES.md](evals/MISSES.md) until converted to pattern + fixture. Current gaps and roadmap: [COVERAGE.md](COVERAGE.md).
 
 ## License
 

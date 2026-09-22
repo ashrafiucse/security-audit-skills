@@ -64,6 +64,23 @@ Scan hygiene:
 - Prioritize: auth code > input handlers > data access > config > everything else
 - For repos > ~2k files, scan by category (auth files first, then routes/controllers, then DB layers) rather than exhaustively
 
+## Phase 1.5 — Optional tool bridges (skip silently if absent)
+
+```bash
+bash ../security-audit/scripts/probe_tools.sh .
+```
+
+If a scanner is installed, run its probe line (all read-only) and ingest the results alongside manual scans:
+
+| Tool | Catches that greps miss | Ingestion rule |
+|---|---|---|
+| gitleaks / trufflehog | secrets in **full git history** (deleted-then-rotated keys are invisible to worktree regex) | report as `../secrets-detection/SKILL.md` findings; verify before CRITICAL |
+| semgrep | cross-file taint flows, language-semantic sinks | treat hits as leads — re-verify `file:line` and source→sink yourself; drop tool-only findings that fail context triage |
+| osv-scanner / npm audit / pip-audit | offline dep CVEs | merge + dedupe with the OSV API results from `../dependency-vulns/SKILL.md` |
+| checkov / kube-linter / tfsec | IaC misconfigs beyond the grep set | map to `../container-iac-security/SKILL.md` categories |
+
+Rules: tools are leads, not verdicts — every reported finding still needs evidence you read yourself. Never install tools on the user's machine; never run a tool in a mode that writes/modifies. No tools found → proceed with the manual phases exactly as below.
+
 ## Phase 2 — Triage
 
 Rate each finding:

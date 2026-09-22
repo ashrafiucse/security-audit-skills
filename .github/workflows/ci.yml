@@ -21,9 +21,10 @@ jobs:
         run: |
           bash -n install.sh
           bash -n skills/secrets-detection/scripts/scan.sh
+          bash -n skills/security-audit/scripts/probe_tools.sh
 
       - name: Python syntax
-        run: python3 -m py_compile scripts/validate.py skills/dependency-vulns/scripts/osv_scan.py
+        run: python3 -m py_compile scripts/validate.py scripts/selftest_patterns.py skills/dependency-vulns/scripts/osv_scan.py
 
       - name: Secrets scanner self-test (planted fakes must be found)
         run: |
@@ -34,6 +35,9 @@ jobs:
           out2=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/infra-vuln)
           printf '%s\n' "$out2"
           grep -q 'Fake4EvalsDoNotUse' <<<"$out2"
+          out3=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/iac-vuln-app)
+          printf '%s\n' "$out3"
+          grep -q 'Fake4EvalsDoNotUse' <<<"$out3"
 
       - name: OSV end-to-end (live API)
         run: |
@@ -41,6 +45,9 @@ jobs:
           printf '%s\n' "$out"
           grep -q 'npm:lodash' <<<"$out"
           grep -q 'fixed in' <<<"$out"
+
+      - name: Detection-pattern self-test (planted lines must match)
+        run: python3 scripts/selftest_patterns.py
 
       - name: OSV parser coverage (gradle/swift/conan lockfiles)
         run: |

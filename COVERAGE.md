@@ -10,14 +10,14 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 |---|---|---|
 | Secrets detection | strong | regex set + triage; grows with provider patterns |
 | Dependency CVEs | strong (live) | OSV API; parser coverage below |
-| Injection (SQLi/XSS/cmd/path/SSTI/deser) | strong | Node/Python/Java/Ruby/PHP/Go packs in `injection-flaws/references/` |
-| Auth/authz | strong | sessions, JWT, OAuth, IDOR |
+| Injection (SQLi/XSS/cmd/path/SSTI/deser) | strong | Node/Python/Java/Ruby/PHP/Go packs in `injection-flaws/references/`; + XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, upload abuse, second-order/stored flows, query-builder raw sinks, multi-line construction |
+| Auth/authz | strong | sessions, JWT, OAuth, IDOR; + route census, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | Crypto | strong | usage-context judgment table |
 | Config/headers/CORS/CI | strong | |
-| Containers & IaC | strong | Docker/compose/K8s/Terraform |
+| Containers & IaC | strong | Docker/compose/K8s/Terraform; measured by `iac-vuln-app` fixture (+CI workflow) |
 | Data exposure / logging | good | A09 pack (audit events, log forging, verbosity); alerting config remains report-level |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
-| Insecure design (A04) | thin | guided prompts only; no systematic method |
+| Insecure design (A04) | good | grep-anchored checklist (replay/idempotency, client-controlled money/scope, negative values, step-skipping) in `security-audit/references/owasp-top10.md`; judgment still required |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |
 | Django/Python | good | `django-security`: raw()/extra(), mark_safe, `__all__` mass assignment, settings |
