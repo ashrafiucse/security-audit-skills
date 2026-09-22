@@ -26,6 +26,7 @@ Give it any project (any language, any stack) and it will:
 | `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
+| `llm-security` | LLM/AI apps: prompt injection & data exfil, unsafe model deserialization (pickle/torch.load/LangChain), hardcoded LLM keys, over-powered agent tools, prompt/PII logging & telemetry |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
 | `django-security` | Django: `raw()`/`extra()` SQLi, `mark_safe`/`|safe` XSS, `fields='__all__'` mass assignment, settings misconfig |

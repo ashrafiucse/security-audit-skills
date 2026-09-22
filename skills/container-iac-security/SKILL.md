@@ -46,6 +46,13 @@ rg --files -g '*.yaml' -g '*.yml' | xargs grep -ln "kind: Deployment\|kind: Pod\
 - Resource limits absent (DoS surface) → LOW
 - Exposed `type: LoadBalancer` on admin/debug services → HIGH
 - Secrets as plain `ConfigMap`/env instead of Secret objects/external secrets → MEDIUM
+- **Ingress (nginx-ingress) annotations**:
+```bash
+rg -n "nginx\.ingress\.kubernetes\.io/(configuration-snippet|server-snippet|auth-url|rewrite-target|proxy-ssl)" -g '*.yaml' -g '*.yml'
+```
+  - `configuration-snippet`/`server-snippet` in user-editable Ingress objects → config injection by anyone who can create Ingresses (CVE-2021-25742 family); controller must have snippets disabled → HIGH if reachable
+  - `rewrite-target` with attacker-influenced capture groups → open redirect/proxy (CVE-2021-25741 family — check controller version)
+  - `auth-url` with broad skip/bypass paths (`*-snippets` overriding auth) → HIGH
 - **Egress**: no `NetworkPolicy` with `Egress` policyType for pods that fetch URLs / call external APIs → MEDIUM alone, raise the paired SSRF finding (see `../injection-flaws/SKILL.md`) — the fetcher can reach cloud metadata (169.254.169.254) and internal services
 ```bash
 rg -n "policyTypes:" -g '*.yaml' -g '*.yml'     # any Egress policy at all?

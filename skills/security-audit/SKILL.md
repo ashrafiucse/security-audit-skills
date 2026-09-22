@@ -60,6 +60,7 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | Any dependency manifest | `../dependency-vulns/SKILL.md` |
 | Input handling / queries / templates / subprocesses | `../injection-flaws/SKILL.md` |
 | GraphQL server / `.graphql` schema files | `../graphql-security/SKILL.md` |
+| LLM/AI stack (langchain/llamaindex/autogen, openai/anthropic SDKs, model files `.pkl/.pt/.gguf/.safetensors`) | `../llm-security/SKILL.md` |
 | Android/iOS files (`AndroidManifest.xml`, `Info.plist`, mobile code) | `../mobile-security/SKILL.md` |
 | Laravel/PHP project (`composer.json` with laravel/framework, `artisan`, Blade views) | `../laravel-security/SKILL.md` |
 | Django/Python project (`manage.py`, `settings.py`, Django in requirements) | `../django-security/SKILL.md` |

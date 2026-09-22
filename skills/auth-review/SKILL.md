@@ -51,6 +51,15 @@ rg -n -i "bcrypt|argon2|scrypt|pbkdf2|md5|sha1|sha256.*password|hashpw|crypt\("
 rg -n "jwt\.(sign|decode|verify)|verify\(|algorithms|algorithm|none|HS256|RS256"
 ```
 - `algorithm: "none"` accepted or `jwt.decode(token)` without algorithm pinning → **CRITICAL**
+- **Algorithm confusion** (RS256 → HS256): `jwt.verify(token, PUBLIC_KEY, {algorithms: ['HS256', ...]})` — attacker signs with the public key as HMAC secret → **CRITICAL**. Pin asymmetric algorithms only when the key is public; never pass a public key where the library accepts it for HMAC.
+```bash
+rg -n "algorithms.*HS256|verify\(.*public|createPublicKey|jwt\.RSAPublicKey" 
+```
+- **JWKS `kid` injection**: token-controlled `kid`/`alg`/`jku`/`x5u` header flowing into paths, queries, or fetches (`'./keys/' + header.kid`, `jwks_url + kid`) → path traversal / attacker-controlled key material → **Critical**. Trust `kid` for lookup only against a fixed key set.
+```bash
+rg -n "header\.kid|\bkid\b.*\+|jku|x5u" 
+```
+- **PKCE**: public clients (SPA/mobile/desktop — anything that can't hold a secret) using auth-code flow without `code_challenge`/`code_verifier` → code interception, HIGH. Server-side confidential clients may omit it (note, not a finding).
 - Symmetric signing with weak/default secret (`secret`, `jwt-secret`, `changeme`) → CRITICAL
 - No `exp` validation, or no `aud`/`iss` checks where multiple services share keys → HIGH
 - Tokens in localStorage with XSS present elsewhere → MEDIUM (compounding)

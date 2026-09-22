@@ -1,0 +1,7 @@
+anthropic
+langchain
+langchain-experimental
+torch
+transformers
+safetensors
+requests

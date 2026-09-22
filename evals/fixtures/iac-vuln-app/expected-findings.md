@@ -21,7 +21,8 @@ Actions). Exercises `container-iac-security` and the CI/CD section of
 | 3b | Checkout of untrusted PR head ref | deploy.yml:16 | Critical (combined with 3a) |
 | 3c | Overbroad token (`contents: write-all`) | deploy.yml:8 | Medium |
 | 3d | Action pinned by tag, not commit SHA | deploy.yml:14 | Medium |
-| 3e | `curl | sh` in workflow | deploy.yml:19 | High |
+| 3e | `curl | sh` in workflow | deploy.yml:20 | High |
+| 3f | Workflow script injection — `github.event.pull_request.title` interpolated inside `run:` (PR title = shell payload) | deploy.yml:18 | Critical |
 
 ## Must NOT trigger (near-misses — `hardened-deployment.yaml`)
 

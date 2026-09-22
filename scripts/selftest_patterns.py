@@ -94,6 +94,23 @@ RULES = [
     ("postmessage-listener",
      r"addEventListener\(\s*['\"]message",
      "spa-vuln-app/index.html", "addEventListener('message'"),
+    # --- config-hardening: CI workflow script injection (iac-vuln-app) ---
+    ("ci-script-injection",
+     r"github\.event\.pull_request\.(title|body|head\.ref)",
+     "iac-vuln-app/.github/workflows/deploy.yml", "PR title: ${{"),
+    # --- llm-security (llm-vuln-app) ---
+    ("llm-unsafe-deserialization",
+     r"(pickle|torch)\.(load|loads)",
+     "llm-vuln-app/app.py", "pickle.load(f)"),
+    ("llm-repl-tool",
+     r"PythonREPLTool|ShellTool",
+     "llm-vuln-app/app.py", "PythonREPLTool()"),
+    ("llm-prompt-concat",
+     r"prompt\s*=\s*f['\"]",
+     "llm-vuln-app/app.py", "{user_message}"),
+    ("llm-anthropic-key",
+     r"sk-ant-api03-[A-Za-z0-9_-]{20,}",
+     "llm-vuln-app/app.py", "sk-ant-api03-"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -128,6 +145,12 @@ MUST_NOT_MATCH = [
     ("postmessage-innerhtml-safe",
      r"innerHTML",
      "spa-vuln-app/safe-index.html"),
+    ("llm-deserialization-safe",
+     r"(pickle|torch)\.(load|loads)\(",
+     "llm-vuln-app/safe_app.py"),
+    ("llm-key-safe",
+     r"sk-ant-api03-[A-Za-z0-9_-]{20,}",
+     "llm-vuln-app/safe_app.py"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

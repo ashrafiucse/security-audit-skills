@@ -38,6 +38,12 @@ jobs:
           out3=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/iac-vuln-app)
           printf '%s\n' "$out3"
           grep -q 'Fake4EvalsDoNotUse' <<<"$out3"
+          out4=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/python-vuln-app)
+          printf '%s\n' "$out4"
+          grep -q 'hf_FakeTokenForEvalFixtures123' <<<"$out4"
+          out5=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/llm-vuln-app)
+          printf '%s\n' "$out5"
+          grep -q 'sk-ant-api03-' <<<"$out5"
 
       - name: OSV end-to-end (live API)
         run: |

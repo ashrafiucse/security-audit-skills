@@ -20,6 +20,10 @@ improvement targets (see repo `COVERAGE.md`).
 
 ## A04 design pass (run when the table shows no code-level findings for it)
 
+**AI/LLM stacks**: walk `../llm-security/SKILL.md` additionally — OWASP LLM
+Top 10 issues (prompt injection, excessive agency, insecure output handling)
+fall outside this 2021 table; the LLM skill is the completeness gate for them.
+
 Work the checklist; each item has a grep to find candidates, then reason about the abuse case. Record as design-level findings (usually Medium):
 
 | Abuse case | Grep for candidates | Ask |

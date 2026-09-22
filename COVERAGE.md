@@ -17,6 +17,7 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Containers & IaC | strong | Docker/compose/K8s/Terraform; measured by `iac-vuln-app` fixture (+CI workflow); + egress/NetworkPolicy + IMDSv2 checks |
 | Data exposure / logging | good | A09 pack (audit events, log forging, verbosity); alerting config remains report-level |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
+| LLM / AI apps | good | `llm-security`: prompt injection/exfil, model deserialization, LLM keys, agent tools, telemetry; measured by `llm-vuln-app` fixture |
 | Insecure design (A04) | good | grep-anchored checklist (replay/idempotency, client-controlled money/scope, negative values, step-skipping) in `security-audit/references/owasp-top10.md`; judgment still required |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade, CSRF except |
