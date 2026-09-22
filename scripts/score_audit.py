@@ -20,18 +20,29 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 TOLERANCE = 2
-# file.ext:line(-line), or a bare line(-line) continuing the last file
-FILE_TOKEN = re.compile(r"([\w./-]+\.[A-Za-z0-9]+):(\d+)(?:-(\d+))?")
+FILE_LEVEL_MAX = 10 ** 9  # sentinel hi for file-level (`file:-`) anchors
+# files may be dotfiles (.env) or well-known extension-less manifests (Gemfile)
+FILE_RE = r"[\w./-]*\.[A-Za-z0-9]+|Gemfile|Dockerfile|Procfile|Jenkinsfile|Makefile"
+FILE_TOKEN = re.compile(rf"({FILE_RE}):(\d+)(?:-(\d+))?")
+FILE_LEVEL_TOKEN = re.compile(rf"({FILE_RE}):-")
 BARE_TOKEN = re.compile(r"(?<![\w:./-])(\d+)(?:-(\d+))?(?![\w.])")
+# a file mentioned WITHOUT a line — how agents cite global/absence findings
+FILE_MENTION = re.compile(rf"(?<![\w./-])({FILE_RE})(?![\w.:])")
 ROW_RE = re.compile(r"^\|\s*\w[\w.a-z]*\s*\|.*\|.*\|", re.I)  # 3+ col table row
 SEC_RE = re.compile(r"^###\s+(SEC-\d+)", re.I)
 
 
 def scan_tokens(text):
-    """[(file, lo, hi)] — bare ranges inherit the most recent file."""
+    """[(file, lo, hi)] — bare ranges inherit the most recent file;
+    `file:-` anchors become file-level tokens (lo=0, hi=FILE_LEVEL_MAX)."""
     tokens, last_file = [], None
     pos = 0
     while pos < len(text):
+        fl = FILE_LEVEL_TOKEN.match(text, pos)
+        if fl:
+            tokens.append((fl.group(1), 0, FILE_LEVEL_MAX))
+            pos = fl.end()
+            continue
         fm = FILE_TOKEN.match(text, pos)
         if fm:
             last_file = fm.group(1)
@@ -47,6 +58,13 @@ def scan_tokens(text):
             continue
         pos += 1
     return tokens
+
+
+def scan_bare_files(text):
+    """Basenames of files cited WITHOUT any line (global/absence findings)."""
+    cited = {m.group(1) for m in FILE_TOKEN.finditer(text)}
+    return {m.group(1).rsplit("/", 1)[-1] for m in FILE_MENTION.finditer(text)
+            if m.group(1) not in cited}
 
 
 def parse_expected(fixture_dir: Path):
@@ -67,7 +85,7 @@ def parse_expected(fixture_dir: Path):
 
 
 def parse_report(report_path: Path):
-    """{SEC-id: tokens} per findings section."""
+    """{SEC-id: (tokens, bare_files)} per findings section."""
     sections, current = {}, None
     for line in report_path.read_text(encoding="utf-8").splitlines():
         m = SEC_RE.match(line)
@@ -75,8 +93,9 @@ def parse_report(report_path: Path):
             current = m.group(1).upper()
             sections[current] = []
         elif current:
-            sections[current].extend(scan_tokens(line))
-    return sections
+            sections[current].append(line)
+    return {sec: (scan_tokens("\n".join(ls)), scan_bare_files("\n".join(ls)))
+            for sec, ls in sections.items()}
 
 
 def basename(path):
@@ -109,18 +128,30 @@ def main():
 
     expected = parse_expected(Path(args.fixture_dir))
     report = parse_report(Path(args.report))
-    all_report_toks = [t for toks in report.values() for t in toks]
+    all_report_toks = [t for toks, _ in report.values() for t in toks]
 
     matched, missed = 0, []
+    all_bare = set().union(*(bare for _, bare in report.values())) if report else set()
     for label, toks in expected:
-        if any(token_matches(t, all_report_toks) for t in toks):
+        hit = any(token_matches(t, all_report_toks) for t in toks)
+        if not hit:
+            # file-level rows are satisfied by ANY bare-file citation of that basename
+            hit = any(lo == 0 and basename(f) in all_bare for f, lo, _ in toks)
+        if hit:
             matched += 1
         else:
             missed.append(label)
 
     supported, phantoms = 0, []
-    for sec, toks in report.items():
-        if any(any(token_matches(t, etoks) for _, etoks in expected) for t in toks):
+    file_level_basenames = {basename(f) for _, etoks in expected
+                            for f, lo, _ in etoks if lo == 0}
+    for sec, (toks, bare) in report.items():
+        ok = any(token_matches(t, toks) for _, etoks in expected for t in etoks)
+        if not ok:
+            # file-level support: a bare-file citation backs a `file:-` row of
+            # the same basename (global/absence findings, e.g. "no lockfile")
+            ok = bool(bare & file_level_basenames)
+        if ok:
             supported += 1
         else:
             phantoms.append(sec)

@@ -11,3 +11,4 @@
 | 7 | Host root path mounted writable | docker-compose.yml:10 | Critical |
 | 8 | Default credentials (postgres) | compose:12,16 | High (published ports) |
 | 9 | Postgres port published to host | docker-compose.yml:18 | High |
+| 10 | No `HEALTHCHECK` in Dockerfile — orchestrator cannot detect a wedged app (file-level anchor) | Dockerfile:- | Low |

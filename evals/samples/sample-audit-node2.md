@@ -1,9 +1,10 @@
 # Security Audit — node-vuln-app-2 (SAMPLE)
 
 Sample report used to self-test `scripts/score_audit.py`. It deliberately:
-reports findings 1-6 and 8 of the ground truth (missing #7 → recall 7/8),
-and fabricates SEC-009 citing evidence that is not in ground truth (→ 1
-phantom, precision 7/8). Not a real audit — do not copy as documentation.
+reports 10 of 11 ground-truth rows (misses the lockfile row → recall 0.909),
+includes one file-level citation pattern (bare `app.js`) to exercise the
+`file:-` anchor support, and fabricates SEC-011 citing a file that does not
+exist (→ 1 phantom, precision 0.909). Not a real audit — do not copy.
 
 Date: 2026-09-22 | Scope: sample | Auditor: security-skills (sample)
 
@@ -11,7 +12,8 @@ Date: 2026-09-22 | Scope: sample | Auditor: security-skills (sample)
 | Severity | Count |
 |---|---|
 | Critical | 4 |
-| High | 2 |
+| High | 4 |
+| Medium | 2 |
 
 ## Findings
 
@@ -31,10 +33,19 @@ Date: 2026-09-22 | Scope: sample | Auditor: security-skills (sample)
 - **Where:** `app.js:67`
 
 ### SEC-006: TOCTOU race on coupon redeem — HIGH
-- **Where:** `app.js:74`
+- **Where:** `app.js:75`
 
-### SEC-008: WebSocket — no handshake auth, no subscription authz — CRITICAL
+### SEC-007: Unsafe file upload — HIGH
+- **Where:** `app.js:88`
+
+### SEC-008: WebSocket authz missing — CRITICAL
 - **Where:** `app.js:101`
 
-### SEC-009: Insecure TLS configuration — HIGH
-- **Where:** `app.js:200`
+### SEC-009: Missing security headers — MEDIUM
+- **Where:** `app.js` (global middleware — no helmet/CSP anywhere in the response path)
+
+### SEC-010: No authentication layer; no login audit events — HIGH
+- **Where:** `app.js` (route census: 0 of 8 routes carry auth middleware)
+
+### SEC-011: Insecure TLS configuration — HIGH
+- **Where:** `config/settings.json:12`

@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- Fixture: client/API hardening gaps. FAKE data only.
+     Expected findings: see expected-findings.md -->
+<html>
+  <head>
+    <!-- SEC-01: CSP present but weak — unsafe-inline + unsafe-eval neutralize it -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+    <!-- SEC-02: third-party script without SRI (integrity=) -->
+    <script src="https://cdn.example-fake.com/analytics.js"></script>
+  </head>
+  <body>
+    <div id="feed"></div>
+    <script>
+      fetch('https://partner.example-fake.com/api/feed')
+        .then(r => r.json())
+        .then(data => {
+          // SEC-03: upstream response rendered as HTML — compromised partner = stored XSS here
+          document.getElementById('feed').innerHTML = data.html;
+          // SEC-04: upstream field trusted for authorization
+          if (data.is_premium_user) { document.getElementById('feed').dataset.premium = '1'; }
+        });
+      // SEC-05: no timeout on the outbound call (resource consumption; hung sockets)
+    </script>
+  </body>
+</html>

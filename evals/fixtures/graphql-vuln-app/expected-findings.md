@@ -11,7 +11,8 @@
 | 7 | No depth/complexity limit (`validationRules` absent) | server.js:46 | High |
 | 8 | Cookie-session auth + CSRF protection not configured | server.js:49-50 | High |
 | 9 | `dev-secret` as cookie signing key (weak hardcoded) | server.js:50 | High |
-| 10 | Old graphql@15.8.0 / express@4.17.1 deps (live OSV) | package.json | High (network-dependent) |
+| 10 | express 4.17.1 — below the CVE-2022-24999 fix line (transitive qs prototype pollution; vuln-db entry) | package.json:7 | High |
+| 11 | No lockfile — non-reproducible installs (file-level anchor) | package.json:- | Medium |
 
 ## Must NOT trigger
 

@@ -13,6 +13,8 @@
 | 9 | Auth header + token printed to logs | app.py:62 | High |
 | 10 | No rate limiting on /login | app.py:17 | Medium |
 | 11 | Sequential int user IDs (enumeration on /login failures distinguishability) | app.py:24-29 | Low/Medium |
+| 12 | No authentication/authorization on ANY route (census 0/6) — RCE paths reachable unauthenticated | app.py:- | Critical |
+| 13 | No dependency manifest — unpinned/unverifiable stack (absence anchor: the missing file itself) | requirements.txt:- | Medium |
 
 ## Must NOT trigger
 

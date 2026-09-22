@@ -18,6 +18,7 @@ Each pattern in `patterns.txt`, what it catches, and its false-positive profile.
 | `hf_...` | Hugging Face tokens (fine-grained, org-scoped) | ML scripts, demo notebooks | `write` scope = model-repo poisoning, not just quota |
 | `gsk_...` | Groq API keys | Config blobs | Quota theft |
 | Generic assignment | `password = "..."` style | Very noisy | Always triage; require plausible entropy + non-placeholder |
+| Unquoted key=value | `spring.datasource.password=prod-pass` in `.properties`/`.conf`/`.env` lines | Anchored (key=value at EOL), still triage | Catches properties-style creds the quoted patterns structurally cannot |
 
 ## Adding a new pattern
 

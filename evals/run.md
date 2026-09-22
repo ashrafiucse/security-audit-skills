@@ -22,6 +22,13 @@ Have it write the report to a scratch path so you can score it before it
 overwrites anything, e.g. ask for `SECURITY-AUDIT.md` in the fixture dir
 (fixtures are read-only inputs — reset with `git checkout` after the round).
 
+**Blind-eval hygiene:** the auditing agent must not only "not open"
+`expected-findings.md` — it must EXCLUDE it from every recursive scan
+(`rg --glob '!**/expected-findings.md'`), or a broad grep can print
+ground-truth rows into its tool output and compromise the round. If it
+happens anyway, keep the disclosure, label the scoreboard row COMPROMISED,
+and re-verify each finding against the fixture independently.
+
 ## 3. Score it
 
 ```
@@ -30,7 +37,11 @@ python3 scripts/score_audit.py <path-to>/SECURITY-AUDIT.md evals/fixtures/<scena
 ```
 
 The scorer matches report citations (`file:line`) against ground truth rows
-(±2 line tolerance). Manual pass afterwards for what it can't judge:
+(±2 line tolerance). **File-level anchors**: rows whose `Where` cell uses
+`file:-` (e.g. `package.json:-`, or the absent file itself like
+`requirements.txt:-` for "no manifest") are satisfied by ANY mention of that
+file — use them for global/absence findings ("no lockfile", "no auth
+middleware"). Manual pass afterwards for what it can't judge:
 
 - **Near-miss violations**: any "Must NOT trigger" item reported → precision
   miss (count it manually; the scorer can't read judgment).

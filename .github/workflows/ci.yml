@@ -44,6 +44,9 @@ jobs:
           out5=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/llm-vuln-app)
           printf '%s\n' "$out5"
           grep -q 'sk-ant-api03-' <<<"$out5"
+          out6=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/spring-vuln-app)
+          printf '%s\n' "$out6"
+          grep -q 'spring-prod-pass-2026' <<<"$out6"
 
       - name: OSV end-to-end (live API)
         run: |
@@ -58,15 +61,15 @@ jobs:
       - name: Eval scorer self-test (sample audit scores as designed)
         run: |
           out=$(python3 scripts/score_audit.py evals/samples/sample-audit-node2.md evals/fixtures/node-vuln-app-2 \
-            --min-recall 0.87 --min-precision 0.87 --max-phantoms 1)
+            --min-recall 0.9 --min-precision 0.9 --max-phantoms 1)
           printf '%s\n' "$out"
-          grep -q 'recall=0.875' <<<"$out"
-          grep -q 'precision=0.875' <<<"$out"
+          grep -q 'recall=0.909' <<<"$out"
+          grep -q 'precision=0.909' <<<"$out"
           grep -q 'RESULT: PASS' <<<"$out"
           python3 scripts/score_audit.py evals/samples/sample-audit-node2.md evals/fixtures/node-vuln-app-2 \
-            --min-recall 0.87 --min-precision 0.87 --max-phantoms 1 --append "$RUNNER_TEMP/sb.md" --label ci \
+            --min-recall 0.9 --min-precision 0.9 --max-phantoms 1 --append "$RUNNER_TEMP/sb.md" --label ci \
             >/dev/null
-          grep -q '| node-vuln-app-2 | 87.50% | 87.50% | 1 | 7/8 | ci |' "$RUNNER_TEMP/sb.md"
+          grep -q '| node-vuln-app-2 | 90.91% | 90.91% | 1 | 10/11 | ci |' "$RUNNER_TEMP/sb.md"
 
       - name: OSV parser coverage (gradle/swift/conan lockfiles)
         run: |
