@@ -240,6 +240,19 @@ RULES = [
     ("admin-no-role",
      r"app\.post\(\s*['\"]\S*admin",
      "course-vuln-app/app.js", "app.post('/api/admin/courses'"),
+    ("course-moderation-admin-html-sink",
+     r"res\.send\(\s*`[^`]*\$\{r\.body\}",
+     "course-vuln-app/app.js", "${r.body}"),
+    # --- laravel-security: moderation-queue XSS census (live miss 2026-09-23) ---
+    ("blade-moderation-detail-raw-render",
+     r"\{!!",
+     "laravel-vuln-app/resources/views/course-edit/reviews/view.blade.php", "{!! nl2br($review->body)"),
+    ("blade-census-react-noise",
+     r"\{!!",
+     "laravel-vuln-app/resources/js/AdminDashboard.tsx", "aria-invalid={!!errors.body}"),
+    ("review-validation-string-only",
+     r"'body'\s*=>\s*\[\s*'required',\s*'string'",
+     "laravel-vuln-app/app/Http/Requests/CourseReviewRequest.php", "'required', 'string'"),
     # --- surface round (surface-vuln-app) ---
     ("saml-nonstrict",
      r"['\"]strict['\"]\s*:\s*False",
@@ -356,6 +369,15 @@ MUST_NOT_MATCH = [
     ("self-enrollment-safe",
      r"userId:\s*req\.body\.userId",
      "course-vuln-app/safe-platform.js"),
+    ("course-moderation-unescaped-safe",
+     r"res\.send\(\s*`[^`]*\$\{r\.body\}",
+     "course-vuln-app/safe-platform.js"),
+    ("moderation-list-raw-echo-safe",
+     r"\{!!",
+     "laravel-vuln-app/resources/views/course-edit/reviews/index.blade.php"),
+    ("moderation-detail-raw-body-safe",
+     r"nl2br\(\s*\$review->body",
+     "laravel-vuln-app/resources/views/course-edit/reviews/safe-detail-view.blade.php"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

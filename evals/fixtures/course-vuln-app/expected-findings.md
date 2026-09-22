@@ -10,6 +10,7 @@ skill — persona-driven: public/student/admin).
 | 3 | student | ENROLLMENT | self-enrollment for any course/user with no paid-order artifact; userId from body | app.js:42-49 | Critical |
 | 4 | student | COHORT | materials route has NO enrollment check and NO cohort scope — cross-cohort + non-student read; cohort from query | app.js:52-58 | Critical |
 | 5 | public | ADMIN | `POST /api/admin/courses` without auth or role check — anyone publishes courses/sets prices | app.js:60-66 | Critical |
+| 6 | student→admin | ADMIN (moderation §6.5) | student review body stored raw (length check only) then rendered UNESCAPED into the admin moderation detail view (`res.send` HTML template) — staff-origin XSS → session riding → staff account takeover; `pending` status guarantees a privileged viewer opens it | app.js:70-86 | Critical |
 
 ## Must NOT trigger (near-misses — `safe-platform.js`)
 
@@ -18,3 +19,4 @@ skill — persona-driven: public/student/admin).
 - Enrollment only from the paid-order fulfillment path (status-guarded, user-matched)
 - Materials scoped by the caller's enrollment record (cohort from enrollment, not query)
 - Admin route with `requireAuth, requireAdmin`
+- `res.send` moderation render with `escapeHtml(r.body)` (safe-platform.js:62) — escaping at the render sink is the fix shape; the `POST /reviews` write path alone is not the finding
