@@ -149,6 +149,8 @@ rg -n -i "\?(next|continue|returnTo|returnUrl|redirect|redirect_uri|url|goto)=" 
 Flag when the redirect target comes from user input with no exact-host allowlist. Login/logout/reset flows carrying `?next=` params are the classic; **High** when the URL carries tokens/codes (OAuth `code`, reset token) or silences origin checks, otherwise **Medium**. Safe: exact allowlist of destinations, or relative-only after `new URL(next, base)` origin check — prefix/suffix matching on the host is bypassable (`evil.com` vs `evil-example.com`).
 
 ### Unsafe file upload
+
+**C/C++ native components**: memory-safety and native injection sinks (`strcpy`/`sprintf`, format strings, `system()`, integer-overflow allocs, TOCTOU) live in `references/patterns.md` "C/C++ native code" — load it when the repo carries `.c/.cc/.cpp` service/extension code.
 ```bash
 rg -n "multer|multipart|form\.File|FormFile|MultipartFormDataEntry|\.originalname|file\.filename|Storage\(|upload"
 ```

@@ -114,6 +114,19 @@ rg -n "if\s*\(.*\b(used|redeemed|approved|active|enabled|stock|balance|remaining
 - Balance/stock read-modify-write: `user.balance -= amt; user.save()` → double-spend under concurrency. Fix: `UPDATE accounts SET balance = balance - ? WHERE id = ? AND balance >= ?`.
 - Webhooks/event handlers without idempotency keys or event-id dedup → replayable. Report as one grouped finding with every affected flow listed.
 
+### API keys as authentication (service-to-service)
+
+Machine auth has its own failure modes — check every API-key/gateway-token scheme:
+```bash
+rg -n -i "x-api-key|api[_-]?key" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*.go' -g '*.rb' | head
+```
+- **Key in URL/query** (`?api_key=`) — hits logs, referrers, browser history → HIGH (same class as tokens in URLs)
+- **Unscoped keys** — one god-key instead of per-service/per-permission keys: lateral movement on any leak → MEDIUM/HIGH
+- **No rotation story** — no expiry, no revocation endpoint, keys older than the repo's history → MEDIUM (operational)
+- **Constant-time comparison absent** (`==` on the key) → timing oracle → LOW/MEDIUM (pairs with `crypto-review` comparison rules)
+- **Weak key generation** — `uuid()`, `random.random()`, timestamp-derived → predictable keys → HIGH (see crypto-review randomness table)
+- **Key = password reuse** — same key validates AND encrypts/signs → separation of duties violation → MEDIUM
+
 ## 4 — Session & CSRF
 
 - Cookie flags on session/auth cookies: `HttpOnly` (missing + XSS present → HIGH), `Secure` (missing → HIGH if prod is HTTPS), `SameSite` (missing → MEDIUM)
