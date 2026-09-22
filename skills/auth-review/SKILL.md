@@ -96,6 +96,8 @@ rg -n -i "req\.headers\[\s*['\"]x-|request\.headers\.get\(|getHeader\(\s*\"X-|he
 ```
 Using `X-User-Id` / `X-Email` / `X-Admin` / `X-Forwarded-For` as the **identity or authz input** means anyone who can reach the service directly is any user → **CRITICAL**. Valid only when BOTH hold: (1) an edge proxy/gateway strips these headers from inbound traffic, and (2) the app is not directly reachable (check NodePort/LoadBalancer services, ingress annotations, port exposure in compose). Microservice meshes are the classic miss: service B trusts `X-User-Id` "because only service A calls us" — but anything on the cluster network can. Headers used only for logging (`X-Request-Id`) are fine — trace the value into an authz decision before flagging.
 
+**SSO/OIDC callback host verification (CWE-943).** Rocket.Chat GHSL-2026-004/005: an account/SSO service accepted callbacks whose host did not match the configured/allowed one → authentication bypass. Wherever an OIDC/OAuth/SAML/OmniAuth callback or JWKS/discovery URL is resolved from configuration, verify the code checks the **exact** host/origin (allowlist, not substring/`endsWith`) and rejects mismatches before trusting the identity assertion → Critical (direct auth bypass).
+
 ### Multi-tenant scoping census (SaaS)
 
 Per-object IDOR checks miss the systematic version: in a multi-tenant app, EVERY data access must carry the tenant filter — one query without it leaks a whole tenant's data to another tenant's users (often via list/export/report endpoints that feel "shared").

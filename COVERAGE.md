@@ -38,7 +38,9 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 
 ## Help wanted (priority order)
 
-1. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only, Java library sinks, Rust, Phoenix. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
+1. **`dotnet-security` skill** — surfaced by the 2026-09-23 GHSL extraction (Umbraco, Orchard, NanaZip advisories keep landing in .NET; detection feasible via `.csproj`/`packages.lock.json` versions + Razor/ASP.NET sink patterns) — see `cve-research/references/ghsl-lessons.md`
+1b. **WebAssembly review checks** (WSTG 4.13) — niche; documented gap in `security-audit/references/methodology-mirror.md`
+2. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only, Java library sinks, Rust, Phoenix. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
 2. **More vuln-db entries** — ongoing weekly via KEV triage issues; incident-research batches (Metasploit-class waves) welcome — see `cve-research/references/notable-incidents.md`
 3. **Real-world quarterly benchmarks** using `scripts/score_audit.py` (see `evals/run.md`); scoreboard rows from any agent-run round welcome
 4. **Retry the 3 blocked e2e runs** (node-vuln-app-3, crypto-vuln-app, dep-manifests) when subagent models are available
