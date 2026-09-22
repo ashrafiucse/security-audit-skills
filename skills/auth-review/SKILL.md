@@ -67,6 +67,14 @@ rg -n "req\.params\.id|findById\(|get\(|\.filter\(.*userId|user\.id|currentUser|
 - Horizontal vs vertical: test reasoning for both — same-role users touching each other's data, and low-role → admin.
 - Trusting client-side hints: `is_admin` from request body/cookie-in-JWT-without-verify, hidden-but-served admin UI → HIGH
 
+### Mass assignment (generic)
+
+The framework skills cover Laravel/Django/Rails fillable semantics; the generic version bites every ORM:
+```bash
+rg -n "\.create\(\s*req\.body|\.update\(\s*req\.body|Object\.assign\(\s*\w+\s*,\s*req\.body|new \w+\(\s*req\.body|findOneAndUpdate\(\s*\w+,\s*req\.body|bulkCreate\(\s*req\.body"
+```
+Request body spread into create/update without an allowlist → attacker sets `role`, `isAdmin`, `userId`, `credits`, `price`, `email` (account takeover via email change). Report **High** — Critical when the model has role/permission fields. Safe: explicit field destructuring/pick, schema-level allowlist (`$fillable`, `fields`), validators configured to strip unknown keys (default `validate`/zod `.strict()` — not passthrough). Also check filter/map "sanitizers" that only check types: an allowLIST of keys, not of types, is what counts.
+
 ### Trusted-header authorization (identity spoofing)
 ```bash
 rg -n -i "req\.headers\[\s*['\"]x-|request\.headers\.get\(|getHeader\(\s*\"X-|headers\[\s*'X-|x-forwarded-for|x-forwarded-user|x-real-ip|HTTP_X_"

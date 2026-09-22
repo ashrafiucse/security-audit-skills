@@ -45,4 +45,15 @@ queue.process = (job) => {
   execFile('convert', [abs, '/tmp/out.png'], () => job.done());
 };
 
+// SAFE (vs SEC-06): explicit key allowlist — unknown fields never reach the ORM
+const UPDATABLE = new Set(['name', 'email', 'bio']);
+
+app.put('/users/me-safe', requireAuth, async (req, res) => {
+  const patch = Object.fromEntries(
+    Object.entries(req.body || {}).filter(([k]) => UPDATABLE.has(k))
+  );
+  await knex('users').where({ id: req.session.userId }).update(patch);
+  res.json({ ok: true });
+});
+
 app.listen(3001);

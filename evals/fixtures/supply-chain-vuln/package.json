@@ -1,0 +1,11 @@
+{
+  "name": "supply-chain-vuln-fixture",
+  "private": true,
+  "description": "Eval fixture: never install. See evals/fixtures/supply-chain-vuln/expected-findings.md",
+  "dependencies": {
+    "lodash2": "^1.0.2",
+    "reqeusts": "^2.88.0",
+    "@acme-corp/auth-lib": "^3.2.1",
+    "express": "^4.19.2"
+  }
+}

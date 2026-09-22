@@ -20,3 +20,18 @@ resource "aws_db_instance" "shop" {
   username          = "admin"
   password          = "Fake4EvalsDoNotUse" # SEC-2c: hardcoded DB password
 }
+
+resource "aws_launch_template" "fetcher" {
+  image_id      = "ami-fake123"
+  instance_type = "t3.small"
+
+  metadata_options {             # SEC-2d: IMDSv1 still allowed on a URL-fetching workload
+    http_endpoint = "enabled"
+    http_tokens   = "optional"
+  }
+
+  user_data = <<-EOF
+    #!/bin/bash
+    curl -sSL https://install.example-fake.com/agent.sh | bash # SEC-2e: curl | sh in bootstrap
+  EOF
+}

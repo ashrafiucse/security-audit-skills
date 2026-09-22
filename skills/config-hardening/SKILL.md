@@ -63,6 +63,20 @@ rg -n "pull_request_target|secrets\.|curl.*\|\s*(ba)?sh|sudo|GITHUB_TOKEN|persis
 - Rails: `force_ssl` off, `config.hosts` empty
 - Spring: `management.endpoints.web.exposure.include: "*"` → HIGH
 
+## 7 — Client-side: postMessage & friends
+
+```bash
+rg -n "addEventListener\(\s*['\"]message|onmessage\s*=|\.receive\(|window\.postMessage|\.postMessage\(" -g '*.js' -g '*.ts' -g '*.html' -g '*.vue' -g '*.svelte'
+```
+
+SPA/extension/embed code that listens for messages:
+- **No `event.origin` check** before using `event.data` → HIGH (any window/embed can message it)
+- `event.data` flowing into DOM sinks (`innerHTML`, `location.href = e.data`) → **CRITICAL** combo (cross-origin XSS)
+- Sending with `postMessage(payload, '*')` when payload is sensitive → MEDIUM (any parent/iframe receives it)
+- Safe form: `if (e.origin !== 'https://app.example.com') return;` + escaped sinks + explicit target origin
+
+Also: `window.open` handles with `opener` access across origins, and service-worker `message` handlers — same rules.
+
 ## Reporting
 
 Table of config → issue → severity → exact config change. Config findings are usually cheap fixes; order the fix list by severity then by effort (these often come first after secrets).

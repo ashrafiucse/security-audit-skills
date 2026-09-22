@@ -33,6 +33,8 @@ scripts/validate.py                   # lint: frontmatter, cross-refs, vuln-db e
 
 - [ ] Fixtures added/updated and passing (audit run reports planted findings, no phantoms)
 - [ ] `python3 scripts/validate.py` passes (frontmatter, cross-references, vuln-db entries)
+- [ ] `python3 scripts/selftest_patterns.py` passes (greps still match planted lines; safe files stay clean)
+- [ ] New/changed skills scored with `python3 scripts/score_audit.py` per `evals/run.md` where a fixture exists
 - [ ] `bash -n` clean for shell scripts; `python3 -m py_compile` clean for python
 - [ ] SKILL.md frontmatter valid (`name` lowercase-hyphens, description specific, ≤1024 chars)
 - [ ] No real secrets, credentials, or live URLs that imply them

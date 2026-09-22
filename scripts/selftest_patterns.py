@@ -82,6 +82,18 @@ RULES = [
     ("ci-tag-pinned-action",
      r"uses:\s*\S+@v\d",
      "iac-vuln-app/.github/workflows/deploy.yml", "actions/checkout@v4"),
+    # --- auth-review: mass assignment (node-vuln-app-3) ---
+    ("mass-assignment",
+     r"\.update\(\s*req\.body",
+     "node-vuln-app-3/app.js", ".update(req.body)"),
+    # --- container-iac: IMDSv1 allowed (iac-vuln-app) ---
+    ("imds-v1-allowed",
+     r"http_tokens\s*=\s*\"optional\"",
+     "iac-vuln-app/main.tf", 'http_tokens   = "optional"'),
+    # --- config-hardening: postMessage (spa-vuln-app) ---
+    ("postmessage-listener",
+     r"addEventListener\(\s*['\"]message",
+     "spa-vuln-app/index.html", "addEventListener('message'"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -110,6 +122,12 @@ MUST_NOT_MATCH = [
     ("k8s-privileged-safe",
      r"privileged:\s*true|runAsUser:\s*0",
      "iac-vuln-app/hardened-deployment.yaml"),
+    ("mass-assignment-safe",
+     r"\.update\(\s*req\.body",
+     "node-vuln-app-3/safe-counterexamples.js"),
+    ("postmessage-innerhtml-safe",
+     r"innerHTML",
+     "spa-vuln-app/safe-index.html"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

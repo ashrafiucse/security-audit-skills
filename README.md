@@ -17,13 +17,13 @@ Give it any project (any language, any stack) and it will:
 
 | Skill | Purpose |
 |---|---|
-| `security-audit` | Master orchestrator: full-project audit workflow + report format + optional tool bridges (gitleaks/semgrep/checkov… when installed) |
+| `security-audit` | Master orchestrator: full-project audit workflow, fix-verification (re-audit) mode, report format, optional tool bridges (gitleaks/semgrep/checkov… when installed) |
 | `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
-| `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) |
+| `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) + supply-chain hygiene (dependency confusion, typosquats, provenance) |
 | `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF, deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads, query-builder raw sinks |
-| `auth-review` | Authn/authz, route census for unguarded endpoints, password storage, sessions, JWT, OAuth, IDOR, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
+| `auth-review` | Authn/authz, route census for unguarded endpoints, password storage, sessions, JWT, OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
-| `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls |
+| `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |

@@ -46,6 +46,10 @@ rg --files -g '*.yaml' -g '*.yml' | xargs grep -ln "kind: Deployment\|kind: Pod\
 - Resource limits absent (DoS surface) → LOW
 - Exposed `type: LoadBalancer` on admin/debug services → HIGH
 - Secrets as plain `ConfigMap`/env instead of Secret objects/external secrets → MEDIUM
+- **Egress**: no `NetworkPolicy` with `Egress` policyType for pods that fetch URLs / call external APIs → MEDIUM alone, raise the paired SSRF finding (see `../injection-flaws/SKILL.md`) — the fetcher can reach cloud metadata (169.254.169.254) and internal services
+```bash
+rg -n "policyTypes:" -g '*.yaml' -g '*.yml'     # any Egress policy at all?
+```
 
 ## Terraform / CloudFormation / Pulumi
 
@@ -60,6 +64,12 @@ rg -n -i "hardcoded|access_key|secret_key|aws_secret" -g '*.tf'
 - Public S3/GCS buckets (`public_access_block` absent, `acl: public-read`) → HIGH if data is non-static
 - IAM: `Action: "*"` / `resources: ["*"]` policies attached to broad principals → HIGH; wildcard trust policies → CRITICAL
 - Hardcoded cloud keys in state files/code → CRITICAL (also check `.tfstate` committed to git)
+- Cloud: metadata with v1 tokens allowed → raises SSRF severity
+```bash
+rg -n -i "metadata_options|http_tokens|hop_limit|imdsv2" -g '*.tf' -g '*.yaml'
+```
+- `http_tokens = "optional"` / IMDSv1 allowed on internet-facing workloads → HIGH (metadata credential theft pairs with any SSRF)
+- No `hop_limit = 1` on containers/instances fetching user URLs → MEDIUM
 - Disabled logging (no `aws_flow_log`, `enable_audit` variants) → MEDIUM
 - Snapshot/backup configs absent → LOW
 

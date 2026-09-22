@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- Fixture: intentionally vulnerable SPA embed page. FAKE data only. -->
+<html>
+  <body>
+    <div id="out"></div>
+    <script>
+      // SEC-01: no origin check + innerHTML sink = cross-origin XSS via postMessage
+      window.addEventListener('message', (e) => {
+        document.getElementById('out').innerHTML = e.data;
+      });
+
+      // SEC-02: sensitive payload broadcast to any parent/iframe ('*')
+      window.parent.postMessage({ token: sessionStorage.getItem('session') }, '*');
+    </script>
+  </body>
+</html>

@@ -72,4 +72,11 @@ app.post('/jobs/resize', requireAuth, (req, res) => {
   res.json({ queued: true });
 });
 
+// ---------- Mass assignment ----------
+app.put('/users/me', requireAuth, async (req, res) => {
+  // SEC-06: whole request body into update — role/isAdmin/credits settable by anyone
+  await knex('users').where({ id: req.session.userId }).update(req.body);
+  res.json({ ok: true });
+});
+
 app.listen(3000);

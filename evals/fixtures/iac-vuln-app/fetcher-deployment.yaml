@@ -1,0 +1,15 @@
+# Fixture: URL-fetching pod with unrestricted egress. FAKE data only.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-fetcher
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: fetcher
+          image: shop-fetcher@sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+          # SEC-4: no NetworkPolicy anywhere in this repo restricts this pod's
+          # egress — it can reach cloud metadata (169.254.169.254) and every
+          # internal service. Pairs with any user-URL fetch feature (SSRF).

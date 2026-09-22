@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- SAFE counter-example for spa-vuln-app. An audit must NOT report this. -->
+<html>
+  <body>
+    <div id="out"></div>
+    <script>
+      const ALLOWED_ORIGIN = 'https://app.example.com';
+      window.addEventListener('message', (e) => {
+        if (e.origin !== ALLOWED_ORIGIN) return; // origin check
+        const el = document.getElementById('out');
+        el.textContent = typeof e.data === 'string' ? e.data : ''; // safe sink
+      });
+      window.parent.postMessage({ theme: 'dark' }, ALLOWED_ORIGIN); // explicit target, non-sensitive
+    </script>
+  </body>
+</html>

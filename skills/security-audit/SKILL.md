@@ -15,6 +15,20 @@ Full-project, read-only security review that ends in a written report. Works for
 - **Verify before reporting.** Read surrounding context to kill false positives (test files, examples, fixtures, obviously-fake values).
 - **No network required**, but if network is available, the `dependency-vulns` and `cve-research` skills use live databases.
 
+## Mode: fix verification (re-audit)
+
+Use when the user asks to "verify the fixes", "re-audit", "check what's fixed", or an existing `SECURITY-AUDIT.md` is present from a prior run. Never silently re-scan from zero when prior findings exist — verification comes first.
+
+1. **Load the prior report** (`SECURITY-AUDIT.md` in project root). If missing, run the normal flow.
+2. **Verify each prior finding** by reading the cited `file:line` (and its function/route context):
+   - **FIXED** — the offending code is gone or the defense is present (parameterized, allowlisted, guarded, rotated secret + scrubbed history)
+   - **STILL PRESENT** — evidence unchanged
+   - **MOVED / REGRESSED** — code moved: re-cite the new `file:line`; if the "fix" introduced a new flaw, that's a new finding
+   - Secrets: FIXED only after rotation evidence — removing the string from HEAD is not a fix (history + old deployments keep it)
+3. **Then scan for NEW findings** in changed code since the prior report (`git diff <prior-commit>..HEAD` if the report records a commit) — full re-scan only if the user asks.
+4. **Rewrite `SECURITY-AUDIT.md`**: per-finding status line (`FIXED` / `STILL PRESENT`, with the re-checked citation), a summary table (fixed n / open n / new n), and new findings appended with fresh SEC-NNN ids. Keep ids stable across runs — SEC-004 stays SEC-004 whether open or fixed.
+5. Verbal summary: fixed count, still-open worst issue, anything the fix broke.
+
 ## Phase 0 — Recon: build the security map
 
 Do NOT read every file. Probe cheaply first:

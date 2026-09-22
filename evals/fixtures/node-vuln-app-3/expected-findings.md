@@ -11,6 +11,7 @@ results are informational only — not ground truth for this fixture.
 | 3 | Query-builder raw sink — `knex.raw('SELECT ... ORDER BY ' + req.query.order)` | app.js:46 | Critical |
 | 4 | SQL injection via multi-line template literal (built across lines 54-58; single-line greps miss it) | app.js:54-58 | Critical |
 | 5 | Second-order command injection — queue worker `exec(`convert ${job.data.path} ...`)` trusts producer payload | app.js:65-68 | Critical |
+| 6 | Mass assignment — `.update(req.body)` without key allowlist (role/isAdmin settable) | app.js:76-79 | High |
 
 ## Must NOT trigger (near-misses)
 
@@ -20,4 +21,5 @@ results are informational only — not ground truth for this fixture.
   - `/admin/billing` guarded by both middlewares (census safe form)
   - `knex.raw('... ORDER BY ??', [col])` identifier binding (builder safe form)
   - `execFile('convert', [abs, ...])` with normalized + contained path (worker safe form)
+  - `.update(patch)` built from a key allowlist (mass-assignment safe form)
 - `postgres://db.internal.example.com/shop` connection string (no credentials — not a secret)

@@ -69,6 +69,15 @@ rg -n "requests\.get\(|axios\.(get|post)|fetch\(|urllib\.request|HttpClient|curl
 ```
 Flag only when the URL (host or full) derives from user input — e.g. "fetch this webhook URL", URL preview features, image import by URL. Check for allowlist/redirect limits/private-IP blocking.
 
+**Egress controls (defense verification, A10):** when the app fetches user-influenced URLs, also check the environment makes SSRF expensive:
+- Kubernetes: any `NetworkPolicy` restricting egress for the fetcher pods? (absence → note; pair with the SSRF finding — see `../container-iac-security/SKILL.md`)
+- Cloud: metadata service reachable with v1 tokens (AWS `metadata_options http_tokens = "optional"`, no hop limit) → cloud-metadata SSRF = credential theft, raise SSRF severity
+- No egress proxy/allowlist at all → mention as hardening: the fix lives in network config, not app code
+```bash
+rg -n "http_tokens|metadata_options|hop_limit" -g '*.tf' -g '*.yaml' -g '*.json'
+rg --files -g '*networkpolicy*' -g '*NetworkPolicy*' ; rg -n "kind: NetworkPolicy|policyTypes:.*Egress" -g '*.yaml' -g '*.yml'
+```
+
 ### Deserialization
 ```bash
 rg -n "pickle\.loads?|yaml\.load\((?!.*Loader=)|marshal\.loads|ObjectInputStream|readObject|unserialize\(|eval\(|exec\(|new Function\(|Function\("
