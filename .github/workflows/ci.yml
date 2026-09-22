@@ -56,7 +56,9 @@ jobs:
           grep -q 'fixed in' <<<"$out"
 
       - name: Workflow YAML validity
-        run: ruby -ryaml -e "Dir['.github/workflows/*.yml'].each { |f| YAML.load_file(f); }; puts 'workflows OK'">
+        run: |
+          python3 -m pip install --quiet pyyaml 2>/dev/null || python3 -m pip install --quiet --break-system-packages pyyaml
+          python3 -c "import yaml, glob; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]; print('workflows OK')"
 
       - name: Read-only safety gate (skills must not mutate audited projects)
         run: python3 scripts/audit_readonly.py
