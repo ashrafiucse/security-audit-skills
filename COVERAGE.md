@@ -21,6 +21,8 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Course/e-learning platforms | good | `course-platform-security`: gating truth, preview leaks, enrollment state machine, cohort scoping, moderation-queue student→admin XSS — persona-driven (public/student/admin); fixture `course-vuln-app` |
 | Skill authoring | — | `skill-forge`: scaffold + authoring laws + blind-test protocol for building NEW custom skills without external dependencies |
 | Insecure design (A04) | good | grep-anchored checklist + `flow-security` skill for flow-wise analysis (F1–F8 classes, flow-vuln-app fixture) |
+| **Design-phase threat modeling (pre-code)** | good | `design-threat-review`: spec in → THREAT-MODEL.md out (actor×asset matrix, trust boundaries, STRIDE→detector mapping, audit contract); fixture `design-threat-review-vuln-app`; audit-time consumption via security-audit Phase 0 THREAT-MODEL.md hook |
+| **Audit completeness enforcement** | good | security-audit Completeness gate v2 (actor×surface matrix, every cell ✅/🟢/⬜ dispositioned, NOT-ASSESSED listed by name) + census receipts (`hits=N dispositioned=N`) + enumeration discipline; incremental PR/diff audit mode (`pr_diff_scope.sh`) for early-stage delta audits |
 | Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade raw-output census (glob + disposition + privilege-direction triage), CSRF except; fixture `laravel-vuln-app` |
 | Django/Python | good | `django-security`: raw()/extra(), mark_safe, `__all__` mass assignment, settings |

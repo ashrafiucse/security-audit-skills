@@ -29,6 +29,7 @@ Give it any project (any language, any stack) and it will:
 | `llm-security` | LLM/AI apps: prompt injection & data exfil, unsafe model deserialization (pickle/torch.load/LangChain), hardcoded LLM keys, over-powered agent tools, prompt/PII logging & telemetry |
 | `flow-security` | Cross-endpoint business flows: state-machine violations (skip/replay/disorder), client-supplied data at terminal steps, association/chained IDOR, webhook replay, step-skipping via direct access, post-payment mutation, amount drift, privilege transitions between hops |
 | `course-platform-security` | E-learning/course platforms, persona-driven: catalog gating truth (draft/private exposure), preview-vs-full-content leaks, enrollment state machines, cohort/multi-cohort access, admin-only surfaces |
+| `design-threat-review` | **Design-stage gate, before code exists**: spec/PRD in → `THREAT-MODEL.md` out — actor×asset inventory, trust boundaries, STRIDE sweep mapped to detection skills, per-persona abuse cases, and the audit contract (actor×surface matrix + acceptance criteria) the future audit must disposition |
 | `skill-forge` | Authors NEW custom skills for this repo: scoping from personas/pains, scaffold script, authoring laws from the eval LEARNINGS, blind-test protocol, wiring checklist |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
