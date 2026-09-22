@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- SAFE counter-examples for web-hardening-vuln. An audit must NOT report these. -->
+<html>
+  <head>
+    <!-- SAFE (vs SEC-01): CSP with nonces, no unsafe-* -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'nonce-r4nd0m';">
+    <!-- SAFE (vs SEC-02): SRI + subresource integrity on the third-party script -->
+    <script src="https://cdn.example-fake.com/analytics.js"
+            integrity="sha384-FAKEHASH0000000000000000000000000000000000000000000000"
+            crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="feed"></div>
+    <script nonce="r4nd0m">
+      const AC = new AbortController();
+      const t = setTimeout(() => AC.abort(), 5000); // SAFE (vs SEC-05): timeout
+      fetch('https://partner.example-fake.com/api/feed', { signal: AC.signal })
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('feed').textContent = data.text; // SAFE (vs SEC-03): text sink
+          const premium = data.entitlements?.includes('premium:read') === true; // SAFE (vs SEC-04): re-derived server-side claim
+        })
+        .finally(() => clearTimeout(t));
+    </script>
+  </body>
+</html>

@@ -15,6 +15,9 @@ only — not ground truth for this fixture.
 | 6 | TOCTOU race — single-use coupon: check (`coupon.used`) and claim (`updateOne`) are separate steps → replay | app.js:73-83 | High |
 | 7 | Unsafe file upload — user filename verbatim (91), stored under served webroot (90: `public/uploads` + `express.static('public')` at 15), no filter/limits (93) | app.js:88-98 | High (Critical for parse-to-RCE chains) |
 | 8 | WebSocket authz — no handshake auth middleware (`io.use` absent) + subscription without ownership check → IDOR over sockets | app.js:101-108 | Critical |
+| 9 | No lockfile — non-reproducible installs, transitive-swap risk (file-level anchor) | package.json:- | High |
+| 10 | Missing security headers — no helmet/CSP/X-Frame-Options middleware on the response path (file-level anchor) | app.js:- | Medium |
+| 11 | No authentication layer — 0/8 routes have auth middleware; login emits no success/failure audit events (file-level anchor) | app.js:- | High |
 
 ## Must NOT trigger (near-misses — all in `safe-counterexamples.js`)
 

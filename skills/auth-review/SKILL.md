@@ -29,6 +29,11 @@ Build a table `route → auth middleware → ownership check` and fill it by rea
 - the one handler missing `@login_required` / `authorize` / `auth:sanctum` in an otherwise-guarded file
 - non-HTTP surfaces that are routes in disguise: queue consumers, cron/background job handlers, webhook receivers, GraphQL resolvers (see `../graphql-security/SKILL.md`), event subscribers, RPC/message handlers — census them with the same table
 - dispatch-style apps (`?action=` → switch) — enumerate the switch arms, not the single URL
+- **gRPC / protobuf services**: `service X { rpc Y (...) }` in `.proto` files — every `rpc` is a route; check per-method auth interceptors and validate request fields like any handler. Same for **message-queue consumers** (Kafka/Rabbit/SQS handlers), **scheduled job entry points**, and **Netty/WebSocket frame handlers** — add them all to the census table
+```bash
+rg -n "rpc \w+\(" -g '*.proto'; rg -n "@GrpcClient|StreamObserver" -g '*.java' -g '*.kt'
+rg -n "@(KafkaListener|RabbitListener)|consumer\.|@Scheduled|@CloudFunction|functions\." -g '*.java' -g '*.kt' -g '*.py' -g '*.js' | head
+```
 
 ## 2 — Authentication checks
 

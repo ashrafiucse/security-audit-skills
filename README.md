@@ -21,9 +21,9 @@ Give it any project (any language, any stack) and it will:
 | `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
 | `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) + supply-chain hygiene (dependency confusion, typosquats, provenance) |
 | `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF, deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads, query-builder raw sinks |
-| `auth-review` | Authn/authz, route census for unguarded endpoints, password storage, sessions, JWT, OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
+| `auth-review` | Authn/authz, route census (incl. gRPC/MQ/scheduled handlers), password storage, sessions, JWT (confusion/kid/PKCE), OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
-| `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers |
+| `config-hardening` | Headers (incl. weak-CSP review), cookie prefixes, SRI, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers, API resource & consumption (API4/API10) |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
 | `llm-security` | LLM/AI apps: prompt injection & data exfil, unsafe model deserialization (pickle/torch.load/LangChain), hardcoded LLM keys, over-powered agent tools, prompt/PII logging & telemetry |

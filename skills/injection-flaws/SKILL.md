@@ -84,6 +84,12 @@ rg -n "pickle\.loads?|yaml\.load\((?!.*Loader=)|marshal\.loads|ObjectInputStream
 ```
 `yaml.load` without `SafeLoader`, `pickle.loads` on user-controlled bytes, PHP `unserialize` on user input, `eval` on anything remote = CRITICAL.
 
+### CRLF / header injection
+```bash
+rg -n "setHeader\(|addHeader\(|res\.set\(|header\(\s*['\"]Location|redirect\(.*\+\s*req|Location.*\+ *request"
+```
+User-controlled data (query params, URL paths, filenames, webhook fields) written into response headers → `\r\n` in it splits/adds headers: `?next=/%0d%0aSet-Cookie: admin=1`, response splitting on proxies, poisoned caches, injected email headers when the same data feeds mail APIs. Report MEDIUM (HIGH when the header is `Location`/`Set-Cookie` or feeds an email/sms gateway). Fix: strip `\r\n` (and `\0`) from values before any header/mail use, URL-encode redirect components.
+
 ### Template injection (SSTI)
 ```bash
 rg -n "render_template_string|Template\(.*\+|Jinja2\(.*from_string|erb\.new\(.*\+|Mustache\.render\(.*\+|StringTemplate"

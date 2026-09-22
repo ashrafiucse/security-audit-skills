@@ -18,3 +18,6 @@ column.
 
 | Date | Fixture/App | Recall | Precision | Phantoms | Found/Expected | Trigger |
 |---|---|---|---|---|---|---|
+| 2026-09-22 | node-vuln-app-2 | 90.91% | 100.00% | 0 | 10/11 | e2e baseline: subagent audit round (post v1.2.0) |
+| 2026-09-22 | llm-vuln-app | 100.00% | 100.00% | 0 | 8/8 | e2e baseline: subagent audit round (post v1.2.0) |
+| 2026-09-22 | iac-vuln-app | 100.00% | 100.00% | 0 | 17/17 | e2e baseline: subagent audit round (post v1.2.0) |

@@ -13,6 +13,7 @@ intentionally unpinned.
 | 4 | Exfil/SSRF tool — `requests.get(url)` with model-chosen URL, no allowlist | app.py:29-31 | High |
 | 5 | `PythonREPLTool` on an agent driven by untrusted chat (prompt injection → code exec) | app.py:34 | Critical |
 | 6 | Prompt injection — user input concatenated into the instruction prompt with tools attached | app.py:38-41 | High |
+| 7 | Unpinned dependencies + no lockfile — non-reproducible, supply-chain swap risk (file-level anchor) | requirements.txt:- | High |
 
 ## Must NOT trigger (near-misses — `safe_app.py`)
 

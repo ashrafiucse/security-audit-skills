@@ -117,7 +117,7 @@ Write `SECURITY-AUDIT.md` in the project root (this is the only file you create)
 
 ```markdown
 # Security Audit — <project>
-Date: YYYY-MM-DD | Scope: <commit hash / "working tree"> | Auditor: security-skills v<version>
+Date: YYYY-MM-DD | Scope: <commit hash / "working tree"> | Auditor: security-skills v$(git describe --tags --always 2>/dev/null || echo dev)
 Knowledge base: <N> vuln-db entries (newest YYYY-MM-DD) | Live checks: OSV.dev + CISA KEV
 
 ## Stack

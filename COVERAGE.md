@@ -11,11 +11,11 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Secrets detection | strong | regex set + triage; grows with provider patterns |
 | Dependency CVEs | strong (live) | OSV API; parser coverage below; + supply-chain hygiene (confusion/typosquat, `supply-chain-vuln` fixture) |
 | Injection (SQLi/XSS/cmd/path/SSTI/deser) | strong | Node/Python/Java/Ruby/PHP/Go packs in `injection-flaws/references/`; + XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, upload abuse, second-order/stored flows, query-builder raw sinks, multi-line construction |
-| Auth/authz | strong | sessions, JWT, OAuth, IDOR; + route census, mass assignment, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
-| Crypto | strong | usage-context judgment table |
-| Config/headers/CORS/CI | strong | + postMessage/client-side handlers (`spa-vuln-app` fixture) | |
+| Auth/authz | strong | sessions, JWT (confusion/kid/PKCE), OAuth, IDOR; + route census (HTTP + gRPC/MQ/scheduled), mass assignment, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
+| Crypto | strong | usage-context judgment table; measured end-to-end by `crypto-vuln-app` fixture (ECB/DES/MD5/non-CSPRNG/TLS-off/weak-KDF + safe forms) |
+| Config/headers/CORS/CI | strong | + postMessage/client-side handlers, weak-CSP/cookie-prefix/SRI review, CRLF, API4/API10 (`web-hardening-vuln` fixture) | |
 | Containers & IaC | strong | Docker/compose/K8s/Terraform; measured by `iac-vuln-app` fixture (+CI workflow); + egress/NetworkPolicy + IMDSv2 checks |
-| Data exposure / logging | good | A09 pack (audit events, log forging, verbosity); alerting config remains report-level |
+| Data exposure / logging | strong | A09 pack: audit events, log forging, verbosity; alerting-config checks (in-repo evidence first, "not assessed" fallback) |
 | GraphQL APIs | good | `graphql-security`: introspection, depth limits, resolver authz, CSRF, batching |
 | LLM / AI apps | good | `llm-security`: prompt injection/exfil, model deserialization, LLM keys, agent tools, telemetry; measured by `llm-vuln-app` fixture |
 | Insecure design (A04) | good | grep-anchored checklist (replay/idempotency, client-controlled money/scope, negative values, step-skipping) in `security-audit/references/owasp-top10.md`; judgment still required |
@@ -34,10 +34,9 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 
 ## Help wanted (priority order)
 
-1. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
+1. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only, Java library sinks. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
 2. **More vuln-db entries** — ongoing weekly via KEV triage issues
-3. **A09 alerting depth** — currently report-level prompts in `data-exposure/references/logging-a09.md`
-4. **Real-world quarterly benchmarks** using `scripts/score_audit.py` (see `evals/run.md`)
+3. **Real-world quarterly benchmarks** using `scripts/score_audit.py` (see `evals/run.md`); scoreboard rows from any agent-run round welcome
 
 ## Benchmark targets (quarterly, per evals/README.md)
 
