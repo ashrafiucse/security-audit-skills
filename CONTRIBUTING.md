@@ -40,6 +40,9 @@ scripts/validate.py                   # lint: frontmatter, cross-refs, vuln-db e
 - [ ] No real secrets, credentials, or live URLs that imply them
 - [ ] Docs updated (README skill table if adding a skill; pattern tables in `references/`)
 
-## Reporting a missed finding (users)
+## Reporting a missed finding or a false positive (users)
 
-Open an issue with: the code snippet (sanitized), what the vulnerability was, which skill should have caught it. Maintainers convert it into a fixture + pattern — that's how the skills get smarter (see MAINTENANCE.md).
+Open an issue with the right template — both directions train the skills:
+
+- **Missed finding** (`[miss]`): the code snippet (sanitized), what the vulnerability was, which skill should have caught it. Maintainers convert it into a fixture + pattern — that's how the skills get smarter (see MAINTENANCE.md).
+- **False positive** (`[fp]`): what the audit reported, why it's wrong (the safe context), which pattern fired. Maintainers narrow the pattern + add a near-miss fixture — that's how the skills get quieter.

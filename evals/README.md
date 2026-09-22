@@ -33,6 +33,7 @@ evals/
 
 - **Every accepted PR that adds/changes a detection pattern must add or update a fixture.** No fixture, no merge.
 - **Every miss goes in `MISSES.md`** (this directory) the session it's found — open row until the pattern + fixture land. A miss without a ledger row didn't happen.
+- **Every false positive gets the same treatment** — `[fp]` issue → narrowed pattern + near-miss fixture. Recall and precision train symmetrically; drift history lives in `SCOREBOARD.md`.
 - Fixtures contain ONLY fake data: `AKIAIOSFODNN7EXAMPLE`-style keys, `example.com` hosts, `password123` values. Never real secrets — people will clone this repo.
 - A finding that a fixture *shouldn't* trigger (near-miss) is as valuable as a planted one — add both.
 - Fixtures also serve as living examples of what each finding looks like.

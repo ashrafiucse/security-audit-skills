@@ -44,6 +44,8 @@ the ruleset to *disabled* (Settings → Rules → Rulesets), do the change, rest
 ### Monthly (~2 h) — pattern refresh
 - Review the month's high-profile advisories for *new bug classes or APIs* (not just CVEs). New dangerous API → new grep pattern in the relevant skill's `references/`, + fixture.
 - Re-run evals on all fixtures; fix any precision regressions (new patterns causing false positives are the #1 decay mode).
+- **Adversarial drill (30 min, one skill per month, rotate):** try to write code that *defeats* the skill — a real bug phrased so its greps miss it, and a safe near-miss phrased so its greps fire. Whatever you find becomes a fixture + pattern. Attack your own patterns like a red team; fixture sets that only contain bugs phrased the way the author already thought of them don't generalize.
+- Scan `evals/SCOREBOARD.md` for drift: any fixture/skill whose recall or precision dropped vs. its last row gets a bisect (`git log --oneline skills/<skill>`) and a regression row in `MISSES.md`.
 
 ### Quarterly (~half day) — external benchmark
 - Run `/skill:security-audit` against the real-world test beds (Juice Shop, Node Goof, Railsgoat, WebGoat — see `evals/README.md`).
@@ -53,11 +55,13 @@ the ruleset to *disabled* (Settings → Rules → Rulesets), do the change, rest
 ## 3. The improvement loop (how the skills "learn")
 
 ```
-user reports a miss (issue)
+user reports a miss or a FALSE POSITIVE (issue templates)
    → maintainer LOGS it in evals/MISSES.md the same session (open row — no miss untracked)
-   → maintainer writes a fixture reproducing it (evals/)
-   → adds/updates detection guidance (references/ or vuln-db/)
-   → re-runs eval round (all fixtures must still pass)
+   → maintainer writes a fixture reproducing it (evals/) — planted finding for a miss,
+     a near-miss for a false positive
+   → adds/updates detection guidance (references/ or vuln-db/) — widen for recall,
+     narrow for precision
+   → re-runs eval round (all fixtures must still pass; SCOREBOARD row appended)
    → PR merged → version tag → MISSES.md row closed
 ```
 

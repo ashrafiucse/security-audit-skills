@@ -39,9 +39,15 @@ The scorer matches report citations (`file:line`) against ground truth rows
 
 ## 4. Record the round
 
-- Append to the PR description (pattern changes) or the quarterly benchmark
-  table in this README: fixture, date, recall/precision/phantoms, deltas.
-- Every miss → open row in `MISSES.md` the same session.
+- Append to the drift history automatically:
+  ```
+  python3 scripts/score_audit.py <report> evals/fixtures/<scenario> \
+      --append --label "<what changed / PR #>"
+  ```
+  (`evals/SCOREBOARD.md`; real-world benchmarks get manual rows in the same format.)
+- Every miss → open row in `MISSES.md` the same session; every near-miss
+  violation (reporting a "Must NOT trigger" item) → false-positive issue
+  template + pattern narrowing.
 - Regressions block merge: re-run ALL fixtures if you changed shared skills
   (`injection-flaws`, `auth-review`) — `python3 scripts/selftest_patterns.py`
   catches the grep-level half automatically.

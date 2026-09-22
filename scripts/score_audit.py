@@ -16,6 +16,7 @@ agents re-cite nearby lines) and basename-based; bare continuation ranges
 import argparse
 import re
 import sys
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 TOLERANCE = 2
@@ -99,6 +100,11 @@ def main():
     ap.add_argument("--min-recall", type=float, default=0.9)
     ap.add_argument("--min-precision", type=float, default=0.8)
     ap.add_argument("--max-phantoms", type=int, default=0)
+    ap.add_argument("--append", nargs="?", const="evals/SCOREBOARD.md", default=None,
+                    metavar="SCOREBOARD",
+                    help="append the round row to evals/SCOREBOARD.md (or given path)")
+    ap.add_argument("--label", default="manual round",
+                    help="change trigger / PR ref recorded with the row")
     args = ap.parse_args()
 
     expected = parse_expected(Path(args.fixture_dir))
@@ -132,6 +138,25 @@ def main():
     ok = (recall >= args.min_recall and precision >= args.min_precision
           and len(phantoms) <= args.max_phantoms)
     print("RESULT: PASS" if ok else "RESULT: FAIL (thresholds not met)")
+
+    if args.append:
+        sb = Path(args.append)
+        row = (f"| {date.today().isoformat()} | {Path(args.fixture_dir).name} "
+               f"| {recall:.2%} | {precision:.2%} | {len(phantoms)} "
+               f"| {matched}/{len(expected)} | {args.label} |")
+        header = ("# Eval Scoreboard\n\nRound history for scored audits. "
+                  "See evals/run.md and the scorer --append flag.\n\n"
+                  "## Round history\n\n"
+                  "| Date | Fixture/App | Recall | Precision | Phantoms "
+                  "| Found/Expected | Trigger |\n|---|---|---|---|---|---|---|\n")
+        if not sb.exists():
+            sb.parent.mkdir(parents=True, exist_ok=True)
+            sb.write_text(header + row + "\n", encoding="utf-8")
+        else:
+            with sb.open("a", encoding="utf-8") as fh:
+                fh.write(row + "\n")
+        print(f"scoreboard: appended -> {sb}")
+
     return 0 if ok else 1
 
 
