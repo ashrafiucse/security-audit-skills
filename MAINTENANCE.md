@@ -28,7 +28,7 @@ Automation inventory:
 
 | Workflow | Cadence | Output | Human action |
 |---|---|---|---|
-| `update-kev.yml` | daily 06:00 UTC | deduped KEV triage issue | vuln-db entries for ecosystem items; close infra-only |
+| `update-kev.yml` | daily 06:00 UTC | deduped KEV triage issue | vuln-db entries for ecosystem items; close infra-only; record every batch in `vuln-db/kev-triage-log.md` |
 | `critical-cve-digest.yml` | daily 06:15 UTC | digest issue with drafts | pick items with in-repo detection |
 | `notify.yml` | on issue opened | @maintainer mention (+optional Slack) | none |
 | `ci.yml` | push / PR | quality gate | keep green |
