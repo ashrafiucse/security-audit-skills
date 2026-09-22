@@ -1,0 +1,14 @@
+# Fixture: K8s RBAC escalation + serverless gaps. FAKE data only.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deploy-helper
+rules:
+  # SEC-05: escalation verbs — any holder can self-escalate to cluster-admin
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "clusterroles"]
+    verbs: ["escalate", "bind", "create", "update"]
+  # SEC-06: cluster-wide secret reads (every credential readable)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]

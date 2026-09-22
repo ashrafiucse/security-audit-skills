@@ -1,0 +1,23 @@
+{
+  "info": {
+    "name": "Shop API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_comment": "SEC-11: live bearer token saved in a shared collection (next Authorization header)"
+  },
+  "item": [
+    {
+      "name": "Admin login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.FAKEW1pZ2h0eSBoYXBwZW5lZCB0byBiZSBmYWtlIDEyMzQ1Njc4OTA.gYqUwqZDeadBeefFake",
+            "type": "text"
+          }
+        ],
+        "url": "https://api.example-fake.com/admin/login"
+      }
+    }
+  ]
+}

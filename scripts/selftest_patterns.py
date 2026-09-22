@@ -240,6 +240,28 @@ RULES = [
     ("admin-no-role",
      r"app\.post\(\s*['\"]\S*admin",
      "course-vuln-app/app.js", "app.post('/api/admin/courses'"),
+    # --- surface round (surface-vuln-app) ---
+    ("saml-nonstrict",
+     r"['\"]strict['\"]\s*:\s*False",
+     "surface-vuln-app/saml_route.py", '"strict": False'),
+    ("saml-unsigned",
+     r"want(Response|Assertions)Signed['\"]\s*:\s*False",
+     "surface-vuln-app/saml_route.py", "wantResponseSigned"),
+    ("k8s-escalate-verbs",
+     r"verbs:\s*\[.*['\"](escalate|bind|impersonate)['\"]",
+     "surface-vuln-app/clusterrole.yaml", '"escalate", "bind"'),
+    ("serverless-wildcard-iam",
+     r"Action:\s*['\"]\*['\"]",
+     "surface-vuln-app/serverless.yml", 'Action: "*"'),
+    ("serverless-authorizer-none",
+     r"authorizer:\s*none",
+     "surface-vuln-app/serverless.yml", "authorizer: none"),
+    ("devart-vscode-token",
+     r"GITHUB_TOKEN['\"]?\s*[:=]",
+     "surface-vuln-app/.vscode/launch.json", 'GITHUB_TOKEN'),
+    ("devart-postman-bearer",
+     r"Bearer eyJ[A-Za-z0-9_.-]+",
+     "surface-vuln-app/shop-api.postman_collection.json", 'Bearer eyJ'),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.

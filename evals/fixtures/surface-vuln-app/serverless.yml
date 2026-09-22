@@ -1,0 +1,26 @@
+# Fixture: serverless gaps. FAKE data only.
+service: shop-api
+
+provider:
+  name: aws
+  runtime: python3.12
+  iam:
+    role:
+      statements:
+        # SEC-07: wildcard everything on the function role
+        - Effect: Allow
+          Action: "*"
+          Resource: "*"
+  environment:
+    # SEC-08: secret in the function env
+    STRIPE_KEY: sk_test_Fake51ExampleDoNotUseXX99999
+
+functions:
+  createOrder:
+    handler: handler.create_order
+    events:
+      # SEC-09: state-changing route with NO authorizer
+      - http:
+          path: orders
+          method: post
+          authorizer: none
