@@ -290,6 +290,16 @@ RULES = [
     ("infra-docker-sock-mount",
      r"/var/run/docker\.sock",
      "infra-vuln/docker-compose.yml", "/var/run/docker.sock"),
+    # --- sibling moderation-direction plants (class propagation, 2026-09-23) ---
+    ("django-moderation-safe-filter",
+     r"\|safe\b",
+     "django-vuln-app/myapp/templates/reviews/moderation.html", "r.body|safe"),
+    ("rails-moderation-raw",
+     r"<%=\s*raw\b",
+     "rails-vuln-app/app/views/reviews/_moderation.html.erb", "<%= raw @review.body"),
+    ("spring-moderation-utext",
+     r"th:utext",
+     "spring-vuln-app/src/main/resources/templates/reviews/moderation.html", "th:utext=\"${review.body}"),
     ("blade-mail-raw-render",
      r"\{!!",
      "laravel-vuln-app/resources/views/mail/support-ticket.blade.php", "{!! $ticket->body !!}"),
@@ -430,6 +440,15 @@ MUST_NOT_MATCH = [
     ("quiz-grade-escaped-safe",
      r"nl2br\(\s*\$answer->text",
      "laravel-vuln-app/resources/views/course-edit/quiz/safe-grade.blade.php"),
+    ("django-moderation-escaped-safe",
+     r"\|safe\b",
+     "django-vuln-app/myapp/templates/reviews/safe-moderation.html"),
+    ("rails-moderation-escaped-safe",
+     r"<%=\s*raw\b|\.html_safe",
+     "rails-vuln-app/app/views/reviews/_safe_moderation.html.erb"),
+    ("spring-moderation-escaped-safe",
+     r"th:utext",
+     "spring-vuln-app/src/main/resources/templates/reviews/safe-moderation.html"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

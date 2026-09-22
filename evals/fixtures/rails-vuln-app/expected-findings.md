@@ -13,9 +13,11 @@
 | 9 | Committed `secret_key_base` | config/secrets.yml:2 | Critical |
 | 10 | Over-returning — `render json: user` leaks every column incl. admin/password digest | users_controller.rb:16 | Medium |
 | 11 | No lockfile — `Gemfile.lock` absent, non-reproducible installs (file-level anchor) | Gemfile:- | High |
+| 12 | Moderation-view XSS — `raw @review.body` in the staff moderation partial (privilege direction: unprivileged→privileged = Critical) | app/views/reviews/_moderation.html.erb:4 | Critical |
 | — | rails 5.2.3 / devise 4.7.1 / pg 1.1.4 (live OSV — informational, network-dependent) | Gemfile | High |
 
 ## Must NOT trigger
 
 - `<%= @user.name %>` (escaped counterpart)
+- `<%= @review.body %>` in app/views/reviews/_safe_moderation.html.erb:2 (escaped moderation counterpart)
 - `User.find(params[:id])` alone in `show` (authz context missing → note, but not Critical by itself)

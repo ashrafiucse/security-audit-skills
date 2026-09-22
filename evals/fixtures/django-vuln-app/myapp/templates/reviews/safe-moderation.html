@@ -1,0 +1,6 @@
+{# SAFE counter-example (moderation view): plain interpolation escapes. #}
+<div class="mod-queue">
+  {% for r in reviews %}
+    <blockquote>{{ r.body }}</blockquote>
+  {% endfor %}
+</div>

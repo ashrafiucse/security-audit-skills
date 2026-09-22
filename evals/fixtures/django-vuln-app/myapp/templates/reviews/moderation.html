@@ -1,0 +1,8 @@
+{# Fixture: staff moderation view — student-submitted review bodies. #}
+{# SEC-11: |safe bypasses escaping; student authors, staff reads #}
+{# (privilege direction: unprivileged -> privileged = Critical). #}
+<div class="mod-queue">
+  {% for r in reviews %}
+    <blockquote>{{ r.body|safe }}</blockquote>
+  {% endfor %}
+</div>

@@ -14,8 +14,10 @@
 | 10 | Unpinned-hash requirements (no `--require-hashes` possible) — supply-chain reproducibility | requirements.txt:- | Low |
 | 9 | XSS via `\|safe` filter in template | templates/greet.html:2 | High |
 | 10 | Django 2.2.0 + DRF 3.9.1 (live OSV: many CVEs, EOL) | requirements.txt | High (network-dependent) |
+| 11 | Moderation-view XSS — student review body through `\|safe` in the STAFF queue template (privilege direction: unprivileged→privileged = Critical) | myapp/templates/reviews/moderation.html:6 | Critical |
 
 ## Must NOT trigger
 
 - `{{ count }}` (auto-escaped)
 - ORM usage itself (parameterized — the safe counterpart to finding 5)
+- `{{ r.body }}` in myapp/templates/reviews/safe-moderation.html:4 (escaped moderation counterpart)
