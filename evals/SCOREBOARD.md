@@ -29,3 +29,12 @@ column.
 | 2026-09-22 | rails-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round — BLIND-EVAL COMPROMISED (rg scan printed 3 ground-truth lines into tool output; findings re-verified independently) |
 | 2026-09-22 | flow-vuln-app | 100.00% | 100.00% | 0 | 10/10 | e2e flow-security round (new skill first run; blind hygiene honored) |
 | 2026-09-22 | dep-risk-vuln-app | 100.00% | 100.00% | 0 | 8/8 | e2e dep-risk round (beyond-CVEs pack first run; blind hygiene honored) |
+| 2026-09-22 | node-vuln-app | 100.00% | 100.00% | 0 | 13/13 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | python-vuln-app | 100.00% | 100.00% | 0 | 13/13 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | python-vuln-app-2 | 100.00% | 100.00% | 0 | 6/6 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | infra-vuln | 100.00% | 100.00% | 0 | 9/9 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | java-libs-vuln | 100.00% | 100.00% | 0 | 4/4 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | web-hardening-vuln | 100.00% | 100.00% | 0 | 9/9 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | rails-libs-vuln | 100.00% | 100.00% | 0 | 1/1 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | spa-vuln-app | 100.00% | 100.00% | 0 | 2/2 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-22 | supply-chain-vuln | 100.00% | 100.00% | 0 | 3/3 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |

@@ -198,6 +198,22 @@ RULES = [
     ("dep-vendored-old-jquery",
      r"jQuery JavaScript Library v1\.",
      "dep-risk-vuln-app/public/vendor/jquery-1.8.3.min.js", "v1.8.3"),
+    # --- proactive gap round (gaps3-vuln-app) ---
+    ("tenant-unscoped-read",
+     r"res\.json\(db\.reports\)",
+     "gaps3-vuln-app/app.js", "res.json(db.reports)"),
+    ("hook-registration-url",
+     r"hooks\.push\(.*url:\s*req\.body\.url",
+     "gaps3-vuln-app/app.js", "url: req.body.url"),
+    ("hook-delivery-fetch",
+     r"fetch\(\s*h\.url",
+     "gaps3-vuln-app/app.js", "fetch(h.url"),
+    ("zip-extract-overwrite",
+     r"extractAllTo\(.*true\)",
+     "gaps3-vuln-app/app.js", "extractAllTo("),
+    ("host-substring-allowlist",
+     r"host\.includes\(h\)",
+     "gaps3-vuln-app/app.js", "host.includes(h)"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -271,6 +287,15 @@ MUST_NOT_MATCH = [
     ("dep-vendored-old-jquery-safe",
      r"jQuery JavaScript Library v1\.",
      "dep-risk-vuln-app/public/vendor/jquery-3.7.1.min.js"),
+    ("tenant-unscoped-safe",
+     r"res\.json\(db\.reports\)",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("zip-extract-overwrite-safe",
+     r"extractAllTo\([^)]*true\)",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("host-substring-safe",
+     r"host\.includes\(h\)",
+     "gaps3-vuln-app/safe-gaps3.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

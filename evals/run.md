@@ -38,9 +38,10 @@ python3 scripts/score_audit.py <path-to>/SECURITY-AUDIT.md evals/fixtures/<scena
 
 The scorer matches report citations (`file:line`) against ground truth rows
 (±2 line tolerance). **File-level anchors**: rows whose `Where` cell uses
-`file:-` (e.g. `package.json:-`) are satisfied by ANY mention of that file —
-use them for global/absence findings ("no lockfile", "no auth middleware").
-Manual pass afterwards for what it can't judge:
+`file:-` (e.g. `package.json:-`, or the absent file itself like
+`requirements.txt:-` for "no manifest") are satisfied by ANY mention of that
+file — use them for global/absence findings ("no lockfile", "no auth
+middleware"). Manual pass afterwards for what it can't judge:
 
 - **Near-miss violations**: any "Must NOT trigger" item reported → precision
   miss (count it manually; the scorer can't read judgment).

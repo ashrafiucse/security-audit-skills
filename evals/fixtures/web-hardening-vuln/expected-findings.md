@@ -13,6 +13,7 @@ prefixes, CRLF, API4/API10). FAKE domains only.
 | 6 | Auth/session cookie without `__Host-`/`__Secure-` prefix | app.js:7 | Medium |
 | 7 | CRLF injection — user data into `Location` header (no `\r\n` strip) | app.js:9 | Medium |
 | 8 | Unbounded list endpoint (no limit/pagination — API4) | app.js:15 | Medium |
+| 9 | No authentication on any route (census 0/2 guarded — file-level anchor) | app.js:- | High |
 
 ## Must NOT trigger (near-misses — `safe-index.html`)
 
