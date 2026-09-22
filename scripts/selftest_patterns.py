@@ -111,6 +111,19 @@ RULES = [
     ("llm-anthropic-key",
      r"sk-ant-api03-[A-Za-z0-9_-]{20,}",
      "llm-vuln-app/app.py", "sk-ant-api03-"),
+    # --- vuln-db library families (java-libs-vuln, rails-libs-vuln) ---
+    ("fastjson-autotype",
+     r"setAutoTypeSupport|autoTypeSupport",
+     "java-libs-vuln/src/main/java/com/example/web/ApiController.java", "setAutoTypeSupport(true)"),
+    ("text4shell-substitutor",
+     r"StringSubstitutor",
+     "java-libs-vuln/src/main/java/com/example/web/ApiController.java", "StringSubstitutor.createDefault()"),
+    ("shiro-default-key",
+     r"kPH\+bIxk5D2deZiIxcaaaA==",
+     "java-libs-vuln/src/main/java/com/example/web/ApiController.java", "kPH+bIxk5D2deZiIxcaaaA=="),
+    ("rails-render-file-params",
+     r"render\s+file:\s*params",
+     "rails-libs-vuln/app/controllers/demos_controller.rb", "render file: params[:path]"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -151,6 +164,12 @@ MUST_NOT_MATCH = [
     ("llm-key-safe",
      r"sk-ant-api03-[A-Za-z0-9_-]{20,}",
      "llm-vuln-app/safe_app.py"),
+    ("fastjson-autotype-safe",
+     r"setAutoTypeSupport\(true\)|autoTypeSupport",
+     "java-libs-vuln/src/main/java/com/example/web/SafeController.java"),
+    ("shiro-default-key-safe",
+     r"kPH\+bIxk5D2deZiIxcaaaA==|setCipherKey",
+     "java-libs-vuln/src/main/java/com/example/web/SafeController.java"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

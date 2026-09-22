@@ -157,6 +157,14 @@ when the stack matches. Format: dangerous → safe → grep.
 | `skip_before_action :verify_authenticity_token` on cookie-auth API | token auth (Bearer) or CSRF tokens | API mode makes CSRF *more* subtle, not gone |
 | `params.permit!` / `params.to_unsafe_h` into model update | `permit(:name, :email)` | mass assignment |
 
+## Java — libraries that are sinks by themselves
+
+| Dangerous | Safe | Notes |
+|---|---|---|
+| fastjson `JSON.parseObject(userJson)` with autoType (`setAutoTypeSupport(true)`, ≤1.2.80) | typed `parseObject(json, DTO.class)`; fastjson2 | CVE-2022-25845 RCE family — version + sink |
+| commons-text `StringSubstitutor.createDefault().replace(userText)` (1.0–1.9) | explicit map/string lookups only | Text4Shell CVE-2022-42889 — `${script:}` executes |
+| Shiro rememberMe with default/known `setCipherKey` (`kPH+bIxk5D2deZiIxcaaaA==`) | unique random key from env/secret | Shiro550 deserialization RCE — the key string is the finding |
+
 ## Adding a framework
 
 Same rules as `patterns.md`: one row = one fixture line (true positive + a
