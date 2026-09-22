@@ -38,3 +38,6 @@ column.
 | 2026-09-22 | rails-libs-vuln | 100.00% | 100.00% | 0 | 1/1 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
 | 2026-09-22 | spa-vuln-app | 100.00% | 100.00% | 0 | 2/2 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
 | 2026-09-22 | supply-chain-vuln | 100.00% | 100.00% | 0 | 3/3 | e2e gap-hunt wave (9/12; node3/crypto/dep-manifests blocked: subagent model availability) |
+| 2026-09-23 | laravel-vuln-app | 100.00% | 100.00% | 0 | 12/12 | gate-v2 validation round — IN-PROCESS (ground-truth-aware; artifact/achievability validation, not blind recall). Blind re-run pending: subagent registry exhausted + no external CLI agents on PATH |
+| 2026-09-23 | course-vuln-app | 100.00% | 100.00% | 0 | 6/6 | gate-v2 validation round — IN-PROCESS (same caveat) |
+| 2026-09-23 | design-threat-review-vuln-app | 100.00% | 100.00% | 0 | 6/6 | gate-v2 validation round — IN-PROCESS (same caveat); round caught + fixed T-NNN scorer contract |

@@ -29,7 +29,7 @@ BARE_TOKEN = re.compile(r"(?<![\w:./-])(\d+)(?:-(\d+))?(?![\w.])")
 # a file mentioned WITHOUT a line — how agents cite global/absence findings
 FILE_MENTION = re.compile(rf"(?<![\w./-])({FILE_RE})(?![\w.:])")
 ROW_RE = re.compile(r"^\|\s*\w[\w.a-z]*\s*\|.*\|.*\|", re.I)  # 3+ col table row
-SEC_RE = re.compile(r"^###\s+(SEC-\d+)", re.I)
+SEC_RE = re.compile(r"^###\s+((?:SEC|T)-\d+)", re.I)
 
 
 def scan_tokens(text):

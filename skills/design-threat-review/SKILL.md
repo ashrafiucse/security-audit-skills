@@ -83,10 +83,22 @@ abuse? Defaults that must not be argued away:
 ## Step 5 — Write THREAT-MODEL.md (the audit contract)
 
 1. Actor×asset power matrix (Step 1) and flows+boundaries (Step 2).
-2. Threat table: `| # | actor | asset | surface | threat | severity-if-missed | detector skill | acceptance criterion |` —
-   the acceptance criterion is the control implementation MUST show, stated
-   as a checkable fact (e.g. "review body passes through e() before any
-   formatting in EVERY staff view — list AND detail — or is stored purified").
+2. Threat list — one section per threat, same shape as security-audit Phase 3
+   findings so the scorer and future audits parse both the same way
+   (`T-NNN` ids; the spec anchor is the citable `file:line` evidence):
+
+   ```markdown
+   ### T-01: <threat title> — <severity-if-missed>
+   - **Actor → Asset:** student → admin power
+   - **Surface:** moderation detail view
+   - **Spec anchor:** spec.md:17-19
+   - **Detector skill:** ../laravel-security/SKILL.md Step 4 (privilege direction) + ../course-platform-security/SKILL.md §6.5
+   - **Acceptance criterion:** <the control implementation MUST show, stated as a checkable fact>
+   ```
+
+   The acceptance criterion is checkable — e.g. "review body passes through
+   e() before any formatting in EVERY staff view — list AND detail — or is
+   stored purified" — never "input is handled safely".
 3. The pre-seeded actor×surface coverage matrix, all cells ⬜ — the exact
    artifact `../security-audit/SKILL.md` Phase 0 loads and Phase 2 (gate v2)
    forces to disposition.
