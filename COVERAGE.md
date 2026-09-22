@@ -34,9 +34,10 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 
 ## Help wanted (priority order)
 
-1. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only, Java library sinks. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
-2. **More vuln-db entries** — ongoing weekly via KEV triage issues
+1. **More framework rows** in `injection-flaws/references/frameworks.md` — added: NestJS, Ktor, Django REST, Rails API-only, Java library sinks, Rust, Phoenix. Still wanted: Flask-RESTful, Gin+sqlx, ASP.NET Web Forms
+2. **More vuln-db entries** — ongoing weekly via KEV triage issues; incident-research batches (Metasploit-class waves) welcome — see `cve-research/references/notable-incidents.md`
 3. **Real-world quarterly benchmarks** using `scripts/score_audit.py` (see `evals/run.md`); scoreboard rows from any agent-run round welcome
+4. **Retry the 3 blocked e2e runs** (node-vuln-app-3, crypto-vuln-app, dep-manifests) when subagent models are available
 
 ## Benchmark targets (quarterly, per evals/README.md)
 
