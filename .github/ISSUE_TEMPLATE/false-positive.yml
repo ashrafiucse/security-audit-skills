@@ -1,0 +1,43 @@
+name: False positive
+description: Report a finding the audit skills got wrong — noise trains precision
+title: "[fp] <one-line description>"
+labels: [false-positive, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every confirmed false positive narrows a pattern + adds a near-miss
+        fixture, so the skills stop crying wolf on it forever. The mirror of
+        the missed-finding report. **Sanitize snippets — no real secrets.**
+  - type: textarea
+    id: finding
+    attributes:
+      label: What the audit reported
+      description: The finding as written (title, where file:line, severity)
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it's wrong
+      description: The context that makes the code safe (allowlist, sanitizer, guarded route, test fixture, constant...)
+    validations:
+      required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Which skill/pattern fired
+      placeholder: e.g. injection-flaws XSS grep, auth-review census
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested narrowing (optional)
+      description: What signal would separate this from real findings?
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does it fire?
+      options:
+        - Every audit on this stack (blocks triage)
+        - Sometimes
+        - Once

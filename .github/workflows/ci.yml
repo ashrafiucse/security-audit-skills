@@ -21,9 +21,10 @@ jobs:
         run: |
           bash -n install.sh
           bash -n skills/secrets-detection/scripts/scan.sh
+          bash -n skills/security-audit/scripts/probe_tools.sh
 
       - name: Python syntax
-        run: python3 -m py_compile scripts/validate.py skills/dependency-vulns/scripts/osv_scan.py
+        run: python3 -m py_compile scripts/validate.py scripts/selftest_patterns.py skills/dependency-vulns/scripts/osv_scan.py
 
       - name: Secrets scanner self-test (planted fakes must be found)
         run: |
@@ -34,6 +35,15 @@ jobs:
           out2=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/infra-vuln)
           printf '%s\n' "$out2"
           grep -q 'Fake4EvalsDoNotUse' <<<"$out2"
+          out3=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/iac-vuln-app)
+          printf '%s\n' "$out3"
+          grep -q 'Fake4EvalsDoNotUse' <<<"$out3"
+          out4=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/python-vuln-app)
+          printf '%s\n' "$out4"
+          grep -q 'hf_FakeTokenForEvalFixtures123' <<<"$out4"
+          out5=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/llm-vuln-app)
+          printf '%s\n' "$out5"
+          grep -q 'sk-ant-api03-' <<<"$out5"
 
       - name: OSV end-to-end (live API)
         run: |
@@ -41,6 +51,22 @@ jobs:
           printf '%s\n' "$out"
           grep -q 'npm:lodash' <<<"$out"
           grep -q 'fixed in' <<<"$out"
+
+      - name: Detection-pattern self-test (planted lines must match)
+        run: python3 scripts/selftest_patterns.py
+
+      - name: Eval scorer self-test (sample audit scores as designed)
+        run: |
+          out=$(python3 scripts/score_audit.py evals/samples/sample-audit-node2.md evals/fixtures/node-vuln-app-2 \
+            --min-recall 0.87 --min-precision 0.87 --max-phantoms 1)
+          printf '%s\n' "$out"
+          grep -q 'recall=0.875' <<<"$out"
+          grep -q 'precision=0.875' <<<"$out"
+          grep -q 'RESULT: PASS' <<<"$out"
+          python3 scripts/score_audit.py evals/samples/sample-audit-node2.md evals/fixtures/node-vuln-app-2 \
+            --min-recall 0.87 --min-precision 0.87 --max-phantoms 1 --append "$RUNNER_TEMP/sb.md" --label ci \
+            >/dev/null
+          grep -q '| node-vuln-app-2 | 87.50% | 87.50% | 1 | 7/8 | ci |' "$RUNNER_TEMP/sb.md"
 
       - name: OSV parser coverage (gradle/swift/conan lockfiles)
         run: |

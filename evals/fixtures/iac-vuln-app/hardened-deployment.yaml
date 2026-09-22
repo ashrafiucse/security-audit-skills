@@ -1,0 +1,29 @@
+# SAFE counter-example for iac-vuln-app. An audit must NOT report these.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+spec:
+  replicas: 2
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: shop-api@sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 # digest-pinned
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: # secret via K8s Secret, not plaintext
+                  name: shop-secrets
+                  key: db-password
+          resources:
+            limits: { cpu: "500m", memory: "512Mi" }

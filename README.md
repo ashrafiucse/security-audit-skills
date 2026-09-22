@@ -17,15 +17,16 @@ Give it any project (any language, any stack) and it will:
 
 | Skill | Purpose |
 |---|---|
-| `security-audit` | Master orchestrator: full-project audit workflow + report format |
+| `security-audit` | Master orchestrator: full-project audit workflow, fix-verification (re-audit) mode, report format, optional tool bridges (gitleaks/semgrep/checkov… when installed) |
 | `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
-| `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) |
-| `injection-flaws` | SQLi, command injection, XSS, path traversal, SSRF, deserialization, SSTI |
-| `auth-review` | Authn/authz, password storage, sessions, JWT, OAuth, IDOR, CSRF |
+| `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) + supply-chain hygiene (dependency confusion, typosquats, provenance) |
+| `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF, deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads, query-builder raw sinks |
+| `auth-review` | Authn/authz, route census for unguarded endpoints, password storage, sessions, JWT, OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
-| `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls |
+| `config-hardening` | Headers, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes, Terraform/CloudFormation |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
+| `llm-security` | LLM/AI apps: prompt injection & data exfil, unsafe model deserialization (pickle/torch.load/LangChain), hardcoded LLM keys, over-powered agent tools, prompt/PII logging & telemetry |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
 | `django-security` | Django: `raw()`/`extra()` SQLi, `mark_safe`/`|safe` XSS, `fields='__all__'` mass assignment, settings misconfig |
@@ -93,7 +94,7 @@ This repo is designed to be updated as new vulnerabilities go public. See [MAINT
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Every accepted detection pattern must ship with a test fixture in `evals/` so quality only goes up. Current gaps and roadmap: [COVERAGE.md](COVERAGE.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Every accepted detection pattern must ship with a test fixture in `evals/` so quality only goes up. Misses (user-reported or benchmark-found) are tracked in [evals/MISSES.md](evals/MISSES.md) until converted to pattern + fixture. Current gaps and roadmap: [COVERAGE.md](COVERAGE.md).
 
 ## License
 

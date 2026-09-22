@@ -33,11 +33,16 @@ scripts/validate.py                   # lint: frontmatter, cross-refs, vuln-db e
 
 - [ ] Fixtures added/updated and passing (audit run reports planted findings, no phantoms)
 - [ ] `python3 scripts/validate.py` passes (frontmatter, cross-references, vuln-db entries)
+- [ ] `python3 scripts/selftest_patterns.py` passes (greps still match planted lines; safe files stay clean)
+- [ ] New/changed skills scored with `python3 scripts/score_audit.py` per `evals/run.md` where a fixture exists
 - [ ] `bash -n` clean for shell scripts; `python3 -m py_compile` clean for python
 - [ ] SKILL.md frontmatter valid (`name` lowercase-hyphens, description specific, ≤1024 chars)
 - [ ] No real secrets, credentials, or live URLs that imply them
 - [ ] Docs updated (README skill table if adding a skill; pattern tables in `references/`)
 
-## Reporting a missed finding (users)
+## Reporting a missed finding or a false positive (users)
 
-Open an issue with: the code snippet (sanitized), what the vulnerability was, which skill should have caught it. Maintainers convert it into a fixture + pattern — that's how the skills get smarter (see MAINTENANCE.md).
+Open an issue with the right template — both directions train the skills:
+
+- **Missed finding** (`[miss]`): the code snippet (sanitized), what the vulnerability was, which skill should have caught it. Maintainers convert it into a fixture + pattern — that's how the skills get smarter (see MAINTENANCE.md).
+- **False positive** (`[fp]`): what the audit reported, why it's wrong (the safe context), which pattern fired. Maintainers narrow the pattern + add a near-miss fixture — that's how the skills get quieter.

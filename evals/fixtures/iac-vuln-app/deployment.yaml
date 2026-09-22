@@ -1,0 +1,25 @@
+# Fixture: intentionally vulnerable K8s deployment. FAKE data only.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: api
+          image: shop-api:latest          # SEC-1b: untagged/rolling base
+          securityContext:
+            privileged: true              # SEC-1a: privileged container
+            runAsUser: 0                  # SEC-1c: runs as root
+          env:
+            - name: DB_PASSWORD
+              value: "Fake4EvalsDoNotUse" # SEC-1d: plaintext secret in pod spec
+          volumeMounts:
+            - name: hostroot
+              mountPath: /host            # SEC-1e: host root mounted
+      volumes:
+        - name: hostroot
+          hostPath:
+            path: /

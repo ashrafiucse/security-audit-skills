@@ -1,0 +1,21 @@
+# Fixture: intentionally vulnerable CI workflow. FAKE data only.
+name: deploy
+on:
+  pull_request_target: # SEC-3a: forks run with base-repo secrets
+    types: [opened]
+
+permissions:
+  contents: write-all # SEC-3c: overbroad token
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # SEC-3d: pinned by tag, not commit SHA
+        with:
+          ref: ${{ github.event.pull_request.head.sha }} # SEC-3b: checks out untrusted PR head
+      - run: |
+          echo "PR title: ${{ github.event.pull_request.title }}" # SEC-3f: event text interpolated into run: = script injection via PR title
+          echo "::add-mask::${{ secrets.DEPLOY_TOKEN }}"
+          curl -sSL https://install.example.com/bootstrap.sh | bash # SEC-3e: curl | sh
+          ./deploy.sh ${{ secrets.DEPLOY_TOKEN }}

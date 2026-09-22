@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# local agent memory (not part of the published security-skills repo)
+.agents/
