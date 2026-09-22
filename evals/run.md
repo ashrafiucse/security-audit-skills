@@ -22,6 +22,13 @@ Have it write the report to a scratch path so you can score it before it
 overwrites anything, e.g. ask for `SECURITY-AUDIT.md` in the fixture dir
 (fixtures are read-only inputs — reset with `git checkout` after the round).
 
+**Blind-eval hygiene:** the auditing agent must not only "not open"
+`expected-findings.md` — it must EXCLUDE it from every recursive scan
+(`rg --glob '!**/expected-findings.md'`), or a broad grep can print
+ground-truth rows into its tool output and compromise the round. If it
+happens anyway, keep the disclosure, label the scoreboard row COMPROMISED,
+and re-verify each finding against the fixture independently.
+
 ## 3. Score it
 
 ```

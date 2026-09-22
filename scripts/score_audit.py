@@ -21,12 +21,13 @@ from pathlib import Path
 
 TOLERANCE = 2
 FILE_LEVEL_MAX = 10 ** 9  # sentinel hi for file-level (`file:-`) anchors
-# file.ext:line(-line), or a bare line(-line) continuing the last file
-FILE_TOKEN = re.compile(r"([\w./-]+\.[A-Za-z0-9]+):(\d+)(?:-(\d+))?")
-FILE_LEVEL_TOKEN = re.compile(r"([\w./-]+\.[A-Za-z0-9]+):-")
+# files may be dotfiles (.env) or well-known extension-less manifests (Gemfile)
+FILE_RE = r"[\w./-]*\.[A-Za-z0-9]+|Gemfile|Dockerfile|Procfile|Jenkinsfile|Makefile"
+FILE_TOKEN = re.compile(rf"({FILE_RE}):(\d+)(?:-(\d+))?")
+FILE_LEVEL_TOKEN = re.compile(rf"({FILE_RE}):-")
 BARE_TOKEN = re.compile(r"(?<![\w:./-])(\d+)(?:-(\d+))?(?![\w.])")
-# a file path mentioned WITHOUT a line — how agents cite global/absence findings
-FILE_MENTION = re.compile(r"(?<![\w./-])([\w./-]+\.[A-Za-z0-9]{1,5})(?![\w.:])")
+# a file mentioned WITHOUT a line — how agents cite global/absence findings
+FILE_MENTION = re.compile(rf"(?<![\w./-])({FILE_RE})(?![\w.:])")
 ROW_RE = re.compile(r"^\|\s*\w[\w.a-z]*\s*\|.*\|.*\|", re.I)  # 3+ col table row
 SEC_RE = re.compile(r"^###\s+(SEC-\d+)", re.I)
 

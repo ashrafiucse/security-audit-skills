@@ -21,3 +21,9 @@ column.
 | 2026-09-22 | node-vuln-app-2 | 90.91% | 100.00% | 0 | 10/11 | e2e baseline: subagent audit round (post v1.2.0) |
 | 2026-09-22 | llm-vuln-app | 100.00% | 100.00% | 0 | 8/8 | e2e baseline: subagent audit round (post v1.2.0) |
 | 2026-09-22 | iac-vuln-app | 100.00% | 100.00% | 0 | 17/17 | e2e baseline: subagent audit round (post v1.2.0) |
+| 2026-09-22 | laravel-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round (post ground-truth fixes) |
+| 2026-09-22 | django-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round (post ground-truth fixes) |
+| 2026-09-22 | spring-vuln-app | 100.00% | 100.00% | 0 | 10/10 | e2e frameworks round (post ground-truth fixes) |
+| 2026-09-22 | graphql-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round (post ground-truth fixes) |
+| 2026-09-22 | mobile-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round (post ground-truth fixes) |
+| 2026-09-22 | rails-vuln-app | 100.00% | 100.00% | 0 | 11/11 | e2e frameworks round — BLIND-EVAL COMPROMISED (rg scan printed 3 ground-truth lines into tool output; findings re-verified independently) |

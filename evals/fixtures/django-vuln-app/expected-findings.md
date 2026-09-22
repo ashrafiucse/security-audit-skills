@@ -10,6 +10,8 @@
 | 6 | XSS via `mark_safe(user_input)` | views.py:17 | High |
 | 7 | IDOR — invoice fetched by pk without ownership check | views.py:22 | High |
 | 8 | Mass assignment — ModelForm `fields = '__all__'` on profile with role flags | forms.py:10 | High |
+| 9 | EOL/unmaintained Django 2.2.0 — no security fixes; matches vuln-db CVE-2019-19844 (password-reset unicode) | requirements.txt:1 | High |
+| 10 | Unpinned-hash requirements (no `--require-hashes` possible) — supply-chain reproducibility | requirements.txt:- | Low |
 | 9 | XSS via `\|safe` filter in template | templates/greet.html:2 | High |
 | 10 | Django 2.2.0 + DRF 3.9.1 (live OSV: many CVEs, EOL) | requirements.txt | High (network-dependent) |
 

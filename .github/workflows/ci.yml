@@ -44,6 +44,9 @@ jobs:
           out5=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/llm-vuln-app)
           printf '%s\n' "$out5"
           grep -q 'sk-ant-api03-' <<<"$out5"
+          out6=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/spring-vuln-app)
+          printf '%s\n' "$out6"
+          grep -q 'spring-prod-pass-2026' <<<"$out6"
 
       - name: OSV end-to-end (live API)
         run: |

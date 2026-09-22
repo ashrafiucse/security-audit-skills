@@ -162,6 +162,13 @@ RULES = [
     ("crypto-weak-kdf",
      r"count\s*=\s*[0-9]{1,4}\b",
      "crypto-vuln-app/app.py", "count=1000"),
+    # --- mobile-security: component census by type (mobile-vuln-app) ---
+    ("android-exported-service",
+     r"<service[^>]*android:exported=\"true\"",
+     "mobile-vuln-app/AndroidManifest.xml", 'SyncService'),
+    ("android-exported-activity",
+     r"<activity[^>]*android:exported=\"true\"",
+     "mobile-vuln-app/AndroidManifest.xml", 'AdminActivity'),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
