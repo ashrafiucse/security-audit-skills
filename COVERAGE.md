@@ -9,7 +9,7 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Domain | Coverage | Notes |
 |---|---|---|
 | Secrets detection | strong | regex set + triage; grows with provider patterns |
-| Dependency CVEs | strong (live) | OSV API; parser coverage below; + supply-chain hygiene (confusion/typosquat, `supply-chain-vuln` fixture) |
+| Dependency CVEs | strong (live) | OSV API; + reachability analysis (present→used→dormant), Step 2.5 supply-chain hygiene, Step 2.7 beyond-CVEs (discontinued/compromised-history/dangerous-usage/vendored packs); measured by `supply-chain-vuln` + `dep-risk-vuln-app` fixtures |
 | Injection (SQLi/XSS/cmd/path/SSTI/deser) | strong | Node/Python/Java/Ruby/PHP/Go packs in `injection-flaws/references/`; + XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, upload abuse, second-order/stored flows, query-builder raw sinks, multi-line construction |
 | Auth/authz | strong | sessions, JWT (confusion/kid/PKCE), OAuth, IDOR; + route census (HTTP + gRPC/MQ/scheduled), mass assignment, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | Crypto | strong | usage-context judgment table; measured end-to-end by `crypto-vuln-app` fixture (ECB/DES/MD5/non-CSPRNG/TLS-off/weak-KDF + safe forms) |

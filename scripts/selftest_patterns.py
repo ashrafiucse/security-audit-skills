@@ -182,6 +182,22 @@ RULES = [
     ("flow-float-money",
      r"price\s*\*",
      "flow-vuln-app/app.js", "i.price * i.qty"),
+    # --- dependency-vulns: beyond-CVEs pack (dep-risk-vuln-app) ---
+    ("dep-vm2-usage",
+     r"require\(\s*['\"]vm2['\"]\s*\)|new VM\(",
+     "dep-risk-vuln-app/app.js", "new VM({"),
+    ("dep-lodash-merge-usage",
+     r"\.merge\(\s*\w+,\s*req\.body",
+     "dep-risk-vuln-app/app.js", "_.merge(config, req.body)"),
+    ("dep-request-usage",
+     r"require\(\s*['\"]request['\"]\s*\)",
+     "dep-risk-vuln-app/app.js", "require('request')"),
+    ("dep-compromised-version",
+     r"ua-parser-js['\"]\s*:\s*['\"]0\.7\.29",
+     "dep-risk-vuln-app/package.json", '0.7.29'),
+    ("dep-vendored-old-jquery",
+     r"jQuery JavaScript Library v1\.",
+     "dep-risk-vuln-app/public/vendor/jquery-1.8.3.min.js", "v1.8.3"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -246,6 +262,15 @@ MUST_NOT_MATCH = [
     ("flow-unguarded-assign-safe",
      r"Object\.assign\(order,\s*req\.body\)",
      "flow-vuln-app/safe-flow.js"),
+    ("dep-vm2-request-safe",
+     r"require\(\s*['\"](vm2|request)['\"]\s*\)",
+     "dep-risk-vuln-app/safe-app.js"),
+    ("dep-merge-reqbody-safe",
+     r"\.merge\(\s*\w+,\s*req\.body",
+     "dep-risk-vuln-app/safe-app.js"),
+    ("dep-vendored-old-jquery-safe",
+     r"jQuery JavaScript Library v1\.",
+     "dep-risk-vuln-app/public/vendor/jquery-3.7.1.min.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

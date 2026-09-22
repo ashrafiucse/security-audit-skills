@@ -19,7 +19,7 @@ Give it any project (any language, any stack) and it will:
 |---|---|
 | `security-audit` | Master orchestrator: full-project audit workflow, fix-verification (re-audit) mode, report format, optional tool bridges (gitleaks/semgrep/checkov… when installed) |
 | `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
-| `dependency-vulns` | Known-vulnerable dependencies via OSV.dev (CVE/GHSA/PYSA/RUSTSEC…) + supply-chain hygiene (dependency confusion, typosquats, provenance) |
+| `dependency-vulns` | Dependency risk: live OSV CVE scanning + reachability (used vs dormant), supply-chain hygiene (dependency confusion, typosquats, provenance), and beyond-CVEs — discontinued/unfixable packages, compromised-release history, dangerous usage of safe packages, vendored copies invisible to manifest scanners |
 | `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF, deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads, query-builder raw sinks |
 | `auth-review` | Authn/authz, route census (incl. gRPC/MQ/scheduled handlers), password storage, sessions, JWT (confusion/kid/PKCE), OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
