@@ -81,6 +81,11 @@ counterpart + selftest rule + ledger row; runtime-only → notable-incidents.
 Weekly cadence, ~20 min manual sweep + triage queue. Every conversion still
 passes the precision gate — recall without precision is noise.
 
+Training from step-by-step writeups: see
+`skills/cve-research/references/step-by-step-sources.md` — the blind-predict
+protocol (predict what our skills would catch BEFORE reading the writeup) turns
+external research into measured skill improvement, one writeup per week.
+
 Two decay modes to guard against:
 1. **False positives creep** — every new pattern slightly noisier. Eval precision ≥ 80% is the gate.
 2. **Stale knowledge** — entries older than 18 months with no detection signal get pruned; the live OSV/KEV lookups are the always-fresh layer, the vuln-db is the *curation* layer.
