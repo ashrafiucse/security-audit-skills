@@ -14,6 +14,8 @@
 | 9 | debugbar in production `require` (dev tool) | composer.json:7 | Medium |
 | 10 | No composer.lock — non-reproducible installs, transitive-swap risk (file-level anchor) | composer.json:- | High |
 | 11 | Moderation-queue XSS chain: review body accepted as raw HTML (`required|string` only), stored unpurified, raw-rendered in the STAFF detail view `{!! nl2br($review->body) !!}` — student authors, admin views → admin-origin XSS → staff account takeover. Pending status guarantees a privileged viewer opens it (privilege-direction: unprivileged→privileged = Critical) | CourseReviewRequest.php:14, CreateCourseReviewAction.php:17, resources/views/course-edit/reviews/view.blade.php:6 | Critical |
+| 12 | Support/email channel XSS: student support message rendered raw in the staff HTML mail view (`{!! $ticket->body !!}`) — fires where mail HTML renders (webmail preview / support desk); same privilege direction (student writes, staff reads) | resources/views/mail/support-ticket.blade.php:6 | Critical |
+| 13 | Grading channel XSS: quiz/assignment answer rendered raw (`{!! nl2br($answer->text) !!}`) in the grader's view — grading workflows force staff to open every pending answer | resources/views/course-edit/quiz/grade.blade.php:5 | Critical |
 | — | laravel/framework 8.83.1 (live OSV advisories — informational, network-dependent) | composer.json:6 | High |
 
 ## Must NOT trigger
@@ -24,3 +26,6 @@
 - `{{ $review->body }}` on resources/views/course-edit/reviews/index.blade.php:7 — the moderation LIST view escapes; only the detail view is raw
 - `{!! nl2br(e($review->body)) !!}` on resources/views/course-edit/reviews/safe-detail-view.blade.php:4 — legitimate raw-echo grep hit, but escaped inside (`e()` first); disposition: verified-safe
 - `aria-invalid={!!errors.body}` on resources/js/AdminDashboard.tsx:5 — React/JSX double-negation, NOT Blade; this is the noise an un-globbed scan drowns in (why Step 4 globs to `*.blade.php`)
+- `{{ $ticket->body }}` on resources/views/mail/safe-support-ticket.blade.php:6 — escaped support-mail render (safe counterpart of row 12)
+- `{!! nl2br(e($answer->text)) !!}` on resources/views/course-edit/quiz/safe-grade.blade.php:4 — escape-then-format grading render (safe counterpart of row 13)
+- Note: the Step 4 census glob (`*.blade.php`) automatically includes mail views — channels are covered by the same census, not a separate scan

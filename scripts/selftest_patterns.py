@@ -253,6 +253,15 @@ RULES = [
     ("review-validation-string-only",
      r"'body'\s*=>\s*\[\s*'required',\s*'string'",
      "laravel-vuln-app/app/Http/Requests/CourseReviewRequest.php", "'required', 'string'"),
+    ("blade-mail-raw-render",
+     r"\{!!",
+     "laravel-vuln-app/resources/views/mail/support-ticket.blade.php", "{!! $ticket->body !!}"),
+    ("blade-quiz-grade-raw-render",
+     r"\{!!",
+     "laravel-vuln-app/resources/views/course-edit/quiz/grade.blade.php", "{!! nl2br($answer->text)"),
+    ("redos-nested-quantifier",
+     r"\(\w\+\)\+",
+     "node-vuln-app-2/app.js", "(a+)"),
     # --- surface round (surface-vuln-app) ---
     ("saml-nonstrict",
      r"['\"]strict['\"]\s*:\s*False",
@@ -378,6 +387,12 @@ MUST_NOT_MATCH = [
     ("moderation-detail-raw-body-safe",
      r"nl2br\(\s*\$review->body",
      "laravel-vuln-app/resources/views/course-edit/reviews/safe-detail-view.blade.php"),
+    ("mail-escaped-safe",
+     r"\{!!",
+     "laravel-vuln-app/resources/views/mail/safe-support-ticket.blade.php"),
+    ("quiz-grade-escaped-safe",
+     r"nl2br\(\s*\$answer->text",
+     "laravel-vuln-app/resources/views/course-edit/quiz/safe-grade.blade.php"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —
@@ -386,6 +401,9 @@ CONTENT_RULES = [
     ("multiline-query-build",
      r"raw\(\s*`[\s\S]{0,300}(WHERE|ORDER BY)[\s\S]{0,300}\$\{",
      "node-vuln-app-3/app.js", "WHERE status = '${status}'"),
+    ("toctou-check-then-claim",
+     r"coupon\.used[\s\S]{0,200}updateOne",
+     "node-vuln-app-2/app.js", "updateOne"),
 ]
 
 
