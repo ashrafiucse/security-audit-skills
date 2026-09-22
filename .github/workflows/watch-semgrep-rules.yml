@@ -1,13 +1,14 @@
 name: Weekly community detection-rule watch (semgrep registry)
 
-# Stateless: lists rule files ADDED or MODIFIED under rules/ in semgrep/semgrep-rules
-# in the last 7 days, grouped by language, deduped against open semgrep-labeled
+# Stateless: lists rule files ADDED or MODIFIED in semgrep/semgrep-rules in the
+# last 7 days, grouped by language dir, deduped against open semgrep-labeled
 # issues. Opens ONE digest issue. Community detection rules are real-world
 # scenarios WITH detection logic attached — each new rule is a candidate
 # conversion into a skill pattern + fixture (MAINTENANCE.md §3.1).
-# Shape guard: if the repo renames rules/ the contents call fails LOUDLY.
-# First scheduled/dispatch run doubles as the shape smoke test.
-# Never commits.
+# Shape (VERIFIED 2026-09-23): rules live in LANGUAGE dirs at the repo ROOT
+# (javascript/, python/, php/laravel/, java/spring/, ruby/rails/, ai/, ...) —
+# there is NO rules/ directory. Guard checks a stable language dir and fails
+# LOUDLY on reorganization. Never commits.
 
 on:
   schedule:
@@ -29,9 +30,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           SINCE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
-          # guard: fail loudly if the rules path was renamed
-          gh api "repos/semgrep/semgrep-rules/contents/rules" --jq 'length' >/dev/null
-          gh api --paginate "repos/semgrep/semgrep-rules/commits?path=rules%2F&since=$SINCE&per_page=100" \
+          # guard: fail loudly if language dirs move off the repo root
+          gh api "repos/semgrep/semgrep-rules/contents/javascript" --jq 'length' >/dev/null
+          gh api --paginate "repos/semgrep/semgrep-rules/commits?since=$SINCE&per_page=100" \
             --jq '.[].sha' > /tmp/shas.txt || true
           python3 - <<'EOF'
           import json, os, subprocess
@@ -55,15 +56,16 @@ jobs:
                   continue
               for f in json.loads(detail).get("files", []):
                   fn = f.get("filename", "")
+                  top = fn.split("/")[0] if "/" in fn else ""
                   if (f.get("status") not in ("added", "modified")
-                          or not fn.startswith("rules/")
+                          or not top  # root-level files are not rules
                           or not fn.endswith(".yaml")
                           or "/tests/" in fn):
                       continue
                   if fn in seen or fn in reported:
                       continue
                   seen.add(fn)
-                  lang = fn.split("/")[1] if fn.count("/") >= 2 else "other"
+                  lang = top
                   by_lang.setdefault(lang, []).append(fn.split("/")[-1])
 
           lines = [f"### {lang} ({len(files)})" for lang, files in

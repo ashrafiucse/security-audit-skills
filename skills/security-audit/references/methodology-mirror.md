@@ -49,3 +49,31 @@ triage → report). Revisit when v3 lands in markdown.
 When a new Academy topic or WSTG category appears (they add a few per year),
 re-run this diff and disposition the new row — same completeness gate the
 audit skill enforces on projects, applied to the skills themselves.
+
+## Detection-logic catalog diff (2026-09-23, batch 1)
+
+**CodeQL query help** (javascript 124 / java 110 / python 54 / ruby 52
+security-relevant queries scraped from codeql.github.com): class-level diff
+vs our skills — **~95% covered** (strong regression evidence: full/partial
+SSRF, stored+reflected XSS, prototype pollution family, zip-slip, regex
+injection, partial path traversal, log injection, cookie flags, CSRF
+disabled/missing, weak crypto/keys/seeds, XPath, XXE, SSTI, system-prompt
+injection). Converted after this diff:
+
+- **case-sensitive middleware path** → auth-review route census
+- **host-header poisoning in email generation** → auth-review §5 (generic;
+  django Step 1 had the ALLOWED_HOSTS instance)
+- **world-writable file permissions** → config-hardening
+
+Documented gaps: **LDAP authentication/injection** (java/python enterprise
+stacks) — COVERAGE help-wanted; niche notes (loop-bound injection,
+deep-traversal exhaustion, relative-path command execution) recorded here as
+known-minor.
+
+**Semgrep registry** (shape verified: language dirs at repo ROOT —
+javascript/express/react/vue/jsonwebtoken/vm2, python/django/flask/fastapi,
+java/spring/servlets, ruby/rails, php/laravel/symfony/wordpress-plugins,
+go/generic/ai, typescript/mcp): the per-framework dirs map 1:1 onto our
+framework skills — the weekly `watch-semgrep-rules.yml` digest is the
+ongoing conversion feed; php/laravel + typescript/mcp + ai/ dirs are the
+highest-yield triage targets for laravel-security and llm-security.

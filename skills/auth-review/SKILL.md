@@ -29,6 +29,7 @@ Build a table `route → auth middleware → ownership check` and fill it by rea
 - the one handler missing `@login_required` / `authorize` / `auth:sanctum` in an otherwise-guarded file
 - non-HTTP surfaces that are routes in disguise: queue consumers, cron/background job handlers, webhook receivers, GraphQL resolvers (see `../graphql-security/SKILL.md`), event subscribers, RPC/message handlers — census them with the same table
 - dispatch-style apps (`?action=` → switch) — enumerate the switch arms, not the single URL
+- **case-sensitive middleware paths**: on case-insensitive hosts/routers, `app.use('/admin', guard)` can be bypassed by `/ADMIN` or `/Admin/` — check the router's case-sensitivity setting (Express: default sensitive only with regex; some frameworks/filesystems are not) and whether any guarded prefix can be cased around → authz bypass
 - **gRPC / protobuf services**: `service X { rpc Y (...) }` in `.proto` files — every `rpc` is a route; check per-method auth interceptors and validate request fields like any handler. Same for **message-queue consumers** (Kafka/Rabbit/SQS handlers), **scheduled job entry points**, and **Netty/WebSocket frame handlers** — add them all to the census table
 ```bash
 rg -n "rpc \w+\(" -g '*.proto'; rg -n "@GrpcClient|StreamObserver" -g '*.java' -g '*.kt'
@@ -81,6 +82,7 @@ rg -n "req\.params\.id|findById\(|get\(|\.filter\(.*userId|user\.id|currentUser|
 - Admin routes: how are they guarded? Missing middleware → CRITICAL. Note *function-level* checks too (regular user hitting `/admin/*` handlers).
 - Horizontal vs vertical: test reasoning for both — same-role users touching each other's data, and low-role → admin.
 - Trusting client-side hints: `is_admin` from request body/cookie-in-JWT-without-verify, hidden-but-served admin UI → HIGH
+- **authz on derived/divergent state** (ToB, Provenance 2026): when a permission decision reads a DERIVED value (cached role, denormalized count/balance, materialized flag) instead of the live source-of-truth record, two failure modes: (a) stale/replicated state authorizes what live state would deny, and (b) missing/zero/default derived state must FAIL CLOSED — a check like `if derived_supply > 0: grant admin` grants when the derived value is empty. Trace every authz read to its source-of-truth write; verify the default branch denies.
 
 ### Mass assignment (generic)
 
@@ -143,6 +145,9 @@ rg -n -i "x-api-key|api[_-]?key" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*
 - Token in URL fragment vs query (query leaks via logs/referrers) → MEDIUM
 - `id_token` validated: signature, `nonce`, `aud` → skipping any = CRITICAL
 
+### Host-header poisoning in outbound auth/email flows
+
+Password-reset/verification links and OAuth redirect URIs built from `Host` / `X-Forwarded-Host` (request-derived) let an attacker poison the victim's link domain (CodeQL class; Django's `ALLOWED_HOSTS=['*']` is the classic enabler — see `../django-security/SKILL.md` Step 1). Grep link/URL construction in mailers and auth controllers for request-header inputs → HIGH (account takeover via poisoned reset links).
 ## 6 — SAML (if present)
 
 ```bash

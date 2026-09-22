@@ -1,0 +1,93 @@
+name: Weekly research-feed watch (Trail of Bits + Project Zero)
+
+# Stateless: pulls the last 7 days from the two verified research feeds and
+# opens ONE digest issue of step-by-step posts worth a blind-predict pass
+# (MAINTENANCE.md §3.1 / step-by-step-sources.md training protocol).
+# Feeds VERIFIED 2026-09-23: blog.trailofbits.com/index.xml (RSS) and
+# googleprojectzero.blogspot.com/feeds/posts/default (Atom; needs UA header).
+# Guards fail LOUDLY if a feed moves/empties. Never commits.
+
+on:
+  schedule:
+    - cron: "30 7 * * 2" # Tuesdays 07:30 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  research-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch feeds and list recent posts
+        id: feeds
+        run: |
+          curl -fsSL --max-time 30 -A "Mozilla/5.0 (X11; Linux x86_64)" \
+            "https://googleprojectzero.blogspot.com/feeds/posts/default?max-results=15" -o /tmp/p0.xml
+          curl -fsSL --max-time 30 "https://blog.trailofbits.com/index.xml" -o /tmp/tob.xml
+          python3 - <<'EOF'
+          import datetime, re, xml.etree.ElementTree as ET
+
+          now = datetime.datetime.now(datetime.timezone.utc)
+          cutoff = now - datetime.timedelta(days=7)
+          lines = []
+
+          # Atom (P0)
+          root = ET.parse("/tmp/p0.xml").getroot()
+          ns = {"a": "http://www.w3.org/2005/Atom"}
+          entries = root.findall("a:entry", ns)
+          if not entries:
+              raise SystemExit("P0 feed parsed but has no entries — shape changed, FAIL LOUDLY")
+          for e in entries:
+              u = e.find("a:updated", ns)
+              when = datetime.datetime.fromisoformat(u.text.replace("Z", "+00:00")) if u is not None else None
+              if when and when >= cutoff:
+                  t = (e.find("a:title", ns).text or "").strip()
+                  l = e.find("a:link", ns).get("href")
+                  lines.append(f"P0 | {t} | {l}")
+
+          # RSS (Trail of Bits)
+          root = ET.parse("/tmp/tob.xml").getroot()
+          items = root.findall(".//item")
+          if not items:
+              raise SystemExit("ToB feed parsed but has no items — shape changed, FAIL LOUDLY")
+          for it in items:
+              d = it.find("pubDate")
+              when = None
+              if d is not None and d.text:
+                  import email.utils
+                  when = email.utils.parsedate_to_datetime(d.text)
+              if when and when.astimezone(datetime.timezone.utc) >= cutoff:
+                  t = (it.findtext("title") or "").strip()
+                  l = (it.findtext("link") or "").strip()
+                  lines.append(f"ToB | {t} | {l}")
+
+          open("/tmp/posts.txt", "w").write("\n".join(lines))
+          open("/tmp/count.txt", "w").write(str(len(lines)))
+          EOF
+          echo "new=$(cat /tmp/count.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Open digest issue
+        if: steps.feeds.outputs.new != '' && steps.feeds.outputs.new != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_COUNT: ${{ steps.feeds.outputs.new }}
+        run: |
+          {
+            echo "👀 cc @ashrafiucse — weekly research-feed digest ($NEW_COUNT posts)."
+            echo "(bot-created issues don't trigger workflows — this mention IS the notification)"
+            echo
+            cat /tmp/posts.txt
+            echo
+            echo "Triage per MAINTENANCE.md §3.1 / step-by-step-sources.md: run the blind-predict"
+            echo "protocol on any post touching our stacks — verdict (CAUGHT/CONVERTED/runtime-only)"
+            echo "into vendor-research-lessons.md; one real conversion per batch minimum."
+          } > /tmp/issue-body.md
+          gh label create research 2>/dev/null || true
+          gh label create triage 2>/dev/null || true
+          gh issue create \
+            --title "Research-feed watch: $NEW_COUNT new posts (ToB + P0)" \
+            --body-file /tmp/issue-body.md \
+            --label research --label triage
