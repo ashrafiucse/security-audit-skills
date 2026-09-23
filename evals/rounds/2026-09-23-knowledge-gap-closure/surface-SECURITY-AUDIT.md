@@ -1,4 +1,4 @@
-# Security Audit — surface-vuln-app (knowledge-gap-closure round: LDAP delta)
+# Security Audit — surface-vuln-app (knowledge-gap-closure round: LDAP delta + issue-triage RBAC delta)
 Date: 2026-09-23 | Scope: fixture tree | Auditor: security-skills dev (IN-PROCESS run — ground-truth-aware, not blind recall)
 
 ## Stack
@@ -8,7 +8,7 @@ Polyglot auth-surface fixture: SAML (python3-saml), K8s ClusterRole, serverless.
 | Severity | Count |
 |---|---|
 | Critical | 8 |
-| High | 5 |
+| High | 6 |
 | Medium | 0 |
 
 ## Findings
@@ -56,6 +56,9 @@ Polyglot auth-surface fixture: SAML (python3-saml), K8s ClusterRole, serverless.
 
 ### SEC-015: JNDI LDAP anonymous bind + concat principal — CRITICAL
 - **Where:** `LdapAuth.java:11, 13-14` — CWE-287/CWE-90 — `SECURITY_AUTHENTICATION="none"` + `SECURITY_PRINCIPAL` concatenation; safe: "simple" + LdapUtils.escapeDN (SafeLdapAuth.java:11, 14).
+
+### SEC-016: Wildcard RBAC — apiGroups/resources `"*"` + mutating verbs — HIGH
+- **Where:** `clusterrole.yaml:17-20` — CWE-732 — unbounded cluster-wide write for any holder (IBM-Concert KEV class, converted from issue #23 triage); safe: scoped read-only Role (hardened-clusterrole.yaml:10-12).
 
 ## Must NOT trigger (verified clean)
 safe-ldap_route.py / SafeLdapAuth.java: escaped DN + filter terms, "simple" auth — the DN/filter greps legitimately hit both files; escape-call context is the triage discriminator.

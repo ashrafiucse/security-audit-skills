@@ -319,6 +319,9 @@ RULES = [
     ("k8s-escalate-verbs",
      r"verbs:\s*\[.*['\"](escalate|bind|impersonate)['\"]",
      "surface-vuln-app/clusterrole.yaml", '"escalate", "bind"'),
+    ("k8s-wildcard-rbac",
+     r'(resources|apiGroups|verbs):\s*\[\s*"\*"\s*\]',
+     "surface-vuln-app/clusterrole.yaml", 'resources: ["*"]'),
     ("serverless-wildcard-iam",
      r"Action:\s*['\"]\*['\"]",
      "surface-vuln-app/serverless.yml", 'Action: "*"'),
@@ -564,6 +567,10 @@ MUST_NOT_MATCH = [
     ("wasm-user-url-fetch-safe",
      r"fetch\(\s*url\s*\)",
      "spa-vuln-app/safe-index.html"),
+    # --- K8s wildcard RBAC safe counter-example (IBM-Concert class) ---
+    ("k8s-wildcard-rbac-safe",
+     r'(resources|apiGroups|verbs):\s*\[\s*"\*"\s*\]',
+     "surface-vuln-app/hardened-clusterrole.yaml"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

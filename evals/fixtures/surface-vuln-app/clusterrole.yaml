@@ -12,3 +12,8 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list"]
+  # SEC-16: wildcard resources/apiGroups + mutating verbs (IBM-Concert class) —
+  # effectively cluster-wide write for any holder
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]

@@ -20,6 +20,7 @@ escalation verbs, serverless, dev-artifact leaks).
 | 13 | LDAP | DN injection — bind DN built by concatenation (`"uid=" + uid + ",...`) | ldap_route.py:17 | Critical |
 | 14 | LDAP | Filter injection — f-string filter term (`f"(sAMAccountName={name})"`), no escape | ldap_route.py:36 | High |
 | 15 | LDAP (Java) | `Context.SECURITY_AUTHENTICATION` = `none` (anonymous bind) + `SECURITY_PRINCIPAL` concat DN | LdapAuth.java:11, 13-14 | Critical |
+| 16 | K8s RBAC | Wildcard `apiGroups`/`resources` + mutating verbs — unbounded cluster-wide write for any holder (IBM-Concert class, converted 2026-09-23) | clusterrole.yaml:17-20 | High |
 
 ## Must NOT trigger (near-misses)
 
@@ -28,3 +29,4 @@ escalation verbs, serverless, dev-artifact leaks).
 - `safe-ldap_route.py:17` — DN composed with `escape_dn_chars(uid)` (the escape call is the triage discriminator; the DN-concat grep legitimately hits both files)
 - `safe-ldap_route.py:27` — filter term wrapped in `escape_filter_chars(name)`
 - `SafeLdapAuth.java:11,14` — `SECURITY_AUTHENTICATION="simple"` + DN escaped via `LdapUtils.escapeDN(uid)`
+- `hardened-clusterrole.yaml:10-12` — scoped Role: named apiGroup, named resources, read-only verbs; zero wildcard rows (the wildcard census grep must stay silent here)

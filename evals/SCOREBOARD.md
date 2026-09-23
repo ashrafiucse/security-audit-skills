@@ -44,3 +44,4 @@ column.
 | 2026-09-23 | dotnet-vuln-app | 100.00% | 100.00% | 0 | 16/16 | knowledge-gap-closure round — IN-PROCESS (new dotnet-security skill + CVE-2019-18935 entry; artifact validation, not blind recall) |
 | 2026-09-23 | surface-vuln-app | 100.00% | 100.00% | 0 | 15/15 | knowledge-gap-closure round — IN-PROCESS (auth-review LDAP pack: 11 prior rows re-verified + 4 new) |
 | 2026-09-23 | spa-vuln-app | 100.00% | 100.00% | 0 | 3/3 | knowledge-gap-closure round — IN-PROCESS (config-hardening WebAssembly pack: 2 prior rows + 1 new) |
+| 2026-09-23 | surface-vuln-app | 100.00% | 100.00% | 0 | 16/16 | issue-triage round — IN-PROCESS (KEV/NVD triage #22/#23; RBAC-wildcard plant added: 15 prior rows + 1 new) |
