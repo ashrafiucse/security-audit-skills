@@ -37,6 +37,11 @@ jobs:
           entries = "skills/cve-research/vuln-db/entries"
           for name in os.listdir(entries):
               triaged += open(os.path.join(entries, name), encoding="utf-8", errors="replace").read()
+          # ... or a recorded decision in the append-only triage log (closed issues
+          # live on there — without this, decided CVEs re-appear once their issue closes)
+          log = "skills/cve-research/vuln-db/kev-triage-log.md"
+          if os.path.exists(log):
+              triaged += open(log, encoding="utf-8", errors="replace").read()
 
           # already reported = mentioned in an open kev-labeled issue
           reported = ""

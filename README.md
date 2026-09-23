@@ -18,12 +18,12 @@ Give it any project (any language, any stack) and it will:
 | Skill | Purpose |
 |---|---|
 | `security-audit` | Master orchestrator: full-project audit workflow, fix-verification (re-audit) mode, report format, optional tool bridges (gitleaks/semgrep/checkov… when installed) |
-| `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage) |
+| `secrets-detection` | Hardcoded keys, tokens, passwords, private keys (fast regex scan + triage); connection strings (URL, JDBC, ADO.NET `Server=…;Password=…`) |
 | `dependency-vulns` | Dependency risk: live OSV CVE scanning + reachability (used vs dormant), supply-chain hygiene (dependency confusion, typosquats, provenance), and beyond-CVEs — discontinued/unfixable packages, compromised-release history, dangerous usage of safe packages, vendored copies invisible to manifest scanners |
 | `injection-flaws` | SQLi, command injection, XSS (reflected + stored/second-order), path traversal, SSRF (incl. deferred/registered-callback), deserialization, SSTI, XXE, prototype pollution, NoSQL operator injection, ReDoS, open redirect, unsafe uploads + archive extraction, C/C++ native memory-safety sinks |
-| `auth-review` | Authn/authz, route census (incl. gRPC/MQ/scheduled handlers), password storage, sessions, JWT (confusion/kid/PKCE), **SAML (signature wrapping, comment injection, recipient validation)**, OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz |
+| `auth-review` | Authn/authz, route census (incl. gRPC/MQ/scheduled handlers), password storage, sessions, JWT (confusion/kid/PKCE), **SAML (signature wrapping, comment injection, recipient validation)**, OAuth, IDOR, mass assignment, CSRF, trusted-header spoofing, TOCTOU races, WebSocket/SSE authz, **LDAP (anonymous binds, DN/filter injection)** |
 | `crypto-review` | Weak ciphers/hashes, ECB, hardcoded keys/IVs, bad randomness |
-| `config-hardening` | Headers (incl. weak-CSP review), cookie prefixes, SRI, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers, API resource & consumption (API4/API10) |
+| `config-hardening` | Headers (incl. weak-CSP review), cookie prefixes, SRI, CORS, cookies, TLS, debug modes, CI/CD pitfalls, postMessage/client-side handlers, WebAssembly loading discipline (WSTG 4.13), API resource & consumption (API4/API10) |
 | `container-iac-security` | Dockerfile, docker-compose, Kubernetes (incl. **RBAC escalate/bind/impersonate verbs**), Terraform/CloudFormation + AWS IAM privilege-escalation paths, **serverless/FaaS (IAM wildcards, authorizer gaps, trusted events)** |
 | `graphql-security` | GraphQL abuse vectors: introspection/GraphiQL in prod, depth limits, resolver authz/IDOR, error leakage, batching, CSRF |
 | `llm-security` | LLM/AI apps: prompt injection & data exfil, unsafe model deserialization (pickle/torch.load/LangChain), hardcoded LLM keys, over-powered agent tools, prompt/PII logging & telemetry |
@@ -34,6 +34,7 @@ Give it any project (any language, any stack) and it will:
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
 | `django-security` | Django: `raw()`/`extra()` SQLi, `mark_safe`/`|safe` XSS, `fields='__all__'` mass assignment, settings misconfig |
+| `dotnet-security` | ASP.NET Core/.NET: Razor `Html.Raw`/Blazor MarkupString XSS, EF Core `FromSqlRaw`/Dapper/ADO SQLi, BinaryFormatter/TypeNameHandling deserialization, hardcoded machineKey → ViewState RCE, `[AllowAnonymous]` census, antiforgery, CORS, open redirect |
 | `rails-security` | Rails: interpolated `where`, `permit!`, `raw`/`html_safe`, CSRF skips, `send_file` traversal, `secret_key_base` |
 | `spring-security` | Spring: JPQL concat, MyBatis `${}`, `th:utext`, CSRF/`permitAll`, Actuator over-exposure, Jackson defaultTyping |
 | `data-exposure` | PII handling, secrets in logs, over-returning APIs, git history |

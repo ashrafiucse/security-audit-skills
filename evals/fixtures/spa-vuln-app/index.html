@@ -11,6 +11,13 @@
 
       // SEC-02: sensitive payload broadcast to any parent/iframe ('*')
       window.parent.postMessage({ token: sessionStorage.getItem('session') }, '*');
+
+      // SEC-03: WebAssembly module fetched from a client-controlled URL
+      async function loadEngine() {
+        const url = new URLSearchParams(location.search).get('engine');
+        const res = await fetch(url);
+        return await WebAssembly.instantiateStreaming(res);
+      }
     </script>
   </body>
 </html>

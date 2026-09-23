@@ -1,0 +1,11 @@
+# SAFE counter-example for surface-vuln-app. An audit must NOT report this.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deploy-helper
+  namespace: app
+rules:
+  # scoped: named apiGroup, named resources, read-only — no wildcards
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list"]

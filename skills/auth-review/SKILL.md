@@ -52,6 +52,21 @@ rg -n -i "bcrypt|argon2|scrypt|pbkdf2|md5|sha1|sha256.*password|hashpw|crypt\("
 - Password reset: predictable token (timestamp, userid, `random.random()`), token reused or non-expiring, reset response leaks the token → HIGH/CRITICAL
 - MFA present? Missing MFA on admin accounts → HIGH if roles exist
 
+### LDAP authentication (enterprise directories)
+
+```bash
+rg -n "SECURITY_AUTHENTICATION|ANONYMOUS" -g '*.py' -g '*.java'
+rg -n 'uid="\s*\+\s*\w+|SECURITY_PRINCIPAL.*\+' -g '*.py' -g '*.java'
+rg -n '\(sAMAccountName=|\(uid=' -g '*.py' -g '*.java'
+rg -n "escape_dn_chars|escape_filter_chars|LdapEncoder" -g '*.py' -g '*.java'
+```
+
+- Anonymous bind offered as an auth path (`authentication=ANONYMOUS`, `SECURITY_AUTHENTICATION` set to `none`) → **CRITICAL** — everyone "authenticates"; binding ≠ verifying the intended identity
+- **DN injection** (CWE-90): bind DN built by concatenation — `"uid=" + user + ",ou=people,..."` (Python) or `Context.SECURITY_PRINCIPAL` concatenation (Java) → **CRITICAL**: a uid containing `,...` or `+` rebinds as a different principal
+- **Filter injection**: search filters composed by f-string/format with user terms (`f"(sAMAccountName={name})"`) → HIGH — `*` and `)(` characters forge wildcard/boolean filters (auth bypass + data mining)
+- Safe shape: escape before composing (`escape_dn_chars()` / `escape_filter_chars()` in ldap3, `LdapEncoder.filterEncode/nameEscape` in Java) — or constant service DN + post-bind attribute comparison
+- The DN/filter greps hit BOTH vulnerable and escaped forms — the escape-call context is the triage discriminator (same census discipline as XSS sinks)
+
 ### JWT / tokens
 ```bash
 rg -n "jwt\.(sign|decode|verify)|verify\(|algorithms|algorithm|none|HS256|RS256"

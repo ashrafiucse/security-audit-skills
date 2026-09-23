@@ -11,6 +11,12 @@
         el.textContent = typeof e.data === 'string' ? e.data : ''; // safe sink
       });
       window.parent.postMessage({ theme: 'dark' }, ALLOWED_ORIGIN); // explicit target, non-sensitive
+
+      // safe: fixed-path same-origin wasm module, no client-controlled source
+      async function loadEngine() {
+        const res = await fetch('/engine.wasm');
+        return await WebAssembly.instantiateStreaming(res);
+      }
     </script>
   </body>
 </html>
