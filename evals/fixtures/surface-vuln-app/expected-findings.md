@@ -16,8 +16,15 @@ escalation verbs, serverless, dev-artifact leaks).
 | 9 | Serverless | state-changing route with `authorizer: none` | serverless.yml:25-26 | Critical |
 | 10 | Dev artifact | GITHUB_TOKEN in `.vscode/launch.json` env block | .vscode/launch.json:10 | High |
 | 11 | Dev artifact | Bearer JWT in a Postman collection (shared-by-design surface) | shop-api.postman_collection.json:15 | Critical |
+| 12 | LDAP | Anonymous bind accepted as an auth method (`authentication=ANONYMOUS`) | ldap_route.py:27 | Critical |
+| 13 | LDAP | DN injection — bind DN built by concatenation (`"uid=" + uid + ",...`) | ldap_route.py:17 | Critical |
+| 14 | LDAP | Filter injection — f-string filter term (`f"(sAMAccountName={name})"`), no escape | ldap_route.py:36 | High |
+| 15 | LDAP (Java) | `Context.SECURITY_AUTHENTICATION` = `none` (anonymous bind) + `SECURITY_PRINCIPAL` concat DN | LdapAuth.java:11, 13-14 | Critical |
 
 ## Must NOT trigger (near-misses)
 
 - All values are documented fakes (`ghp_Fake…`, `sk_(live|test)_Fake…`, `FAKE…` JWT) — the PATTERN+placement is the finding, not real creds (triage rule)
 - A strict-mode SAML config with all want*Signed true, pinned ACS + audience (future safe file)
+- `safe-ldap_route.py:17` — DN composed with `escape_dn_chars(uid)` (the escape call is the triage discriminator; the DN-concat grep legitimately hits both files)
+- `safe-ldap_route.py:27` — filter term wrapped in `escape_filter_chars(name)`
+- `SafeLdapAuth.java:11,14` — `SECURITY_AUTHENTICATION="simple"` + DN escaped via `LdapUtils.escapeDN(uid)`

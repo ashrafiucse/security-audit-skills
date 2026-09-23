@@ -41,3 +41,6 @@ column.
 | 2026-09-23 | laravel-vuln-app | 100.00% | 100.00% | 0 | 12/12 | gate-v2 validation round — IN-PROCESS (ground-truth-aware; artifact/achievability validation, not blind recall). Blind re-run pending: subagent registry exhausted + no external CLI agents on PATH |
 | 2026-09-23 | course-vuln-app | 100.00% | 100.00% | 0 | 6/6 | gate-v2 validation round — IN-PROCESS (same caveat) |
 | 2026-09-23 | design-threat-review-vuln-app | 100.00% | 100.00% | 0 | 6/6 | gate-v2 validation round — IN-PROCESS (same caveat); round caught + fixed T-NNN scorer contract |
+| 2026-09-23 | dotnet-vuln-app | 100.00% | 100.00% | 0 | 16/16 | knowledge-gap-closure round — IN-PROCESS (new dotnet-security skill + CVE-2019-18935 entry; artifact validation, not blind recall) |
+| 2026-09-23 | surface-vuln-app | 100.00% | 100.00% | 0 | 15/15 | knowledge-gap-closure round — IN-PROCESS (auth-review LDAP pack: 11 prior rows re-verified + 4 new) |
+| 2026-09-23 | spa-vuln-app | 100.00% | 100.00% | 0 | 3/3 | knowledge-gap-closure round — IN-PROCESS (config-hardening WebAssembly pack: 2 prior rows + 1 new) |
