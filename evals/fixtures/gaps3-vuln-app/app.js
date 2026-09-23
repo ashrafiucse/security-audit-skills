@@ -72,4 +72,34 @@ app.get('/redirect', (req, res) => {
   res.redirect('/');
 });
 
+// ---------- SEC-06: feature flag default-true for a dangerous capability ----------
+const featureFlags = { 'import-leads': true, 'send-email': false };
+
+function isFeatureEnabled(flag) {
+  return featureFlags[flag] === true;
+}
+
+// ---------- SEC-07: capability gated in the UI only — handler has no flag check ----------
+app.post('/admin/leads/email/compose', (req, res) => {
+  // the menu hides this for trials; the handler never checks the flag
+  const dto = { subject: req.body.subject, body: req.body.body };
+  queue.enqueue('email-blast', dto);
+  res.json({ queued: true });
+});
+
+// ---------- SEC-08: F9 outbound amplification — one request -> N emails ----------
+queue.process('email-blast', async (job) => {
+  const leads = await db.leads.findAll(); // unbounded: every lead
+  for (const lead of leads) {
+    await mailer.sendMail({ to: lead.email, subject: job.data.subject, body: job.data.body });
+  }
+});
+
+// ---------- SEC-09: public email-triggering endpoint, no throttle ----------
+app.get('/leads/:id/send-verification-link', async (req, res) => {
+  const lead = await db.leads.findById(req.params.id);
+  await mailer.sendMail({ to: lead.email, subject: 'Verify your email', body: verifyLink(lead) });
+  res.json({ sent: true });
+});
+
 app.listen(3000);

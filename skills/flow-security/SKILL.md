@@ -131,14 +131,19 @@ carry signed/verified flow context (payment id they act on), not trust
 A single request fans out one outbound message (email/SMS/webhook/push) per
 row — loading `all()`/`get()` unbounded, no recipient cap, no per-tenant
 quota, no route throttle. The unit of abuse is the RECIPIENT COUNT, not the
-request: HTTP-layer throttles alone don't bound a 1→N sink. Laravel shape
-(from the 2026-09-23 trial-tenant blast): compose controller dispatches a
-blast job (`Lead::query()->get()` → per-row `Mail::to()`) with the only gate
-inside the job or the menu. **Critical** when the sender endpoint is public
-(verification/subscribe loops need no auth — ID enumeration is the whole
-attack) or when flag/plan gating lives anywhere but the route. Fixes:
-recipient cap + atomic quota inside the job, feature/plan middleware on the
-route, throttle on public senders, verified-recipient targeting.
+request: HTTP-layer throttles alone don't bound a 1→N sink. Generic sink
+shapes (any stack): a loop/map/each over an unbounded fetch (`findAll()`,
+`.get()`, `::all`, `SELECT *` without LIMIT) whose body calls an outbound
+sender — `sendMail`/`Mailer`, `twilio.messages`, `sns.publish`,
+SendGrid/Resend, `fetch(hook.url)` — with attacker-influenced subject/body.
+Laravel shape (from the 2026-09-23 trial-tenant blast): compose controller
+dispatches a blast job (`Lead::query()->get()` → per-row `Mail::to()`) with
+the only gate inside the job or the menu. **Critical** when the sender
+endpoint is public (verification/subscribe loops need no auth — ID
+enumeration is the whole attack) or when flag/plan gating lives anywhere but
+the route. Fixes: recipient cap + atomic quota inside the job, feature/plan
+middleware on the route, throttle on public senders, verified-recipient
+targeting.
 
 ## 4 — Audit mode: flow-first
 
