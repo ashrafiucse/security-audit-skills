@@ -14,6 +14,7 @@ never deleted; closed rows stay as history.
 
 | Date | Source | What was missed | Skill | Pattern added | Fixture |
 |---|---|---|---|---|---|
+| 2026-09-24 | user gap report ("any flutter audit skills?") | Entire Flutter/Dart stack had zero dedicated coverage — storage, cert-validation bypass, WebView bridges, platform channels, deep-link routes, dart-define build secrets, Random()/md5 — only 2 lines inside mobile-security | flutter-security | SKILL.md Steps 1-8 + references/patterns.md; 14 selftest match rules + 8 MUST_NOT_MATCH | flutter-security-vuln-app |
 | 2026-09-22 | coverage audit | 9 uncovered classes: prototype pollution, NoSQL operator injection, XXE, ReDoS, open redirect, trusted-header authz, TOCTOU races, WebSocket/SSE authz, generic file-upload abuse | injection-flaws, auth-review | sections in both SKILL.md + patterns.md | node-vuln-app-2, python-vuln-app-2 |
 | 2026-09-22 | coverage audit | route census (unguarded endpoints found only by pattern luck), second-order/stored flows, query-builder raw sinks, multi-line query construction | auth-review, injection-flaws | census table in auth-review §1; second-order + builder + multiline sections | node-vuln-app-3 |
 | 2026-09-22 | coverage audit | no fix-verification loop (audits were one-shot), no automated eval scoring, missing evals/run.md | security-audit, evals | re-audit mode in security-audit; scripts/score_audit.py + sample; evals/run.md | sample-audit-node2.md |

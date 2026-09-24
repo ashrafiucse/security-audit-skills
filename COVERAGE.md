@@ -23,7 +23,8 @@ anything from "Help wanted" — each item maps to a concrete contribution patter
 | Insecure design (A04) | good | grep-anchored checklist + `flow-security` skill for flow-wise analysis (F1–F8 classes, flow-vuln-app fixture) |
 | **Design-phase threat modeling (pre-code)** | good | `design-threat-review`: spec in → THREAT-MODEL.md out (actor×asset matrix, trust boundaries, STRIDE→detector mapping, audit contract); fixture `design-threat-review-vuln-app`; audit-time consumption via security-audit Phase 0 THREAT-MODEL.md hook |
 | **Audit completeness enforcement** | good | security-audit Completeness gate v2 (actor×surface matrix, every cell ✅/🟢/⬜ dispositioned, NOT-ASSESSED listed by name) + census receipts (`hits=N dispositioned=N`) + enumeration discipline; incremental PR/diff audit mode (`pr_diff_scope.sh`) for early-stage delta audits |
-| Mobile (Android/iOS/RN/Flutter) | good | `mobile-security` pack |
+| Mobile (Android/iOS/RN) | good | `mobile-security` pack (manifest/platform method) |
+| Flutter/Dart | good (first release) | `flutter-security`: storage census, cert-validation bypass (HttpOverrides/dio), WebView bridges, platform channels, deep-link routes, dart-define secrets, Random()/md5 — measured by `flutter-security-vuln-app` (17 rows + substring-trap near-miss) |
 | Laravel/PHP | good | `laravel-security`: mass assignment, APP_KEY chain, Blade raw-output census (glob + disposition + privilege-direction triage), CSRF except; fixture `laravel-vuln-app` |
 | Django/Python | good | `django-security`: raw()/extra(), mark_safe, `__all__` mass assignment, settings |
 | ASP.NET / .NET | good | `dotnet-security`: Html.Raw/Blazor MarkupString XSS census, FromSqlRaw/Dapper/ADO SQLi (with the `FromSqlInterpolated` safe-API near-miss), BinaryFormatter/TypeNameHandling/machineKey→ViewState pack, `[AllowAnonymous]` census, Telerik CVE-2019-18935 via vuln-db; fixture `dotnet-vuln-app` |

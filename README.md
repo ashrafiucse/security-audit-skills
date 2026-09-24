@@ -32,6 +32,7 @@ Give it any project (any language, any stack) and it will:
 | `design-threat-review` | **Design-stage gate, before code exists**: spec/PRD in → `THREAT-MODEL.md` out — actor×asset inventory, trust boundaries, STRIDE sweep mapped to detection skills, per-persona abuse cases, and the audit contract (actor×surface matrix + acceptance criteria) the future audit must disposition |
 | `skill-forge` | Authors NEW custom skills for this repo: scoping from personas/pains, scaffold script, authoring laws from the eval LEARNINGS, blind-test protocol, wiring checklist |
 | `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
+| `flutter-security` | Flutter/Dart shapes: storage census (SharedPreferences/file/sqflite vs secure storage), cert-validation bypass (HttpOverrides/dio adapter), WebView JS bridges, platform channels both directions, deep-link route injection, `--dart-define` secrets, Random()/md5 |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}` |
 | `django-security` | Django: `raw()`/`extra()` SQLi, `mark_safe`/`|safe` XSS, `fields='__all__'` mass assignment, settings misconfig |
 | `dotnet-security` | ASP.NET Core/.NET: Razor `Html.Raw`/Blazor MarkupString XSS, EF Core `FromSqlRaw`/Dapper/ADO SQLi, BinaryFormatter/TypeNameHandling deserialization, hardcoded machineKey → ViewState RCE, `[AllowAnonymous]` census, antiforgery, CORS, open redirect |
