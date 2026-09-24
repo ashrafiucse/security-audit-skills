@@ -46,3 +46,33 @@ app.get('/redirect', (req, res) => {
   if (u.protocol === 'https:' && ALLOWED.has(u.host)) return res.redirect(u.toString());
   res.redirect('/');
 });
+
+// ---------- safe shapes: flag gating + F9 amplification (incident conversion) ----------
+const PLAN_CAPABILITIES = { trial: [], paid: ['send-email', 'import-leads'] };
+
+function isCapabilityEnabled(flag, tenant) {
+  return (PLAN_CAPABILITIES[tenant.plan] || []).includes(flag);
+}
+
+// SAFE: the handler is the enforcement point — flag middleware + rate limit + validated payload
+app.post('/admin/leads/email/compose', requireAuth, requireFlag('send-email'), rateLimit('blast-compose'), (req, res) => {
+  const dto = composeSchema.parse(req.body);
+  queue.enqueue('email-blast', dto);
+  res.json({ queued: true });
+});
+
+// SAFE: atomic quota inside the job + capped + verified-only recipients
+queue.process('email-blast', async (job) => {
+  if (!consumeBlastQuota(job.tenantId)) return;
+  const leads = await db.leads.findAll({ where: { verified: true }, limit: 500 });
+  for (const lead of leads) {
+    await mailer.sendMail({ to: lead.email, subject: job.data.subject });
+  }
+});
+
+// SAFE: POST + signed + throttled verification sender
+app.post('/leads/:id/send-verification-link', requireSigned, throttle({ key: 'lead+ip', max: 3 }), async (req, res) => {
+  const lead = await db.leads.findById(req.params.id);
+  await mailer.sendMail({ to: lead.email, subject: 'Verify your email', body: verifyLink(lead) });
+  res.json({ sent: true });
+});

@@ -133,6 +133,22 @@ rg -n "if\s*\(.*\b(used|redeemed|approved|active|enabled|stock|balance|remaining
 - Balance/stock read-modify-write: `user.balance -= amt; user.save()` → double-spend under concurrency. Fix: `UPDATE accounts SET balance = balance - ? WHERE id = ? AND balance >= ?`.
 - Webhooks/event handlers without idempotency keys or event-id dedup → replayable. Report as one grouped finding with every affected flow listed.
 
+### Feature-flag & plan-capability gating
+
+Flags constrain CAPABILITY (what a plan/tenant/role may do), not identity — an authenticated admin can still be the attacker the plan must stop. UI/menu gating is cosmetic; the handler/route is the enforcement point. Incident class (2026-09-23): a trial tenant blasted 1200+ emails through a compose route whose flag was enforced only in the menu and the queued job.
+
+```bash
+rg -n "Feature::(define|active)|isFeatureEnabled|featureFlags|feature_flags|isEnabled\(|isEnabledFor|\.variation\(" src/ app/ modules/
+rg -n "pennant:purge|flushCache|flag.*purge" deploy/ scripts/ .github/
+```
+
+Stack-agnostic census (framework skills carry the concrete greps — e.g. `../laravel-security/SKILL.md` Step 8):
+
+- For every flag whose name implies a dangerous capability (import, email, send, sms, export, invite, admin, billing): WHERE is it enforced? Checks only in UI/menu code or only inside async jobs = **gated-in-the-wrong-layer** → High; Critical when the ungated surface fans out outbound messages (F9, `../flow-security/SKILL.md`)
+- Default-true definitions for dangerous capabilities (`'import': true`, `"send_email": true` in flag config) → High — the capability exists for everyone including trials; per-plan closures/lookups are the safe shape
+- **Flag-store staleness**: persisted flag stores (Pennant database, DB-backed Unleash/OpenFeature, a `features` table) keep stored per-scope values when defaults change — reverting a default changes nothing for already-stored scopes. Deploy scripts must purge/sync; absence → Medium
+- Public endpoints that TRIGGER OUTBOUND messages (send-verification, subscribe, reset, notify, magic-link, webhook-register): census them with §1's route table; each needs auth-or-signed + throttle (+ captcha where public) → **Critical when public AND unthrottled**: ID enumeration = mail/SMS bomb needing zero auth and zero flags
+
 ### API keys as authentication (service-to-service)
 
 Machine auth has its own failure modes — check every API-key/gateway-token scheme:
