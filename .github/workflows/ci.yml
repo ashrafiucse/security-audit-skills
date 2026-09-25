@@ -41,6 +41,9 @@ jobs:
           out4=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/flutter-security-vuln-app)
           printf '%s\n' "$out4"
           grep -q 'AKIAIOSFODNN7EXAMPLE' <<<"$out4"
+          out5=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/android-code-security-vuln-app)
+          printf '%s\n' "$out5"
+          grep -q 'AIzaFakeForEvalsDoNotUseDoNotUse0000000' <<<"$out5"
           out4=$(bash skills/secrets-detection/scripts/scan.sh evals/fixtures/python-vuln-app)
           printf '%s\n' "$out4"
           grep -q 'hf_FakeTokenForEvalFixtures123' <<<"$out4"

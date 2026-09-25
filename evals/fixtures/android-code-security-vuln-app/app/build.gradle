@@ -1,0 +1,25 @@
+// Fixture Android app (planted vulnerabilities for evals — fake data only)
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'com.example.shop'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.example.shop'
+        minSdk 24
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    implementation 'androidx.webkit:webkit:1.10.0'
+}
