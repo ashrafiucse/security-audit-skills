@@ -1,0 +1,25 @@
+{
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "fake-shop-fixture",
+    "storage_bucket": "fake-shop-fixture.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+        "android_client_info": {
+          "package_name": "com.example.shop"
+        }
+      },
+      "api_key": [
+        {
+          "current_key": "AIzaFakeForEvalsDoNotUseDoNotUse0000000"
+        }
+      ],
+      "oauth_client": [],
+      "services": {}
+    }
+  ],
+  "configuration_version": "1"
+}
