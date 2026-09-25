@@ -49,3 +49,4 @@ column.
 | 2026-09-24 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 9/9 | generic-layer conversion round — IN-PROCESS (auth-review flag-gating + F9 on Node fixture; 5 prior rows re-verified + 4 new) |
 | 2026-09-25 | flutter-security-vuln-app | 100.00% | 100.00% | 0 | 17/17 | new-skill blind round (flutter-security, fresh-context delegate agent) |
 | 2026-09-25 | android-code-security-vuln-app | 100.00% | 100.00% | 0 | 22/22 | new-skill blind round (android-code-security, fresh-context delegate agent) |
+| 2026-09-25 | gaps4-vuln-app | 100.00% | 100.00% | 0 | 4/4 | adversarial-drill round (gaps4: unknown sinks + split construction vs injection-flaws) |
