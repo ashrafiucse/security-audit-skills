@@ -2,14 +2,14 @@
 
 [![CI](https://github.com/ashrafiucse/security-audit-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/ashrafiucse/security-audit-skills/actions/workflows/ci.yml)
 
-A collection of agent skills for **security testing any codebase**. Clone this repo, plug it into your agent (pi, or any Agent Skills-compatible harness), and get a full security audit: secrets, vulnerable dependencies, injection flaws, auth bugs, crypto weaknesses, misconfigurations, container/IaC risks, and fresh CVE intelligence — with a prioritized, evidence-based report.
+A collection of agent skills for **security testing any codebase**. Clone this repo, plug it into your agent (pi, or any Agent Skills-compatible harness), and get a full security audit: secrets, vulnerable dependencies, injection flaws, auth bugs, crypto weaknesses, misconfigurations, container/IaC risks, **mobile app security (Android Kotlin/Java, Flutter)**, and fresh CVE intelligence — with a prioritized, evidence-based report.
 
 ## What it does
 
 Give it any project (any language, any stack) and it will:
 
 1. **Map the stack** — languages, frameworks, dependency manifests, infra files
-2. **Deep-scan** — secrets, CVEs in dependencies, injection flaws, auth/authz issues, weak crypto, config mistakes, Docker/K8s/Terraform risks, data exposure
+2. **Deep-scan** — secrets, CVEs in dependencies, injection flaws, auth/authz issues, weak crypto, config mistakes, Docker/K8s/Terraform risks, data exposure, mobile app code (Android Kotlin/Java + Flutter: storage, TLS bypass, WebView bridges, deep links, build secrets)
 3. **Triage** — severity-ranked findings with evidence (`file:line`), CWE mapping, and exploitability notes
 4. **Report** — a `SECURITY-AUDIT.md` with concrete fix recommendations
 
@@ -31,7 +31,7 @@ Give it any project (any language, any stack) and it will:
 | `course-platform-security` | E-learning/course platforms, persona-driven: catalog gating truth (draft/private exposure), preview-vs-full-content leaks, enrollment state machines, cohort/multi-cohort access, admin-only surfaces |
 | `design-threat-review` | **Design-stage gate, before code exists**: spec/PRD in → `THREAT-MODEL.md` out — actor×asset inventory, trust boundaries, STRIDE sweep mapped to detection skills, per-persona abuse cases, and the audit contract (actor×surface matrix + acceptance criteria) the future audit must disposition |
 | `skill-forge` | Authors NEW custom skills for this repo: scoping from personas/pains, scaffold script, authoring laws from the eval LEARNINGS, blind-test protocol, wiring checklist |
-| `mobile-security` | Android manifest & WebView, iOS ATS/UserDefaults, RN/Flutter storage |
+| `mobile-security` | Mobile platform/manifest half: Android manifest & WebView census, iOS ATS/UserDefaults, RN storage — Dart shapes → `flutter-security`, Kotlin/Java app code → `android-code-security` |
 | `flutter-security` | Flutter/Dart shapes: storage census (SharedPreferences/file/sqflite vs secure storage), cert-validation bypass (HttpOverrides/dio adapter), WebView JS bridges, platform channels both directions, deep-link route injection, `--dart-define` secrets, Random()/md5 |
 | `android-code-security` | Native Android Kotlin+Java app code: storage census (EncryptedSharedPreferences counterpart), local SQLi (execSQL/rawQuery interpolation, both syntaxes), TLS bypass (empty TrustManager, always-true verifier), `@JavascriptInterface` bridge bodies, deep-link Class.forName injection, PendingIntent mutability, Keystore/ECB/MD5/seeded RNG, logcat tokens, google-services.json |
 | `laravel-security` | Laravel: mass assignment, APP_KEY/` .env` RCE chain, DB::raw injection, CSRF `$except`, Blade `{!! !!}`, feature-flag route gating + Pennant staleness, email-blast amplification |
