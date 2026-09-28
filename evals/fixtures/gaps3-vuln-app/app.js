@@ -102,4 +102,41 @@ app.get('/leads/:id/send-verification-link', async (req, res) => {
   res.json({ sent: true });
 });
 
+// ---------- SEC-10: webhook receiver without sender-signature verification ----------
+app.post('/webhooks/billing', async (req, res) => {
+  const event = req.body; // no sender-signature check
+  if (event.type === 'invoice.paid') {
+    await grantEntitlement(event.data.account_id, event.data.plan);
+  }
+  res.json({ received: true });
+});
+
+// ---------- SEC-11: email change without password re-confirmation ----------
+app.post('/account/email', requireAuth, async (req, res) => {
+  // session alone: a hijacked session silently owns the account
+  const user = await db.users.findById(req.user.id);
+  user.email = req.body.email; // no current_password, no re-verification
+  await user.save();
+  res.json({ ok: true });
+});
+
+// ---------- SEC-12: login code returned in the HTTP response ----------
+app.get('/auth/email/code', async (req, res) => {
+  // code generated for ANY supplied address, no ownership proof, no throttle
+  const code = ('000000' + Math.floor(Math.random() * 1000000)).slice(-6);
+  res.json({ sent: true, code }); // the bearer credential leaves in the response body
+});
+
+// ---------- SEC-13: static master code accepted by the verify path ----------
+const MASTER_LOGIN_CODE = '172839'; // shipped in every environment's seed
+app.post('/auth/email/login', async (req, res) => {
+  const expected = req.body.code === MASTER_LOGIN_CODE
+    ? MASTER_LOGIN_CODE // master code works for ANY account
+    : await codes.peek(req.body.email);
+  if (req.body.code !== expected) return res.status(401).json({ error: 'invalid code' });
+  const user = await db.users.findByEmail(req.body.email);
+  issueSession(res, user);
+  res.json({ ok: true });
+});
+
 app.listen(3000);

@@ -76,3 +76,57 @@ app.post('/leads/:id/send-verification-link', requireSigned, throttle({ key: 'le
   await mailer.sendMail({ to: lead.email, subject: 'Verify your email', body: verifyLink(lead) });
   res.json({ sent: true });
 });
+
+// ---------- safe shapes: webhook verification + email-change re-auth ----------
+const crypto = require('crypto');
+
+function verifyBillingSignature(req) {
+  const expected = crypto
+    .createHmac('sha256', process.env.WEBHOOK_SECRET)
+    .update(req.rawBody) // RAW bytes, not re-parsed JSON
+    .digest('hex');
+  const provided = req.get('x-billing-signature') || '';
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
+}
+
+// SAFE: sender-authenticated webhook + replay window before any side effect
+app.post('/webhooks/billing', requireSignature(verifyBillingSignature), withinReplayWindow('5m'), async (req, res) => {
+  const event = req.body;
+  if (event.type === 'invoice.paid') {
+    await grantEntitlement(event.data.account_id, event.data.plan);
+  }
+  res.json({ received: true });
+});
+
+// SAFE: email change behind password re-auth + verify-before-swap
+app.post('/account/email', requireAuth, requireCurrentPassword, async (req, res) => {
+  const pending = await startEmailChange(req.user.id, req.body.email); // verification mail to the NEW address
+  notifyOldAddress(req.user.email);
+  res.json({ pending: pending.id });
+});
+
+// ---------- safe shapes: one-time codes ----------
+function generateLoginCode() {
+  return crypto.randomInt(0, 1000000).toString().padStart(6, '0'); // CSPRNG
+}
+
+// SAFE: code sent only to the STORED record's channel; response carries no code
+app.post('/auth/email/code', throttle({ key: 'email+ip', max: 3 }), async (req, res) => {
+  const user = await db.users.findByEmail(req.body.email);
+  if (!user) return res.json({ sent: true }); // existence-neutral
+  const code = generateLoginCode();
+  await codes.store(user.id, code, { ttl: '5m', maxAttempts: 5 });
+  await mailer.sendMail({ to: user.email, subject: 'Login code', body: `Code: ${code}` });
+  res.json({ sent: true });
+});
+
+// SAFE: verify is single-use, throttled, constant-time — NO static fallback
+app.post('/auth/email/login', throttle({ key: 'ip', max: 10 }), async (req, res) => {
+  const expected = await codes.consume(req.body.email); // single-use, expires
+  if (!expected || !crypto.timingSafeEqual(Buffer.from(String(req.body.code)), Buffer.from(String(expected)))) {
+    return res.status(401).json({ error: 'invalid code' });
+  }
+  const user = await db.users.findByEmail(req.body.email);
+  issueSession(res, user);
+  res.json({ ok: true });
+});
