@@ -12,6 +12,7 @@ Full-project, read-only security review that ends in a written report. Works for
 
 - **Read-only.** Never modify, delete, move, or "fix" files. Never run destructive or mutating commands. Never actually exploit a finding — reasoning about exploitability on paper is enough.
 - **Evidence or it didn't happen.** Every finding must cite `path/file.ext:line` and a short code excerpt you actually read.
+- **State the falsifier.** A finding is not complete until it names the near-miss condition you ruled out and HOW you ruled it out ("this `SharedPreferences` hit is not the `encryptedSharedPreferences:` option — the `.getInstance` call writes a token"). A hit you cannot falsify is a lead, not a finding: read more context or mark it not-assessed.
 - **Verify before reporting.** Read surrounding context to kill false positives (test files, examples, fixtures, obviously-fake values).
 - **No network required**, but if network is available, the `dependency-vulns` and `cve-research` skills use live databases.
 
@@ -87,6 +88,8 @@ For each applicable domain, **read the sibling skill and follow it** (paths are 
 | GraphQL server / `.graphql` schema files | `../graphql-security/SKILL.md` |
 | LLM/AI stack (langchain/llamaindex/autogen, openai/anthropic SDKs, model files `.pkl/.pt/.gguf/.safetensors`) | `../llm-security/SKILL.md` |
 | Android/iOS files (`AndroidManifest.xml`, `Info.plist`, mobile code) | `../mobile-security/SKILL.md` |
+| Flutter/Dart project (`pubspec.yaml` with a flutter SDK entry, `lib/*.dart`) | `../flutter-security/SKILL.md` — load WITH mobile-security (it owns the manifest half) |
+| Native Android app code (`app/src/main` Kotlin/Java, `com.android.application` in build.gradle) | `../android-code-security/SKILL.md` — load WITH mobile-security (manifest half) |
 | Laravel/PHP project (`composer.json` with laravel/framework, `artisan`, Blade views) | `../laravel-security/SKILL.md` |
 | Django/Python project (`manage.py`, `settings.py`, Django in requirements) | `../django-security/SKILL.md` |
 | Rails project (`Gemfile` with rails, `app/controllers`) | `../rails-security/SKILL.md` |
@@ -138,6 +141,8 @@ Rate each finding:
 | **Low** | Hygiene: outdated-but-patched deps, missing lockfile, debug flags in non-prod config |
 
 Also tag **Likelihood** (reachable from unauthenticated input? internal only?) and **Effort to fix** (S/M/L).
+
+**Falsifier gate:** every reported finding must carry the near-miss condition it ruled out (see Ground rules). A finding without a falsifier line is not dispositioned — it is a lead, and leads don't go in the Findings table.
 
 **Completeness gate v2 — disposition everything, skip nothing.** Build the coverage matrix from the Phase 0 census: every ACTOR × every SURFACE cell gets exactly one disposition:
 
@@ -197,6 +202,7 @@ Knowledge base: <N> vuln-db entries (newest YYYY-MM-DD) | Live checks: OSV.dev +
   ```<lang>
   <the actual offending lines>
   ```
+- **Falsifier:** <the near-miss condition ruled out and the check that ruled it out — e.g. "verified NOT the `encryptedSharedPreferences:` safe option: this is the `.getInstance` call site storing a token">
 - **Impact:** what an attacker gains, concretely
 - **Fix:** specific, actionable change (show corrected code when short)
 - **References:** CWE / CVE / OWASP link if applicable

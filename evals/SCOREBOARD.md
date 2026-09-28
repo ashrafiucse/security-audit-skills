@@ -47,6 +47,9 @@ column.
 | 2026-09-23 | surface-vuln-app | 100.00% | 100.00% | 0 | 16/16 | issue-triage round — IN-PROCESS (KEV/NVD triage #22/#23; RBAC-wildcard plant added: 15 prior rows + 1 new) |
 | 2026-09-24 | laravel-vuln-app | 100.00% | 100.00% | 0 | 22/22 | incident-conversion round — IN-PROCESS (trial-tenant email-blast report → Step 8 + F9; 13 prior rows re-verified + 8 new) |
 | 2026-09-24 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 9/9 | generic-layer conversion round — IN-PROCESS (auth-review flag-gating + F9 on Node fixture; 5 prior rows re-verified + 4 new) |
+| 2026-09-25 | flutter-security-vuln-app | 100.00% | 100.00% | 0 | 17/17 | new-skill blind round (flutter-security, fresh-context delegate agent) |
+| 2026-09-25 | android-code-security-vuln-app | 100.00% | 100.00% | 0 | 22/22 | new-skill blind round (android-code-security, fresh-context delegate agent) |
+| 2026-09-25 | gaps4-vuln-app | 100.00% | 100.00% | 0 | 4/4 | adversarial-drill round (gaps4: unknown sinks + split construction vs injection-flaws) |
 | 2026-09-26 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 11/11 | session-resume round — IN-PROCESS (interrupted conversion completed: webhook-receiver-auth + profile-ATO plants now selftest-guarded; 9 prior rows re-verified + 2 new) |
 | 2026-09-26 | llm-vuln-app | 100.00% | 100.00% | 0 | 11/11 | session-resume round — IN-PROCESS (interrupted MCP conversion completed: §7 MCP-server census + mcp_server.py plants now selftest-guarded; 7 prior rows re-verified + 4 new) |
 | 2026-09-27 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 13/13 | triage round — IN-PROCESS (issues #36–#38: CVE-2026-97063/97064 one-time-code class → auth-review §3 census + 2 new plants + safe counterparts; 11 prior rows re-verified + 2 new) |

@@ -45,6 +45,17 @@ pushes, force pushes, and deletion are all blocked; every change lands via a PR
 gated on the required CI check (`test`). Emergency override: temporarily set
 the ruleset to *disabled* (Settings → Rules → Rulesets), do the change, restore it.
 
+**Secret-scanning alerts from eval fixtures (expected, not incidents):** fixtures
+plant shape-accurate fake keys ON PURPOSE — ground truth requires a secret the
+scanner can find, and CI asserts the hit (e.g. the `AIza…` plant in
+`android-code-security-vuln-app`). Push protection passes entropy-free fakes, but
+secret SCANNING still opens one alert per new plant (validity "unknown"). Protocol:
+verify the value is a planted fake (`git grep` the fixture), then resolve the alert
+as **`used_in_tests`** — precedent: alert #1 (Google API Key, fixture plant, 2026-09-25).
+Authoring rule: selftest rules reference TRUNCATED substrings so they don't add
+more alertable copies; a real-looking value in a NON-fixture file is never this
+protocol — that's a rotation incident.
+
 ### Monthly (~2 h) — pattern refresh
 - Review the month's high-profile advisories for *new bug classes or APIs* (not just CVEs). New dangerous API → new grep pattern in the relevant skill's `references/`, + fixture.
 - Re-run evals on all fixtures; fix any precision regressions (new patterns causing false positives are the #1 decay mode).

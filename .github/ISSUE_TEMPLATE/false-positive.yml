@@ -8,7 +8,9 @@ body:
       value: |
         Every confirmed false positive narrows a pattern + adds a near-miss
         fixture, so the skills stop crying wolf on it forever. The mirror of
-        the missed-finding report. **Sanitize snippets — no real secrets.**
+        the missed-finding report. Confirmed FPs are logged in
+        [evals/PHANTOMS.md](../evals/PHANTOMS.md) and converted the same
+        session. **Sanitize snippets — no real secrets.**
   - type: textarea
     id: finding
     attributes:

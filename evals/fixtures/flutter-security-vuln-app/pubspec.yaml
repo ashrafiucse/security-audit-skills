@@ -1,0 +1,16 @@
+name: flutter_shop
+description: Fixture Flutter app (planted vulnerabilities for evals — fake data only)
+publish_to: "none"
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.0.0
+  sqflite: ^2.0.0
+  dio: ^5.0.0
+  webview_flutter: ^4.0.0
+  uni_links: ^0.5.0
+  crypto: ^3.0.0
+  path_provider: ^2.0.0
