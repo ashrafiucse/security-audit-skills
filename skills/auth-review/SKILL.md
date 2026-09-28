@@ -162,6 +162,21 @@ Stack-agnostic census (framework skills carry the concrete greps — e.g. `../la
 - **Flag-store staleness**: persisted flag stores (Pennant database, DB-backed Unleash/OpenFeature, a `features` table) keep stored per-scope values when defaults change — reverting a default changes nothing for already-stored scopes. Deploy scripts must purge/sync; absence → Medium
 - Public endpoints that TRIGGER OUTBOUND messages (send-verification, subscribe, reset, notify, magic-link, webhook-register): census them with §1's route table; each needs auth-or-signed + throttle (+ captcha where public) → **Critical when public AND unthrottled**: ID enumeration = mail/SMS bomb needing zero auth and zero flags
 
+### One-time codes (verification / login / MFA codes)
+
+A one-time code IS a bearer credential — census every endpoint that PRODUCES or VERIFIES one, then check WHERE the code goes and WHAT ELSE the verifier accepts:
+
+```bash
+rg -n -i "verification.?code|login.?code|one[-_ ]?time.?code|\botp\b|magic.?code|sms.?code|email.?code" src/ app/ routes/ | head -40
+rg -n -i "(master|static|backdoor|debug|test).{0,12}code" src/ app/ config/ db/ seeds/ -g '*.sql' -g '*.java' -g '*.py' -g '*.js' -g '*.ts' -g '*.yml'
+```
+
+- Producer endpoint whose HTTP RESPONSE carries the generated code (`res.json({ ..., code })`, `put("code", ...)`, response wrapper, template rendering it) → **Critical** — unauthenticated takeover of any known identifier: request the code, read it from the response, log in (class incident: CVE-2026-97063, X-SpringBoot — GET /sys/mobile/code and /sys/email/code returned codes; login via /sys/emailOrMobileLogin)
+- Static/master code the verifier accepts (seed rows, config constants, "test-mode" fallbacks — X-SpringBoot's `172839` seed, CVE-2026-97064; entry: `../cve-research/vuln-db/entries/2026-09-25-cve-2026-97064.md`) → **Critical** — a public backdoor credential; if it ever shipped, assume it IS used
+- Code delivered to an address/number taken from the REQUEST instead of the stored account record → High — attacker-controlled delivery channel harvests codes
+- Weak hygiene: reusable codes, no expiry, no attempt cap on verify, predictable generators (`Math.random`) → Medium→High by brute-force feasibility
+- Safe shape: CSPRNG code, sent ONLY to the stored channel, response = `{sent: true}` (existence-neutral), single-use + short TTL + verify throttle + constant-time compare, NO static fallback in any environment — dev seeds get cloned to prod
+
 ### Webhook receiver authentication
 
 Webhook endpoints are authenticated by the SENDER's signature, not by your sessions — an unverified receiver is an unauthenticated endpoint with money/entitlement powers. Census every webhook/callback route with §1's table, then:

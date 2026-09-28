@@ -16,6 +16,8 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 | 9 | Public email-trigger endpoint | `GET /leads/:id/send-verification-link` — no auth, no throttle, side effect on GET; ID enumeration = mail bomb | app.js:99-102 | Critical |
 | 10 | Webhook receiver auth | `POST /webhooks/billing` acts on `req.body` with no sender-signature verification — forged events = free entitlements (pairs with F4 replay) | app.js:106-112 | Critical |
 | 11 | Profile change → ATO | `POST /account/email` assigns `user.email = req.body.email` with session only — no current-password, no verify-before-swap; hijacked session silently owns the account | app.js:115-120 | High |
+| 12 | One-time code disclosure | `GET /auth/email/code` returns the generated login code in the response body (`res.json({ sent: true, code })`) — request it for any known address, read it, log in (CVE-2026-97063 class) | app.js:123-128 | Critical |
+| 13 | Static master code | `MASTER_LOGIN_CODE = '172839'` accepted by `POST /auth/email/login` for ANY account — public backdoor credential (CVE-2026-97064 class); also predictable `Math.random` codes, no expiry/attempts | app.js:130-140 | Critical |
 
 ## Must NOT trigger (near-misses — `safe-gaps3.js`)
 
@@ -25,3 +27,5 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 - `safe-gaps3.js` (appended safe shapes): `PLAN_CAPABILITIES` per-plan lookup (no flag map with true), compose handler behind `requireAuth, requireFlag('send-email'), rateLimit`, blast job with atomic `consumeBlastQuota` + `findAll({ where: { verified: true }, limit: 500 })`, verification sender as POST + `requireSigned` + `throttle`
 - `safe-gaps3.js:78-90,93-100` — webhook behind `requireSignature(verifyBillingSignature)` + `withinReplayWindow`, HMAC over RAW bytes, `timingSafeEqual` compare
 - `safe-gaps3.js:103-109` — email change behind `requireAuth, requireCurrentPassword` + `startEmailChange` verify-before-swap (no direct `user.email = req.body.email` assignment)
+- `safe-gaps3.js:108-121` — code sender: `crypto.randomInt` generator, delivery to the STORED record's `user.email`, existence-neutral `{ sent: true }` response carrying NO code, throttled
+- `safe-gaps3.js:123-132` — verify: single-use `codes.consume` + `timingSafeEqual`, throttled, zero static fallback constants anywhere in the file

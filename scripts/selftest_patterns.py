@@ -478,6 +478,13 @@ RULES = [
     ("mcp-transport-bare-sse",
      r"run\(\s*transport=['\"]sse['\"]\s*\)",
      "llm-vuln-app/mcp_server.py", 'server.run(transport="sse")'),
+    # --- triage round: one-time-code disclosure (gaps3-vuln-app, CVE-2026-97063/97064) ---
+    ("otp-code-in-response",
+     r"json\(\s*\{[^}]*[,:]\s*code\s*[,}]",
+     "gaps3-vuln-app/app.js", "sent: true, code }"),
+    ("otp-static-master-code",
+     r"(MASTER_LOGIN_CODE|master.?code)\s*=",
+     "gaps3-vuln-app/app.js", "172839"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -500,6 +507,12 @@ MUST_NOT_MATCH = [
     ("mcp-bare-transport-safe",
      r"run\(\s*transport=['\"]sse['\"]\s*\)",
      "llm-vuln-app/safe_mcp_server.py"),
+    ("otp-code-in-response-safe",
+     r"json\(\s*\{[^}]*[,:]\s*code\s*[,}]",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("otp-static-master-code-safe",
+     r"(MASTER_LOGIN_CODE|master.?code)\s*=",
+     "gaps3-vuln-app/safe-gaps3.js"),
     ("nosql-raw-body-query-safe",
      r"find(One)?\(\s*\{[^}]*req\.(body|query)",
      "node-vuln-app-2/safe-counterexamples.js"),

@@ -49,3 +49,4 @@ column.
 | 2026-09-24 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 9/9 | generic-layer conversion round — IN-PROCESS (auth-review flag-gating + F9 on Node fixture; 5 prior rows re-verified + 4 new) |
 | 2026-09-26 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 11/11 | session-resume round — IN-PROCESS (interrupted conversion completed: webhook-receiver-auth + profile-ATO plants now selftest-guarded; 9 prior rows re-verified + 2 new) |
 | 2026-09-26 | llm-vuln-app | 100.00% | 100.00% | 0 | 11/11 | session-resume round — IN-PROCESS (interrupted MCP conversion completed: §7 MCP-server census + mcp_server.py plants now selftest-guarded; 7 prior rows re-verified + 4 new) |
+| 2026-09-27 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 13/13 | triage round — IN-PROCESS (issues #36–#38: CVE-2026-97063/97064 one-time-code class → auth-review §3 census + 2 new plants + safe counterparts; 11 prior rows re-verified + 2 new) |

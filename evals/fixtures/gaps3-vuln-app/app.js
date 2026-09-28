@@ -120,4 +120,23 @@ app.post('/account/email', requireAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
+// ---------- SEC-12: login code returned in the HTTP response ----------
+app.get('/auth/email/code', async (req, res) => {
+  // code generated for ANY supplied address, no ownership proof, no throttle
+  const code = ('000000' + Math.floor(Math.random() * 1000000)).slice(-6);
+  res.json({ sent: true, code }); // the bearer credential leaves in the response body
+});
+
+// ---------- SEC-13: static master code accepted by the verify path ----------
+const MASTER_LOGIN_CODE = '172839'; // shipped in every environment's seed
+app.post('/auth/email/login', async (req, res) => {
+  const expected = req.body.code === MASTER_LOGIN_CODE
+    ? MASTER_LOGIN_CODE // master code works for ANY account
+    : await codes.peek(req.body.email);
+  if (req.body.code !== expected) return res.status(401).json({ error: 'invalid code' });
+  const user = await db.users.findByEmail(req.body.email);
+  issueSession(res, user);
+  res.json({ ok: true });
+});
+
 app.listen(3000);

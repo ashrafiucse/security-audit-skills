@@ -104,3 +104,29 @@ app.post('/account/email', requireAuth, requireCurrentPassword, async (req, res)
   notifyOldAddress(req.user.email);
   res.json({ pending: pending.id });
 });
+
+// ---------- safe shapes: one-time codes ----------
+function generateLoginCode() {
+  return crypto.randomInt(0, 1000000).toString().padStart(6, '0'); // CSPRNG
+}
+
+// SAFE: code sent only to the STORED record's channel; response carries no code
+app.post('/auth/email/code', throttle({ key: 'email+ip', max: 3 }), async (req, res) => {
+  const user = await db.users.findByEmail(req.body.email);
+  if (!user) return res.json({ sent: true }); // existence-neutral
+  const code = generateLoginCode();
+  await codes.store(user.id, code, { ttl: '5m', maxAttempts: 5 });
+  await mailer.sendMail({ to: user.email, subject: 'Login code', body: `Code: ${code}` });
+  res.json({ sent: true });
+});
+
+// SAFE: verify is single-use, throttled, constant-time — NO static fallback
+app.post('/auth/email/login', throttle({ key: 'ip', max: 10 }), async (req, res) => {
+  const expected = await codes.consume(req.body.email); // single-use, expires
+  if (!expected || !crypto.timingSafeEqual(Buffer.from(String(req.body.code)), Buffer.from(String(expected)))) {
+    return res.status(401).json({ error: 'invalid code' });
+  }
+  const user = await db.users.findByEmail(req.body.email);
+  issueSession(res, user);
+  res.json({ ok: true });
+});
