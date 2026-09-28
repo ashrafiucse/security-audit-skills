@@ -102,4 +102,22 @@ app.get('/leads/:id/send-verification-link', async (req, res) => {
   res.json({ sent: true });
 });
 
+// ---------- SEC-10: webhook receiver without sender-signature verification ----------
+app.post('/webhooks/billing', async (req, res) => {
+  const event = req.body; // no sender-signature check
+  if (event.type === 'invoice.paid') {
+    await grantEntitlement(event.data.account_id, event.data.plan);
+  }
+  res.json({ received: true });
+});
+
+// ---------- SEC-11: email change without password re-confirmation ----------
+app.post('/account/email', requireAuth, async (req, res) => {
+  // session alone: a hijacked session silently owns the account
+  const user = await db.users.findById(req.user.id);
+  user.email = req.body.email; // no current_password, no re-verification
+  await user.save();
+  res.json({ ok: true });
+});
+
 app.listen(3000);

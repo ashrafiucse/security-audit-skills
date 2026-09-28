@@ -14,6 +14,8 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 | 7 | Flag/plan gating (generic layer) | compose handler has NO flag check — capability gated in the UI only; handler is the enforcement point | app.js:83-87 | Critical |
 | 8 | F9 amplification | `db.leads.findAll()` unbounded → per-row `sendMail` with attacker-influenced subject/body — one request → N emails | app.js:92-95 | Critical |
 | 9 | Public email-trigger endpoint | `GET /leads/:id/send-verification-link` — no auth, no throttle, side effect on GET; ID enumeration = mail bomb | app.js:99-102 | Critical |
+| 10 | Webhook receiver auth | `POST /webhooks/billing` acts on `req.body` with no sender-signature verification — forged events = free entitlements (pairs with F4 replay) | app.js:106-112 | Critical |
+| 11 | Profile change → ATO | `POST /account/email` assigns `user.email = req.body.email` with session only — no current-password, no verify-before-swap; hijacked session silently owns the account | app.js:115-120 | High |
 
 ## Must NOT trigger (near-misses — `safe-gaps3.js`)
 
@@ -21,3 +23,5 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 - Hook registration with scheme + anchored-host regex; safeExtract with per-entry containment + symlink rejection + no-overwrite
 - Redirect with parsed `URL` + exact `Set.has(host)` equality
 - `safe-gaps3.js` (appended safe shapes): `PLAN_CAPABILITIES` per-plan lookup (no flag map with true), compose handler behind `requireAuth, requireFlag('send-email'), rateLimit`, blast job with atomic `consumeBlastQuota` + `findAll({ where: { verified: true }, limit: 500 })`, verification sender as POST + `requireSigned` + `throttle`
+- `safe-gaps3.js:78-90,93-100` — webhook behind `requireSignature(verifyBillingSignature)` + `withinReplayWindow`, HMAC over RAW bytes, `timingSafeEqual` compare
+- `safe-gaps3.js:103-109` — email change behind `requireAuth, requireCurrentPassword` + `startEmailChange` verify-before-swap (no direct `user.email = req.body.email` assignment)

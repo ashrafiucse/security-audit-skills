@@ -67,6 +67,19 @@ rg -n "escape_dn_chars|escape_filter_chars|LdapEncoder" -g '*.py' -g '*.java'
 - Safe shape: escape before composing (`escape_dn_chars()` / `escape_filter_chars()` in ldap3, `LdapEncoder.filterEncode/nameEscape` in Java) — or constant service DN + post-bind attribute comparison
 - The DN/filter greps hit BOTH vulnerable and escaped forms — the escape-call context is the triage discriminator (same census discipline as XSS sinks)
 
+### Profile changes → account takeover
+
+Email/password-change endpoints are AUTH endpoints — a session alone is not sufficient proof (stolen session, XSS-riding, insider):
+
+```bash
+rg -n "email\s*=|updateEmail|changeEmail|current_password|currentPassword|change.?password" src/ app/ | head -20
+```
+
+- Email change without current-password confirmation AND without re-verification of the NEW address (verify-before-swap + notice to the old one) → High — a hijacked session silently owns the account: future password resets go to the attacker's address, no signal ever reaches the victim
+- Password change without current password → same class, High
+- Username/handle change that re-frees an old identifier while reset-by-username flows exist → Medium
+- Safe shape: `requireCurrentPassword` (or step-up re-auth) + verification mail to the new address before activation + revocation notice to the old one
+
 ### JWT / tokens
 ```bash
 rg -n "jwt\.(sign|decode|verify)|verify\(|algorithms|algorithm|none|HS256|RS256"
@@ -148,6 +161,21 @@ Stack-agnostic census (framework skills carry the concrete greps — e.g. `../la
 - Default-true definitions for dangerous capabilities (`'import': true`, `"send_email": true` in flag config) → High — the capability exists for everyone including trials; per-plan closures/lookups are the safe shape
 - **Flag-store staleness**: persisted flag stores (Pennant database, DB-backed Unleash/OpenFeature, a `features` table) keep stored per-scope values when defaults change — reverting a default changes nothing for already-stored scopes. Deploy scripts must purge/sync; absence → Medium
 - Public endpoints that TRIGGER OUTBOUND messages (send-verification, subscribe, reset, notify, magic-link, webhook-register): census them with §1's route table; each needs auth-or-signed + throttle (+ captcha where public) → **Critical when public AND unthrottled**: ID enumeration = mail/SMS bomb needing zero auth and zero flags
+
+### Webhook receiver authentication
+
+Webhook endpoints are authenticated by the SENDER's signature, not by your sessions — an unverified receiver is an unauthenticated endpoint with money/entitlement powers. Census every webhook/callback route with §1's table, then:
+
+```bash
+rg -n "webhook|callback" src/ app/ routes/ | rg -i "post|route" | head -20
+rg -n "timingSafeEqual|compare_digest|verify_sig|verifySignature|signature" src/ app/
+```
+
+- Handler parses `req.body`/event and ACTS (fulfill, enroll, activate, refund) without verifying the sender's HMAC signature → **Critical** (forged events = free entitlements; pairs with F4 replay in `../flow-security/SKILL.md`)
+- Signature compared with `==`/`===` instead of constant-time (`timingSafeEqual`, `hmac.compare_digest`) → Medium (timing oracle)
+- Signature computed over re-parsed JSON instead of the RAW request bytes → verification fails → commonly "fixed" by deleting the check (drift toward Critical)
+- No replay window (timestamp/event-id dedup) → High
+- Safe shape: raw-body HMAC + constant-time compare + event-id dedup, all before any side effect
 
 ### API keys as authentication (service-to-service)
 
