@@ -18,6 +18,7 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 | 11 | Profile change → ATO | `POST /account/email` assigns `user.email = req.body.email` with session only — no current-password, no verify-before-swap; hijacked session silently owns the account | app.js:115-120 | High |
 | 12 | One-time code disclosure | `GET /auth/email/code` returns the generated login code in the response body (`res.json({ sent: true, code })`) — request it for any known address, read it, log in (CVE-2026-97063 class) | app.js:123-128 | Critical |
 | 13 | Static master code | `MASTER_LOGIN_CODE = '172839'` accepted by `POST /auth/email/login` for ANY account — public backdoor credential (CVE-2026-97064 class); also predictable `Math.random` codes, no expiry/attempts | app.js:130-140 | Critical |
+| 14 | Webhook fail-open guard | `POST /hooks/deploy/:stackId` skips signature verification when `DEPLOY_WEBHOOK_SECRET` is unset/empty — unauthenticated stack redeploy (git clone + compose up), attacker-controlled compose = container-escape chain (Dockhand CVE-2026-53988 class; contrast row 10's missing check — here verification EXISTS but a config guard disables it) | app.js:144-155 | Critical |
 
 ## Must NOT trigger (near-misses — `safe-gaps3.js`)
 
@@ -29,3 +30,4 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 - `safe-gaps3.js:103-109` — email change behind `requireAuth, requireCurrentPassword` + `startEmailChange` verify-before-swap (no direct `user.email = req.body.email` assignment)
 - `safe-gaps3.js:108-121` — code sender: `crypto.randomInt` generator, delivery to the STORED record's `user.email`, existence-neutral `{ sent: true }` response carrying NO code, throttled
 - `safe-gaps3.js:123-132` — verify: single-use `codes.consume` + `timingSafeEqual`, throttled, zero static fallback constants anywhere in the file
+- `safe-gaps3.js:134-141` — deploy webhook REJECTS when the secret is unset (fail-closed 503), then HMAC over raw bytes + `timingSafeEqual`; zero `!process.env.*WEBHOOK_SECRET` guard forms anywhere in the file

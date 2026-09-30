@@ -39,3 +39,26 @@ def chat(user_message: str) -> str:
     # SEC-06: user input concatenated into the system/instruction prompt
     prompt = f"You are the shop assistant. Help the user: {user_message}"
     return agent.run(prompt)
+
+
+# ---------- SEC: serving-stack RPC (LightLLM pattern, CVE-2026-103040/103041) ----------
+import threading
+
+import rpyc
+from rpyc.utils.server import ThreadedServer
+
+
+class ProfilerService(rpyc.Service):
+    def exposed_run_cmd(self, cmd: str):
+        return profiler_cmd_queue.append(cmd)
+
+
+def start_profiler_rpc():
+    # SEC: unauthenticated RPyC on all interfaces with pickle enabled = network RCE
+    server = ThreadedServer(
+        ProfilerService(),
+        hostname="0.0.0.0",
+        port=8788,
+        protocol_config={"allow_pickle": True},
+    )
+    threading.Thread(target=server.start, daemon=True).start()
