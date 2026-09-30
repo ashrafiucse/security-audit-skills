@@ -68,9 +68,6 @@ jobs:
                   lang = top
                   by_lang.setdefault(lang, []).append(fn.split("/")[-1])
 
-          lines = [f"### {lang} ({len(files)})" for lang, files in
-                   sorted(by_lang.items(), key=lambda kv: -len(kv[1]))
-                   for files in [kv[1]]]
           body = []
           for lang in sorted(by_lang, key=lambda k: -len(by_lang[k])):
               body.append(f"### {lang} ({len(by_lang[lang])})")

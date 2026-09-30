@@ -16,3 +16,13 @@ services:
       - POSTGRES_PASSWORD=postgres      # SEC-08b
     ports:
       - "5432:5432"                     # SEC-09: DB published to host/network
+
+  # AI agent/MCP platform deployed via the vendor quickstart (obot pattern, CVE-2026-101065)
+  agent-platform:
+    image: obot8/obot:0.21.0
+    ports:
+      - "8080:8080"                     # SEC-11: agent/admin plane published to the network
+    environment:
+      - OBOT_AUTH_ENABLED=false         # SEC-11: auth off → every caller is the synthetic admin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # SEC-11 chain: MCP tool runtime reaches host Docker

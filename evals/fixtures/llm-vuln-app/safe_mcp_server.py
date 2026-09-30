@@ -38,6 +38,16 @@ async def fetch_docs(url: str) -> str:
     return f"[UNTRUSTED EXTERNAL CONTENT]\n{body}"
 
 
+# SAFE: connect checks the caller's per-server authorization before any session
+# (obot CVE-2026-101084 counter-shape: possession of a server ID is not permission)
+@server.tool("mcp_connect")
+async def mcp_connect(server_id: str, user: User) -> str:
+    allowed = await acl.servers_for(user)          # per-server ACL at connect time
+    if server_id not in allowed:
+        raise PermissionError("server not granted to this user")
+    return (await registry.get(server_id)).open_session(actor=user)
+
+
 def main():
     # SAFE: authenticated transport
     server.run(transport="sse", middleware=[require_api_key])

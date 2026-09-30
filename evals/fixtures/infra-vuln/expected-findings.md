@@ -12,3 +12,10 @@
 | 8 | Default credentials (postgres) | compose:12,16 | High (published ports) |
 | 9 | Postgres port published to host | docker-compose.yml:18 | High |
 | 10 | No `HEALTHCHECK` in Dockerfile — orchestrator cannot detect a wedged app (file-level anchor) | Dockerfile:- | Low |
+| 11 | AI agent/MCP platform (obot quickstart pattern) with auth disabled AND admin port published — any unauthenticated network caller becomes the synthetic Owner+Admin of the agent plane (CVE-2026-101065); chain: docker.sock mounted in the same service → MCP tool runtime reaches host Docker → host-root takeover | docker-compose.yml:21-28 | Critical |
+
+## Must NOT trigger (near-misses — `hardened-compose.yml`)
+
+- `OBOT_AUTH_ENABLED=true` + `expose:` (no host port mapping) — auth on and unreachable from outside the compose network
+- Published port alone is NOT this finding (row 9 precedent — judge by what the port exposes + auth state); auth-off flag alone on an unpublished dev service → downgrade to High config smell, not the Critical chain
+- No quoted `"host:container"` port mapping occurs in `hardened-compose.yml`
