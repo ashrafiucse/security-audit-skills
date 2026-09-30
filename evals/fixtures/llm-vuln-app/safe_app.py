@@ -37,3 +37,18 @@ def get_client():
     # SAFE (vs SEC-01): key from environment, never hardcoded
     from anthropic import Anthropic
     return Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+
+# ---------- SAFE: serving-stack RPC — localhost bind, authenticator, pickle off ----------
+from rpyc.utils.server import ThreadedServer
+
+
+def start_profiler_rpc():
+    server = ThreadedServer(
+        ProfilerService(),
+        hostname="127.0.0.1",
+        port=8788,
+        authenticator=TokenAuthenticator(API_TOKEN),
+        protocol_config={"allow_pickle": False},
+    )
+    threading.Thread(target=server.start, daemon=True).start()

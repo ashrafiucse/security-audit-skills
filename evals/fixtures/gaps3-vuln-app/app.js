@@ -140,3 +140,16 @@ app.post('/auth/email/login', async (req, res) => {
 });
 
 app.listen(3000);
+
+// ---------- SEC-14: webhook secret guard FAILS OPEN when unset (Dockhand CVE-2026-53988) ----------
+app.post('/hooks/deploy/:stackId', async (req, res) => {
+  // verification exists below — but an unset secret SKIPS it: unsigned redeploy
+  if (!process.env.DEPLOY_WEBHOOK_SECRET || process.env.DEPLOY_WEBHOOK_SECRET === '') {
+    return res.json({ redeployed: true, stack: req.params.stackId }); // unsigned git clone + compose up
+  }
+  const crypto = require('crypto');
+  const expected = crypto.createHmac('sha256', process.env.DEPLOY_WEBHOOK_SECRET).update(req.rawBody).digest();
+  const got = Buffer.from(String(req.headers['x-deploy-signature'] || ''), 'utf8');
+  if (!crypto.timingSafeEqual(got, expected)) return res.status(401).end(); // constant-time — the guard is the bug
+  return res.json({ redeployed: true, stack: req.params.stackId });
+});

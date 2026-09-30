@@ -130,3 +130,13 @@ app.post('/auth/email/login', throttle({ key: 'ip', max: 10 }), async (req, res)
   issueSession(res, user);
   res.json({ ok: true });
 });
+
+// SAFE: unset/empty webhook secret REJECTS (fail closed) — never skips verification
+app.post('/hooks/deploy/:stackId', async (req, res) => {
+  const secret = process.env.DEPLOY_WEBHOOK_SECRET;
+  if (!secret) return res.status(503).json({ error: 'deploy webhook secret is not configured' }); // fail closed
+  const expected = crypto.createHmac('sha256', secret).update(req.rawBody).digest();
+  const got = Buffer.from(String(req.headers['x-deploy-signature'] || ''), 'utf8');
+  if (!crypto.timingSafeEqual(got, expected)) return res.status(401).end();
+  return res.json({ redeployed: true, stack: req.params.stackId });
+});
