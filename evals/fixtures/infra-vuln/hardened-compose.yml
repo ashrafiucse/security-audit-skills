@@ -1,0 +1,11 @@
+# Safe counterpart to the agent-platform quickstart in docker-compose.yml.
+# An audit must NOT report the CVE-2026-101065 finding here: auth is ON and
+# the service publishes no host port (socket-internal only), no docker.sock.
+version: "3"
+services:
+  agent-platform:
+    image: obot8/obot:0.21.0
+    environment:
+      - OBOT_AUTH_ENABLED=true
+    expose:
+      - "8080"

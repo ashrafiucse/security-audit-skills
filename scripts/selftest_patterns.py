@@ -111,6 +111,10 @@ RULES = [
     ("llm-anthropic-key",
      r"sk-ant-api03-[A-Za-z0-9_-]{20,}",
      "llm-vuln-app/app.py", "sk-ant-api03-"),
+    # --- llm-security: MCP connect authorization-by-ID-possession (CVE-2026-101084) ---
+    ("mcp-connect-no-acl",
+     r"mcp[-_]connect",
+     "llm-vuln-app/mcp_server.py", "async def mcp_connect(server_id"),
     # --- vuln-db library families (java-libs-vuln, rails-libs-vuln) ---
     ("fastjson-autotype",
      r"setAutoTypeSupport|autoTypeSupport",
@@ -290,6 +294,10 @@ RULES = [
     ("infra-docker-sock-mount",
      r"/var/run/docker\.sock",
      "infra-vuln/docker-compose.yml", "/var/run/docker.sock"),
+    # --- container-iac: quickstart auth-off + published admin plane (infra-vuln, CVE-2026-101065) ---
+    ("compose-auth-off-published",
+     r"(?i)auth[_-]?(enabled|required)\s*[:=]\s*(false|no|off)|disable[_-]?auth|no[_-]?auth",
+     "infra-vuln/docker-compose.yml", "OBOT_AUTH_ENABLED=false"),
     # --- sibling moderation-direction plants (class propagation, 2026-09-23) ---
     ("django-moderation-safe-filter",
      r"\|safe\b",
@@ -633,6 +641,15 @@ MUST_NOT_MATCH = [
     ("mcp-bare-transport-safe",
      r"run\(\s*transport=['\"]sse['\"]\s*\)",
      "llm-vuln-app/safe_mcp_server.py"),
+    ("mcp-connect-id-only-safe",
+     r"MCP_SERVERS\s*\[\s*server_id\s*\]",
+     "llm-vuln-app/safe_mcp_server.py"),
+    ("compose-auth-off-safe",
+     r"(?i)auth[_-]?(enabled|required)\s*[:=]\s*(false|no|off)|disable[_-]?auth|no[_-]?auth",
+     "infra-vuln/hardened-compose.yml"),
+    ("compose-published-port-safe",
+     r"\"\d+:\d+\"",
+     "infra-vuln/hardened-compose.yml"),
     ("otp-code-in-response-safe",
      r"json\(\s*\{[^}]*[,:]\s*code\s*[,}]",
      "gaps3-vuln-app/safe-gaps3.js"),

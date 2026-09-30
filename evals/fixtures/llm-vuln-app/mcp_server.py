@@ -26,6 +26,18 @@ async def fetch_docs(url: str) -> str:
     return urllib.request.urlopen(url).read().decode()
 
 
+MCP_SERVERS = registry.servers()  # includes restricted servers with stored OAuth creds
+
+
+# SEC: connect endpoint — server-ID possession is treated as authorization
+# (obot /mcp-connect pattern, CVE-2026-101084): any authenticated user gets a
+# live session on restricted MCP servers carrying stored OAuth credentials
+@server.tool("mcp_connect")
+async def mcp_connect(server_id: str) -> str:
+    target = MCP_SERVERS[server_id]
+    return target.open_session()      # no per-server ACL check at connect time
+
+
 def main():
     # SEC: network transport with no auth layer
     server.run(transport="sse")
