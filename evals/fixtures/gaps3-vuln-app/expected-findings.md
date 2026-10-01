@@ -19,6 +19,9 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 | 12 | One-time code disclosure | `GET /auth/email/code` returns the generated login code in the response body (`res.json({ sent: true, code })`) — request it for any known address, read it, log in (CVE-2026-97063 class) | app.js:123-128 | Critical |
 | 13 | Static master code | `MASTER_LOGIN_CODE = '172839'` accepted by `POST /auth/email/login` for ANY account — public backdoor credential (CVE-2026-97064 class); also predictable `Math.random` codes, no expiry/attempts | app.js:130-140 | Critical |
 | 14 | Webhook fail-open guard | `POST /hooks/deploy/:stackId` skips signature verification when `DEPLOY_WEBHOOK_SECRET` is unset/empty — unauthenticated stack redeploy (git clone + compose up), attacker-controlled compose = container-escape chain (Dockhand CVE-2026-53988 class; contrast row 10's missing check — here verification EXISTS but a config guard disables it) | app.js:144-155 | Critical |
+| 15 | Encoding-sensitive path authz (CWE-177) | admin guard tests the RAW `req.url` while the router dispatches on the decoded path — `GET /%61dmin/users` skips the token check and still reaches `/admin/users` (Cisco Catalyst SD-WAN Manager CVE-2026-76504 class) | app.js:157-169 | Critical |
+| 16 | Setup route reachable post-install | `POST /setup/restore` runs raw `req.body.sql` with no auth and no "already installed?" guard — the first-run wizard stayed open as a front door (ground-station CVE-2026-103244 class: setup.restore planted admin users + session tokens) | app.js:172-179 | Critical |
+| 17 | Non-secret identifier as credential | `POST /api/devices/login` authenticates on `findByHostname(req.body.hostname)` and issues a session — hostname is public/guessable, anyone who knows the name IS the device (Fleet CVE-2026-103264 class) | app.js:181-188 | Critical |
 
 ## Must NOT trigger (near-misses — `safe-gaps3.js`)
 
@@ -31,3 +34,6 @@ multi-tenant scoping, deferred SSRF, archive extraction, comparison hygiene).
 - `safe-gaps3.js:108-121` — code sender: `crypto.randomInt` generator, delivery to the STORED record's `user.email`, existence-neutral `{ sent: true }` response carrying NO code, throttled
 - `safe-gaps3.js:123-132` — verify: single-use `codes.consume` + `timingSafeEqual`, throttled, zero static fallback constants anywhere in the file
 - `safe-gaps3.js:134-141` — deploy webhook REJECTS when the secret is unset (fail-closed 503), then HMAC over raw bytes + `timingSafeEqual`; zero `!process.env.*WEBHOOK_SECRET` guard forms anywhere in the file
+- `safe-gaps3.js:144-153` — admin guard mounted at route level (`app.use('/admin', requireAdminToken)`): matching shares the router's DECODED path, so percent-encoded spellings cannot split check from dispatch; zero `req.url` / `req.originalUrl` / `getRequestURI` reads in any authz decision
+- `safe-gaps3.js:156-166` — setup route gated by `requireSetupMode` (server-side installed-state check → 403 once installed) and takes an archive id, never raw SQL; zero `raw(req.body...)` forms
+- `safe-gaps3.js:168-174` — device login verifies an enrolled per-device secret (`verifySecret(deviceId, deviceSecret)`); hostname never read for authz; zero `findByHostname`/`findBySerial` shapes

@@ -153,3 +153,36 @@ app.post('/hooks/deploy/:stackId', async (req, res) => {
   if (!crypto.timingSafeEqual(got, expected)) return res.status(401).end(); // constant-time — the guard is the bug
   return res.json({ redeployed: true, stack: req.params.stackId });
 });
+
+// ---------- SEC-15: auth guard matches the RAW (still-encoded) URL — CWE-177 ----------
+// The router dispatches on the DECODED path, so GET /%61dmin/users keeps the
+// %61 in req.url, fails the startsWith('/admin') guard, and still reaches the
+// admin route below — hex-encoded prefix bypass (Cisco Catalyst SD-WAN
+// Manager CVE-2026-76504 class, KEV 2026-09-30).
+app.use((req, res, next) => {
+  if (req.url.startsWith('/admin')) {
+    if (!req.headers['x-admin-token']) return res.status(403).json({ error: 'admin only' });
+  }
+  next(); // no token needed — if the URL was percent-encoded
+});
+app.get('/admin/users', async (req, res) => {
+  res.json(db.users.all()); // census: /%61dmin/users arrives here unauthenticated
+});
+
+// ---------- SEC-16: setup route still live after installation ----------
+// First-run wizard endpoints are unauthenticated by design; still reachable
+// after setup completes, they are a front door (ground-station
+// CVE-2026-103244 class: setup.restore planted admin users + session tokens).
+app.post('/setup/restore', async (req, res) => {
+  await db.raw(req.body.sql); // no auth, no "already installed?" guard
+  res.json({ restored: true });
+});
+
+// ---------- SEC-17: non-secret identifier accepted as device credential ----------
+// hostname is public/guessable — authenticating on it means anyone who knows
+// the name IS the device (Fleet CVE-2026-103264 class).
+app.post('/api/devices/login', async (req, res) => {
+  const device = db.devices.findByHostname(req.body.hostname); // identifier ≠ secret
+  if (!device) return res.status(401).json({ error: 'unknown device' });
+  issueSession(res, { type: 'device', id: device.id }); // unauthenticated actor became any host
+});
