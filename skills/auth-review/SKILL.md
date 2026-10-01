@@ -30,6 +30,10 @@ Build a table `route → auth middleware → ownership check` and fill it by rea
 - non-HTTP surfaces that are routes in disguise: queue consumers, cron/background job handlers, webhook receivers, GraphQL resolvers (see `../graphql-security/SKILL.md`), event subscribers, RPC/message handlers — census them with the same table
 - dispatch-style apps (`?action=` → switch) — enumerate the switch arms, not the single URL
 - **case-sensitive middleware paths**: on case-insensitive hosts/routers, `app.use('/admin', guard)` can be bypassed by `/ADMIN` or `/Admin/` — check the router's case-sensitivity setting (Express: default sensitive only with regex; some frameworks/filesystems are not) and whether any guarded prefix can be cased around → authz bypass
+- **encoding-sensitive middleware paths** (CWE-177): authz guards comparing the RAW, still-encoded request URI (`req.url` / `req.originalUrl`, Java `getRequestURI()`, `RAW_URI`) while the router dispatches on the DECODED path — `GET /%61dmin/users` fails `startsWith('/admin')` yet still reaches the admin route → unauthenticated admin access (class incident: Cisco Catalyst SD-WAN Manager CVE-2026-76504, KEV). Safe shape: compare the decoded path the router actually dispatches on (`req.path`, Java `getServletPath()`), or mount the guard on the route itself (`app.use('/admin', guard)`), so percent-encoding can't split the check from the dispatch:
+```bash
+rg -n "req\.(url|originalUrl)\.(startsWith|endsWith|includes|match)|getRequestURI\(\)\.(startsWith|contains|equals)|RAW_URI" -g '*.js' -g '*.ts' -g '*.java' -g '*.py'
+```
 - **gRPC / protobuf services**: `service X { rpc Y (...) }` in `.proto` files — every `rpc` is a route; check per-method auth interceptors and validate request fields like any handler. Same for **message-queue consumers** (Kafka/Rabbit/SQS handlers), **scheduled job entry points**, and **Netty/WebSocket frame handlers** — add them all to the census table
 ```bash
 rg -n "rpc \w+\(" -g '*.proto'; rg -n "@GrpcClient|StreamObserver" -g '*.java' -g '*.kt'

@@ -153,3 +153,18 @@ app.post('/hooks/deploy/:stackId', async (req, res) => {
   if (!crypto.timingSafeEqual(got, expected)) return res.status(401).end(); // constant-time — the guard is the bug
   return res.json({ redeployed: true, stack: req.params.stackId });
 });
+
+// ---------- SEC-15: auth guard matches the RAW (still-encoded) URL — CWE-177 ----------
+// The router dispatches on the DECODED path, so GET /%61dmin/users keeps the
+// %61 in req.url, fails the startsWith('/admin') guard, and still reaches the
+// admin route below — hex-encoded prefix bypass (Cisco Catalyst SD-WAN
+// Manager CVE-2026-76504 class, KEV 2026-09-30).
+app.use((req, res, next) => {
+  if (req.url.startsWith('/admin')) {
+    if (!req.headers['x-admin-token']) return res.status(403).json({ error: 'admin only' });
+  }
+  next(); // no token needed — if the URL was percent-encoded
+});
+app.get('/admin/users', async (req, res) => {
+  res.json(db.users.all()); // census: /%61dmin/users arrives here unauthenticated
+});

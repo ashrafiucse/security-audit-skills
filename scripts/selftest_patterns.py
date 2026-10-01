@@ -630,6 +630,13 @@ RULES = [
     ("otp-static-master-code",
      r"(MASTER_LOGIN_CODE|master.?code)\s*=",
      "gaps3-vuln-app/app.js", "172839"),
+    # --- triage round: raw-URI authz prefix guard (gaps3, Cisco CVE-2026-76504) ---
+    ("raw-uri-admin-prefix-guard",
+     r"req\.(url|originalUrl)\.(startsWith|includes|match)",
+     "gaps3-vuln-app/app.js", "req.url.startsWith('/admin')"),
+    ("raw-uri-guarded-route-exists",
+     r"app\.get\(\s*['\"]\/admin\/",
+     "gaps3-vuln-app/app.js", "app.get('/admin/users'"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -953,6 +960,10 @@ MUST_NOT_MATCH = [
     ("android-logcat-token-safe",
      r"Log\.[dvi]\([^)]*[Tt]oken",
      "android-code-security-vuln-app/app/src/main/java/com/example/shop/SafeExamples.kt"),
+    # --- triage round: raw-URI authz prefix guard safe side (gaps3, Cisco CVE-2026-76504) ---
+    ("raw-uri-auth-guard-safe",
+     r"req\.(url|originalUrl)\.|getRequestURI\(",
+     "gaps3-vuln-app/safe-gaps3.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

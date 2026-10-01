@@ -57,3 +57,4 @@ column.
 | 2026-09-29 | llm-vuln-app | 100.00% | 100.00% | 0 | 12/12 | triage round — IN-PROCESS (issues #41-#42: obot CVE-2026-101084 mcp-connect authz class → llm-security §7 connect rule; 11 prior rows re-anchored after insert + 1 new) |
 | 2026-09-30 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 14/14 | triage round — IN-PROCESS (issues #46-#47: Dockhand CVE-2026-53988 fail-open webhook guard → auth-review rule; 13 prior rows re-verified + 1 new + fail-closed safe counterpart) |
 | 2026-09-30 | llm-vuln-app | 100.00% | 100.00% | 0 | 13/13 | triage round — IN-PROCESS (issues #46-#47: LightLLM CVE-2026-103040/103041 RPyC+pickle → llm-security §3 rule; 12 prior rows re-verified + 1 new + localhost/authenticated safe counterpart) |
+| 2026-10-01 | gaps3-vuln-app | 100.00% | 100.00% | 0 | 15/15 | triage round — IN-PROCESS (issue #49: Cisco CVE-2026-76504 CWE-177 raw-URI authz → auth-review §1 rule; 14 prior rows re-verified + 1 new + mount-time safe counterpart) |
