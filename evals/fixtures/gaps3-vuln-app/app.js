@@ -168,3 +168,21 @@ app.use((req, res, next) => {
 app.get('/admin/users', async (req, res) => {
   res.json(db.users.all()); // census: /%61dmin/users arrives here unauthenticated
 });
+
+// ---------- SEC-16: setup route still live after installation ----------
+// First-run wizard endpoints are unauthenticated by design; still reachable
+// after setup completes, they are a front door (ground-station
+// CVE-2026-103244 class: setup.restore planted admin users + session tokens).
+app.post('/setup/restore', async (req, res) => {
+  await db.raw(req.body.sql); // no auth, no "already installed?" guard
+  res.json({ restored: true });
+});
+
+// ---------- SEC-17: non-secret identifier accepted as device credential ----------
+// hostname is public/guessable — authenticating on it means anyone who knows
+// the name IS the device (Fleet CVE-2026-103264 class).
+app.post('/api/devices/login', async (req, res) => {
+  const device = db.devices.findByHostname(req.body.hostname); // identifier ≠ secret
+  if (!device) return res.status(401).json({ error: 'unknown device' });
+  issueSession(res, { type: 'device', id: device.id }); // unauthenticated actor became any host
+});

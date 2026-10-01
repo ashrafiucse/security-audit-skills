@@ -152,3 +152,23 @@ app.use('/admin', requireAdminToken);
 app.get('/admin/users', (req, res) => {
   res.json(db.users || []);
 });
+
+// SAFE (vs SEC-16): setup routes verify installation state server-side and
+// refuse once installed — the first-run window closes after bootstrap, and
+// restore takes an archive id, never raw SQL from the request body
+function requireSetupMode(req, res, next) {
+  if (db.meta.get('installed')) return res.status(403).json({ error: 'already installed' });
+  next();
+}
+app.post('/setup/restore', requireSetupMode, (req, res) => {
+  db.restoreArchive(req.body.archiveId);
+  res.json({ restored: true });
+});
+
+// SAFE (vs SEC-17): devices authenticate with an enrolled per-device secret
+// (one-time enrollment token at first contact); hostname is lookup/display only
+app.post('/api/devices/login', async (req, res) => {
+  const device = await db.devices.verifySecret(req.body.deviceId, req.body.deviceSecret);
+  if (!device) return res.status(401).json({ error: 'invalid credentials' });
+  issueSession(res, { type: 'device', id: device.id });
+});

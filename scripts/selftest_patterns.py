@@ -637,6 +637,17 @@ RULES = [
     ("raw-uri-guarded-route-exists",
      r"app\.get\(\s*['\"]\/admin\/",
      "gaps3-vuln-app/app.js", "app.get('/admin/users'"),
+    # --- triage round: setup-mode + identifier-as-credential (gaps3, issue #50) ---
+    ("gaps3-setup-route-unauth",
+     r"(?i)['\"]\/(setup|install|installer)[^'\"]*['\"]",
+     "gaps3-vuln-app/app.js", "'/setup/restore'"),
+    ("gaps3-identifier-as-credential",
+     r"(?i)findby(hostname|serial|hardware)",
+     "gaps3-vuln-app/app.js", "db.devices.findByHostname"),
+    # --- triage round: do_shortcode on request input (wp-vuln-app, CVE-2026-92966) ---
+    ("wp-do-shortcode-request-input",
+     r"do_shortcode\(\s*\$_(POST|GET|REQUEST)",
+     "wp-vuln-app/vuln.php", "do_shortcode($_POST['content'])"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -964,6 +975,16 @@ MUST_NOT_MATCH = [
     ("raw-uri-auth-guard-safe",
      r"req\.(url|originalUrl)\.|getRequestURI\(",
      "gaps3-vuln-app/safe-gaps3.js"),
+    # --- triage round: setup-mode + identifier-as-credential + do_shortcode (issue #50) ---
+    ("gaps3-setup-raw-sql-safe",
+     r"raw\(\s*req\.body",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-identifier-credential-safe",
+     r"(?i)findby(hostname|serial|hardware)",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("wp-do-shortcode-request-safe",
+     r"do_shortcode\(\s*\$_(POST|GET|REQUEST)",
+     "wp-vuln-app/safe_wp.php"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —
