@@ -648,6 +648,27 @@ RULES = [
     ("wp-do-shortcode-request-input",
      r"do_shortcode\(\s*\$_(POST|GET|REQUEST)",
      "wp-vuln-app/vuln.php", "do_shortcode($_POST['content'])"),
+    # --- triage round issues #52-#53: authz on request-derived principal (DevKit Pro CVE-2026-14378) ---
+    ("gaps3-authz-principal-from-request",
+     r"findById\(\s*req\.(cookies|body|query)",
+     "gaps3-vuln-app/app.js", "findById(req.cookies.original_user_id"),
+    # --- triage round issues #52-#53: session-establishing callback (Divi Membership CVE-2026-19660) ---
+    ("gaps3-callback-public-route",
+     r"app\.get\(\s*['\"][^'\"]*callback[^'\"]*['\"]",
+     "gaps3-vuln-app/app.js", "app.get('/payment/paypal/callback'"),
+    ("gaps3-callback-sets-session",
+     r"req\.login\s*\(",
+     "gaps3-vuln-app/app.js", "req.login(user)"),
+    # --- triage round issues #52-#53: unauth LLM control-plane metadata service (Mooncake CVE-2026-103765) ---
+    ("llm-metadata-server-bind",
+     r"app\.run\(\s*host=[\"']0\.0\.0\.0",
+     "llm-vuln-app/metadata_server.py", 'app.run(host="0.0.0.0"'),
+    ("llm-metadata-unauth-overwrite",
+     r"get_json\(force=True\)",
+     "llm-vuln-app/metadata_server.py", "request.get_json(force=True)"),
+    ("llm-mooncake-version-pin",
+     r"mooncake==",
+     "llm-vuln-app/requirements.txt", "mooncake==0.3.12"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -985,6 +1006,22 @@ MUST_NOT_MATCH = [
     ("wp-do-shortcode-request-safe",
      r"do_shortcode\(\s*\$_(POST|GET|REQUEST)",
      "wp-vuln-app/safe_wp.php"),
+    # --- triage round issues #52-#53 ---
+    ("gaps3-authz-principal-from-request-safe",
+     r"findById\(\s*req\.(cookies|body|query)",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-callback-payload-identity-safe",
+     r"Buffer\.from\(\s*req\.query|paypal_param",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-callback-login-request-user-safe",
+     r"req\.login\(\s*user\s*\)",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("llm-metadata-bind-safe",
+     r"host=[\"']0\.0\.0\.0",
+     "llm-vuln-app/safe_metadata_server.py"),
+    ("llm-metadata-force-json-safe",
+     r"get_json\(force=True\)",
+     "llm-vuln-app/safe_metadata_server.py"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

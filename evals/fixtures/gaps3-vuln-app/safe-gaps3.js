@@ -172,3 +172,25 @@ app.post('/api/devices/login', async (req, res) => {
   if (!device) return res.status(401).json({ error: 'invalid credentials' });
   issueSession(res, { type: 'device', id: device.id });
 });
+
+// SAFE (vs SEC-18): the capability check runs on the SESSION principal
+// (req.user), and the revert target comes from server-side switch state —
+// a forged cookie can name a user but proves nothing about the requester
+app.post('/admin/switch/revert', requireAuth, async (req, res) => {
+  if (!req.user || !req.user.can('manage_options')) return res.status(403).json({ error: 'not allowed' });
+  const originalId = req.session.switch_original_id; // server-recorded switch state
+  const original = await db.users.findById(originalId);
+  if (!original) return res.status(404).json({ error: 'no switch in progress' });
+  issueSession(res, { type: 'user', id: original.id });
+});
+
+// SAFE (vs SEC-19): the callback verifies the sender's signature FIRST and
+// resolves the member from the VERIFIED event's stored order — identity never
+// comes from a request parameter
+app.post('/payment/paypal/callback', async (req, res) => {
+  const event = verifyPaypalSignature(req.rawBody, req.headers['x-paypal-signature']);
+  if (!event) return res.status(401).json({ error: 'bad signature' });
+  const order = await db.orders.findById(event.order_id);
+  req.login(await db.users.findById(order.user_id)); // identity from the verified record
+  res.json({ status: 'ok' });
+});

@@ -186,3 +186,26 @@ app.post('/api/devices/login', async (req, res) => {
   if (!device) return res.status(401).json({ error: 'unknown device' });
   issueSession(res, { type: 'device', id: device.id }); // unauthenticated actor became any host
 });
+
+// ---------- SEC-18: authorization predicate on a request-derived principal ----------
+// The revert handler looks up the user named by the COOKIE and checks the
+// capability on THAT user, not on the authenticated requester — forging the
+// cookie satisfies the check (DevKit Pro CVE-2026-14378 class: capability
+// checked on the cookie-identified user instead of current_user_can()).
+app.post('/admin/switch/revert', async (req, res) => {
+  const original = await db.users.findById(req.cookies.original_user_id); // principal from request data
+  if (!original || !original.can('manage_options')) return res.status(403).json({ error: 'not allowed' });
+  issueSession(res, { type: 'user', id: original.id }); // attacker-named identity becomes the session
+});
+
+// ---------- SEC-19: public callback that ESTABLISHES a session ----------
+// GET callback, base64 param, no IPN validation, no signature, no ownership
+// check — the user id arrives from the attacker and goes straight into
+// session establishment (Divi Membership CVE-2026-19660 class:
+// wp_set_auth_cookie() from paypal_param).
+app.get('/payment/paypal/callback', async (req, res) => {
+  const payload = JSON.parse(Buffer.from(req.query.paypal_param, 'base64').toString());
+  const user = await db.users.findById(payload.user_id); // identity from the request
+  req.login(user); // forged callback = logged in as anyone
+  res.json({ status: 'ok' });
+});

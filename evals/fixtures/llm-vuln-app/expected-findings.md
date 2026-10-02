@@ -20,6 +20,7 @@ intentionally unpinned.
 | 11 | MCP SSE transport started with no auth layer — unauthenticated callers invoke every tool | mcp_server.py:43 | High |
 | 12 | MCP connect endpoint grants server sessions by ID possession only — no per-server ACL at connect time; restricted MCP servers (stored OAuth credentials) reachable by any authenticated user (obot /mcp-connect pattern, CVE-2026-101084) | mcp_server.py:33-38 | High |
 | 13 | Serving-stack RPC exposed unauthenticated with pickle — `ThreadedServer(hostname="0.0.0.0", protocol_config={"allow_pickle": True})`, no authenticator: network deserialization = direct RCE (LightLLM CVE-2026-103040/103041 pattern) | app.py:44-64 | Critical |
+| 14 | Unauthenticated LLM control-plane HTTP service — Mooncake-style `/metadata` server: GET/POST/DELETE with NO auth (`get_json(force=True)` overwrite, `METADATA.clear()` delete) + `app.run(host="0.0.0.0")` all-interfaces bind — metadata poisoning redirects KV transfers to attacker listeners (CVE-2026-103765 class; requirements.txt:9 pins `mooncake==0.3.12` < 0.3.13, which also carries CVE-2026-103764 arbitrary memory R/W via the TCP data port) | metadata_server.py:10-24 | Critical |
 
 ## Must NOT trigger (near-misses — `safe_app.py`)
 
@@ -30,3 +31,4 @@ intentionally unpinned.
 - `Anthropic(api_key=os.environ[...])` — key from env, not hardcoded
 - `safe_app.py` serving RPC (:43-55): `ThreadedServer(hostname="127.0.0.1", authenticator=TokenAuthenticator(API_TOKEN), protocol_config={"allow_pickle": False})` — localhost bind + authenticator + pickle off: zero `0.0.0.0` binds or `allow_pickle: True` in the file
 - `safe_mcp_server.py`: `_scoped()` root containment + truncation (:13-23), allowlisted argument-list command (:27-31), fetched content truncated + marked `[UNTRUSTED EXTERNAL CONTENT]` (:35-38), authenticated transport (:53), connect endpoint checks the caller's per-server ACL before opening any session (:42-48) — zero raw `open(path)`, `shell=True`, `urlopen`, bare `run(transport="sse")`, or ID-possession-only `MCP_SERVERS[server_id]` occurrences
+- `safe_metadata_server.py`: every `/metadata` route behind `require_api_key` (constant-time compare, REJECTS when `METADATA_API_KEY` unset) + `app.run(host="127.0.0.1", ...)` loopback bind — zero `0.0.0.0` binds and zero unauthenticated route handlers in the file
