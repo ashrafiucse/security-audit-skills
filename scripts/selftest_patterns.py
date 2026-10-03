@@ -669,6 +669,20 @@ RULES = [
     ("llm-mooncake-version-pin",
      r"mooncake==",
      "llm-vuln-app/requirements.txt", "mooncake==0.3.12"),
+    # --- triage round issues #55-#56: WS command-forwarding handler (UTMStack CVE-2026-82041) ---
+    ("gaps3-ws-command-handler",
+     r"socket\.on\(\s*['\"][^'\"]*command",
+     "gaps3-vuln-app/app.js", "socket.on('agent:command', async (msg) => {"),
+    ("gaps3-agent-send",
+     r"(agent|host)\.(send|execute|invoke)\(",
+     "gaps3-vuln-app/app.js", "agent.send({ cmd: msg.command })"),
+    # --- triage round issues #55-#56: internal key as master auth (UTMStack CVE-2026-82042) ---
+    ("gaps3-internal-key-header",
+     r"x-internal-key",
+     "gaps3-vuln-app/app.js", "req.headers['x-internal-key'] == process.env.INTERNAL_KEY"),
+    ("gaps3-internal-key-admin",
+     r"role:\s*'admin'",
+     "gaps3-vuln-app/app.js", "{ id: 0, role: 'admin', via: 'internal-key' }"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -1022,6 +1036,16 @@ MUST_NOT_MATCH = [
     ("llm-metadata-force-json-safe",
      r"get_json\(force=True\)",
      "llm-vuln-app/safe_metadata_server.py"),
+    # --- triage round issues #55-#56 ---
+    ("gaps3-ws-command-unguarded-safe",
+     r"socket\.on\(\s*['\"][^'\"]*command['\"]\s*,\s*async",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-internal-key-eq-safe",
+     r"internal-key'\]\s*==",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-internal-key-admin-safe",
+     r"role:\s*'admin'",
+     "gaps3-vuln-app/safe-gaps3.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

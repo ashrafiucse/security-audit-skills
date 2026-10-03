@@ -227,6 +227,10 @@ rg -n -i "x-api-key|api[_-]?key" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*
 ```bash
 rg -n -i "findby(hostname|serial|hardware)|by_(hostname|serial)|token\s*={2,3}[^=]*(hostname|serial|machine.?id)" -g '*.js' -g '*.ts' -g '*.py' -g '*.go' -g '*.java'
 ```
+- **Internal keys honored as master auth on every route** (UTMStack CVE-2026-82042 class: `InternalApiKeyFilter` accepted the `Utm-Internal-Key` header == `INTERNAL_KEY` env var for ANY endpoint — no path restriction, no constant-time compare, no rate limit, no audit logging — so anyone who obtains the infra key gets full admin API: account creation, user management, rule changes): an internal/service perimeter key that the PUBLIC surface also accepts is a god-key with extra steps — the perimeter that justified the key does not exist at the app. The key must (1) be honored only on internal routes/hosts, (2) compare constant-time, (3) grant a SCOPED service identity (never admin), and (4) be obtainable only by internal callers — if any less-privileged endpoint reveals it, the scheme is Critical regardless of the rest:
+```bash
+rg -n -i "internal[_-]?key|x-internal|internal[_-]?api[_-]?key" src/ app/ -g '*.js' -g '*.ts' -g '*.py' -g '*.java'
+```
 
 ## 4 — Session & CSRF
 
@@ -268,6 +272,11 @@ rg -n "io\.on\(|socket\.on\(|new WebSocket|WebSocketServer|@MessageMapping|@Subs
 - **Handshake auth**: no `io.use(authMiddleware)` / token check on connect → **CRITICAL** (any client connects as anyone)
 - **Subscription authz**: `socket.join('room:' + id)` / channel subscribe without ownership check → IDOR over sockets, **High** — same rule as REST IDOR, different transport
 - **Message handlers are routes**: every `socket.on('cmd', ...)` doing a state change needs authz; grep the handler bodies exactly like controllers
+- **Command-forwarding handlers are RCE surfaces** (UTMStack CVE-2026-82041 class: STOMP `/command/{hostname}` destination → `processCommand()` forwarded arbitrary OS commands over gRPC to agents, no role check, no allowlist — any authenticated user, any role, root/SYSTEM on monitored hosts): a realtime channel whose messages become COMMANDS executed on backends/agents must enforce (1) role check per handler — authentication ≠ authorization, "any logged-in user" is not a policy — and (2) a server-side command allowlist (verb + target scope) before anything reaches the executor. Generic shape: message destination → `agent.send({cmd})`, `grpc.invoke`, `exec(`/`spawn(` inside the handler → **Critical** (remote command execution on downstream hosts):
+```bash
+rg -n "socket\.on\(\s*['\"][^'\"]*(command|cmd|exec|run)|@MessageMapping\(\s*['\"][^'\"]*(command|cmd|exec)" src/ app/ -g '*.js' -g '*.ts' -g '*.java'
+rg -n "(agent|host)\.(send|execute|invoke)\(" src/ app/ | head
+```
 - `io.origins('*')` / missing origin check on a credentialed socket → Medium (cross-site WebSocket hijacking)
 - SSE (`EventSource` endpoints) are plain GETs — same authz as any other route
 
