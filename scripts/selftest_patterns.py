@@ -669,6 +669,27 @@ RULES = [
     ("llm-mooncake-version-pin",
      r"mooncake==",
      "llm-vuln-app/requirements.txt", "mooncake==0.3.12"),
+    # --- triage round issues #58-#61: model-emitted code exec on unauth endpoint (MindSearch CVE-2026-105135) ---
+    ("llm-agent-exec-model-code",
+     r"exec\(\s*(command|code|snippet|block)|extract_code",
+     "llm-vuln-app/agent_exec.py", "exec(command, GLOBAL_DICT, LOCAL_DICT)"),
+    ("llm-agent-unauth-solve-route",
+     r"@app\.post\(\s*['\"]\/solve['\"]\s*\)",
+     "llm-vuln-app/agent_exec.py", '@app.post("/solve")'),
+    # --- triage round issues #58-#61: account linking without caller verification (ZITADEL CVE-2026-105207) ---
+    ("gaps3-idp-link-census",
+     r"(?i)add_?idp|idp.?link",
+     "gaps3-vuln-app/app.js", "db.idpLinks.create"),
+    ("gaps3-link-by-login-name",
+     r"findByLoginName\(\s*req\.body",
+     "gaps3-vuln-app/app.js", "db.users.findByLoginName(req.body.login_name)"),
+    # --- triage round issues #58-#61: enrollment code without target-tenant check (ZITADEL CVE-2026-105209) ---
+    ("gaps3-enroll-code-census",
+     r"(?i)enroll(ment)?.?code",
+     "gaps3-vuln-app/app.js", "app.post('/admin/enroll-code'"),
+    ("gaps3-enroll-org-header",
+     r"x-org-id",
+     "gaps3-vuln-app/app.js", "req.headers['x-org-id']"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -1022,6 +1043,22 @@ MUST_NOT_MATCH = [
     ("llm-metadata-force-json-safe",
      r"get_json\(force=True\)",
      "llm-vuln-app/safe_metadata_server.py"),
+    # --- triage round issues #58-#61 ---
+    ("llm-agent-exec-safe",
+     r"exec\(\s*(command|code|snippet|block)|extract_code",
+     "llm-vuln-app/safe_agent_exec.py"),
+    ("llm-agent-unauth-solve-safe",
+     r"@app\.post\(\s*['\"]\/solve['\"]\s*\)",
+     "llm-vuln-app/safe_agent_exec.py"),
+    ("gaps3-link-login-name-safe",
+     r"findByLoginName\(\s*req\.body",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-link-body-idp-id-safe",
+     r"idp_user_id:\s*req\.body",
+     "gaps3-vuln-app/safe-gaps3.js"),
+    ("gaps3-enroll-org-header-safe",
+     r"x-org-id",
+     "gaps3-vuln-app/safe-gaps3.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —
