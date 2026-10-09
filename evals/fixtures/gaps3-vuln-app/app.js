@@ -232,4 +232,26 @@ app.use((req, res, next) => {
     req.user = { id: 0, role: 'admin', via: 'internal-key' }; // key possession = full admin, every route
   }
   next();
+// ---------- SEC-22: external-IdP account linking without caller verification ----------
+// POST /auth/link binds req.body.idp_user_id to the local account named by
+// req.body.login_name — no session, no primary factor, no ownership proof.
+// Knowing a login name lets the attacker attach their OWN IdP identity and
+// sign in as the victim (ZITADEL CVE-2026-105207 class: User Service V2
+// AddIDPLink + identify-only Login V2 sessions — unauthenticated ATO).
+app.post('/auth/link', async (req, res) => {
+  const user = await db.users.findByLoginName(req.body.login_name); // caller names the victim
+  await db.idpLinks.create({ user_id: user.id, idp_user_id: req.body.idp_user_id }); // attacker's IdP identity
+  res.json({ linked: true });
+});
+
+// ---------- SEC-23: enrollment code issued without target-tenant check ----------
+// The handler validates only the caller's request tenant header, then issues
+// a passkey enrollment code for ANY user_id in the instance — an org-A admin
+// enrolls org-B users and registers their own authenticator (ZITADEL
+// CVE-2026-105209 class: x-zitadel-orgid checked, target user's org not).
+app.post('/admin/enroll-code', requireAuth, async (req, res) => {
+  const callerOrg = req.headers['x-org-id']; // the only tenant check — proves nothing about the target
+  const target = await db.users.findById(req.body.user_id); // any org on the instance
+  const code = codes.issue(target.id, 'passkey'); // enrollment credential for a cross-org target
+  res.json({ code });
 });

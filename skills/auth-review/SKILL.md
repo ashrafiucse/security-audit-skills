@@ -149,6 +149,25 @@ rg -n "tenant|org_?id|account_?id|customer_?id|workspace" -g '*.js' -g '*.ts' -g
 rg -n "\.(find|where|filter|all|select|query|get)(All)?\(" -g '*.js' -g '*.py' | rg -v "tenant|org_|account_|customer_|user"   # unscoped reads — census: disposition EVERY line
 ```
 Method: list every model access, mark each SCOPED (tenant filter present) / UNSCOPED / GLOBAL-BY-DESIGN (shared catalog). Every UNSCOPED access to tenant-owned data → **Critical**. Stronger defenses to note when present: DB-level row-level security (RLS), ORM global scopes (Laravel global scope, Django manager), middleware-injected tenant context that queries MUST use. Also check: tenant taken from request body/header instead of session (`req.body.tenantId` — attacker-controlled scope switch → cross-tenant, Critical), and cache keys missing the tenant prefix (cross-tenant cache bleed).
+- **Target-tenant vs caller-tenant on credential-issuing endpoints**: when
+  a request names a TARGET (`user_id`, `email`, `login_name`) and the
+  handler issues enrollment codes / invitations / reset URLs / passkey or
+  passwordless registrations for that target, checking only the CALLER's
+  request tenant (org header, subdomain) while never comparing the
+  TARGET's tenant = cross-tenant takeover: an admin (or any
+  user-write holder) in org A obtains enrollment credentials for org-B
+  users and registers their own authenticator (class incident: ZITADEL
+  CVE-2026-105209 — passkey enrollment codes authorized against
+  `x-zitadel-orgid` while the target user's organization went unchecked,
+  cross-org ATO, CVSS 9.6). The authz must compare the TARGET's tenant
+  with the caller's tenant (or verify the caller's scope covers the
+  target's tenant) — validating the request's own tenant header proves
+  nothing about the target. Strongest shape: scope the target lookup itself
+  by the caller's session tenant (`findOne({ id, org_id: session.org })`)
+  rather than fetch-then-check:
+```bash
+rg -n -i "enroll(ment)?.?code|invite.?(code|user)|passwordless" src/ app/ -g '*.js' -g '*.ts' -g '*.py' -g '*.java' | head
+```
 ### Check-then-act races (TOCTOU)
 
 Look for state checks followed by a **separate** write:
@@ -245,6 +264,21 @@ rg -n -i "internal[_-]?key|x-internal|internal[_-]?api[_-]?key" src/ app/ -g '*.
 - `state` parameter present and verified → missing = CSRF/login CSRF, MEDIUM/HIGH
 - Token in URL fragment vs query (query leaks via logs/referrers) → MEDIUM
 - `id_token` validated: signature, `nonce`, `aud` → skipping any = CRITICAL
+- **Account linking (external IdP identity → local account) without caller
+  verification**: census every surface that BINDS an external-IdP identity
+  to a local account (`AddIDPLink`, `/auth/link`, `link_account`, social
+  connect). A linking call that acts on a caller-SUPPLIED login name /
+  user identifier — without an authenticated session plus a fresh primary
+  factor or proof of control of BOTH identities — lets anyone who knows a
+  victim's login name attach their OWN IdP identity and then sign in as the
+  victim (class incident: ZITADEL CVE-2026-105207 — User Service V2
+  AddIDPLink + identify-only Login V2 sessions, unauthenticated ATO,
+  CVSS 9.8). → Critical. Safe shape: link only to the session principal,
+  require step-up re-auth, and take the external identity from the IdP's
+  verified assertion (never from request fields):
+```bash
+rg -n -i "add_?idp|idp.?link|link.?(account|identity)|connect.?(account|identity)" src/ app/ -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*.go' -g '*.php' | head -20
+```
 
 ### Host-header poisoning in outbound auth/email flows
 

@@ -216,4 +216,24 @@ app.use((req, res, next) => {
     req.user = { id: 'svc:metrics', role: 'service', scope: ['metrics:read'] };
   }
   next();
+// SAFE (vs SEC-22): linking requires the authenticated session AND a fresh
+// primary factor (step-up), links to the session principal only, and takes
+// the external identity from the IdP's VERIFIED assertion — never from a
+// caller-supplied login_name/idp_user_id pair (ZITADEL CVE-2026-105207 safe
+// shape)
+app.post('/auth/link', requireAuth, requireStepUp, async (req, res) => {
+  const assertion = await idp.verify(req.body.assertion); // IdP-signed, audience-checked
+  await db.idpLinks.create({ user_id: req.user.id, idp_user_id: assertion.sub }); // session principal only
+  res.json({ linked: true });
+});
+
+// SAFE (vs SEC-23): the target lookup itself is tenant-scoped — the query
+// carries the caller's SESSION org (never a request header), so a target
+// outside the caller's org is simply absent (ZITADEL CVE-2026-105209 safe
+// shape: scoped query, not fetch-then-check)
+app.post('/admin/enroll-code', requireAuth, async (req, res) => {
+  const target = await db.users.findOne({ id: req.body.user_id, org_id: req.session.org_id });
+  if (!target) return res.status(404).json({ error: 'no such user in your org' });
+  const code = codes.issue(target.id, 'passkey'); // same-org target only
+  res.json({ code });
 });
