@@ -255,3 +255,18 @@ app.post('/admin/enroll-code', requireAuth, async (req, res) => {
   const code = codes.issue(target.id, 'passkey'); // enrollment credential for a cross-org target
   res.json({ code });
 });
+
+// ---------- SEC-24: auth whitelist by path-suffix match ----------
+// The middleware exempts any path ENDING in /configs from the token check —
+// the public endpoint is /api/configs, but every namespace-scoped configs
+// route (private) also ends in /configs and sails through unauthenticated
+// (Kestra CVE-2026-49869 class: AuthenticationFilter endsWith("/configs")
+// → unauth API access → RCE).
+app.use('/api', (req, res, next) => {
+  if (req.path.endsWith('/configs')) return next(); // suffix match frees every colliding route
+  if (!req.headers['x-api-token']) return res.status(401).json({ error: 'token required' });
+  next();
+});
+app.get('/api/namespaces/:ns/configs', async (req, res) => {
+  res.json(await db.namespaceConfigs(req.params.ns)); // private data, now unauthenticated
+});

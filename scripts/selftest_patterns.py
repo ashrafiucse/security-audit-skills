@@ -711,6 +711,13 @@ RULES = [
     ("crypto-multihash-fstring",
      r"hashlib\.(sha256|sha512)\(\s*f[\"']",
      "crypto-vuln-app/app.py", 'f"{action}:{target}"'),
+    # --- KEV backfill (issue #62): suffix-match auth whitelist (Kestra CVE-2026-49869) ---
+    ("gaps3-suffix-auth-whitelist",
+     r"endsWith\(\s*['\"]\/",
+     "gaps3-vuln-app/app.js", "req.path.endsWith('/configs')"),
+    ("gaps3-suffix-bypassed-route",
+     r"app\.get\(\s*['\"]/api/namespaces/:ns/configs",
+     "gaps3-vuln-app/app.js", "app.get('/api/namespaces/:ns/configs'"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -1097,6 +1104,10 @@ MUST_NOT_MATCH = [
     ("crypto-multihash-fstring-safe",
      r"hashlib\.(sha256|sha512)\(\s*f[\"']",
      "crypto-vuln-app/safe_app.py"),
+    # --- KEV backfill (issue #62) ---
+    ("gaps3-suffix-auth-whitelist-safe",
+     r"endsWith\(\s*['\"]\/|\.contains\(\s*['\"]\/",
+     "gaps3-vuln-app/safe-gaps3.js"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —
