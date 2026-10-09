@@ -34,3 +34,19 @@ def verify_webhook(url: str) -> dict:
 def derive_key(password: str, salt: bytes) -> bytes:
     # SAFE (vs SEC-06): 600k iterations, per-user salt
     return PBKDF2(password, salt, 32, count=600_000, hmac_hash_module=hashlib.sha256)
+
+
+def _lenp(field: bytes) -> bytes:
+    # SAFE (vs SEC-07): unambiguous length-prefixed encoding
+    return len(field).to_bytes(8, "big") + field
+
+
+def capability_digest(user: str, role: str, expires: str) -> str:
+    # SAFE (vs SEC-07): domain/customization string + length prefixes —
+    # no separator ambiguity, tuple-order-unique (TupleHash/SequenceHash
+    # style); keyed flows use HMAC, never secret-prefix concatenation
+    h = hashlib.sha256()
+    h.update(b"capability-v1")
+    for field in (user, role, expires):
+        h.update(_lenp(field.encode()))
+    return h.hexdigest()
