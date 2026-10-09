@@ -690,6 +690,13 @@ RULES = [
     ("gaps3-enroll-org-header",
      r"x-org-id",
      "gaps3-vuln-app/app.js", "req.headers['x-org-id']"),
+    # --- triage round issues #64-#69: multihashing ambiguous encoding (ToB SequenceHash, issue #65) ---
+    ("crypto-multihash-concat",
+     r"hashlib\.(sha256|sha512|sha384|blake2b)\(\s*[^)\n]*\+",
+     "crypto-vuln-app/app.py", 'user + "|" + role'),
+    ("crypto-multihash-fstring",
+     r"hashlib\.(sha256|sha512)\(\s*f[\"']",
+     "crypto-vuln-app/app.py", 'f"{action}:{target}"'),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -1059,6 +1066,13 @@ MUST_NOT_MATCH = [
     ("gaps3-enroll-org-header-safe",
      r"x-org-id",
      "gaps3-vuln-app/safe-gaps3.js"),
+    # --- triage round issues #64-#69 ---
+    ("crypto-multihash-concat-safe",
+     r"hashlib\.(sha256|sha512|sha384|blake2b)\(\s*[^)\n]*\+",
+     "crypto-vuln-app/safe_app.py"),
+    ("crypto-multihash-fstring-safe",
+     r"hashlib\.(sha256|sha512)\(\s*f[\"']",
+     "crypto-vuln-app/safe_app.py"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —

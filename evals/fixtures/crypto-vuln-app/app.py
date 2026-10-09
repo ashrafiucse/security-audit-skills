@@ -40,3 +40,17 @@ def verify_webhook(url: str) -> dict:
 def derive_key(password: str) -> bytes:
     # SEC-06: PBKDF2 with trivial iteration count
     return PBKDF2(password, b"staticsalt", 16, count=1000)
+
+
+def capability_digest(user: str, role: str, expires: str) -> str:
+    # SEC-07: multihashing by raw concatenation — ambiguous encoding:
+    # a role containing "|" (or empty fields) makes distinct tuples collide,
+    # so attacker-influenced fields forge capability-token inputs
+    # (ToB SequenceHash class, 2026-10)
+    return hashlib.sha256(user + "|" + role + "|" + expires).hexdigest()
+
+
+def audit_digest(action: str, target: str) -> str:
+    # SEC-07b: same class — f-string tuple hash, no domain separation,
+    # secret-prefix layout also length-extension-able with SHA-2
+    return hashlib.sha256(f"{action}:{target}".encode()).hexdigest()
