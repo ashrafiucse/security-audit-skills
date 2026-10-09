@@ -195,6 +195,27 @@ app.post('/payment/paypal/callback', async (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// SAFE (vs SEC-20): the command channel enforces a role check on the handler
+// AND a server-side command allowlist before anything reaches the agent
+io.on('connection', (socket) => {
+  socket.on('agent:command', requireRole('operator'), async (msg) => {
+    if (!AGENT_COMMANDS.has(msg.command)) return socket.emit('error', 'command not allowed');
+    const agent = agents.byHostname(msg.hostname);
+    agent.send({ cmd: msg.command }); // allowlisted verb, operator-only
+  });
+});
+
+// SAFE (vs SEC-21): the internal key is honored ONLY on /internal routes,
+// compared constant-time, and grants a scoped service identity — never admin
+const INTERNAL_ROUTES = /^\/internal\//;
+app.use((req, res, next) => {
+  if (!INTERNAL_ROUTES.test(req.path)) return next();
+  const expected = process.env.INTERNAL_KEY || '';
+  const got = req.headers['x-internal-key'] || '';
+  if (expected && crypto.timingSafeEqual(Buffer.from(got), Buffer.from(expected))) {
+    req.user = { id: 'svc:metrics', role: 'service', scope: ['metrics:read'] };
+  }
+  next();
 // SAFE (vs SEC-22): linking requires the authenticated session AND a fresh
 // primary factor (step-up), links to the session principal only, and takes
 // the external identity from the IdP's VERIFIED assertion — never from a

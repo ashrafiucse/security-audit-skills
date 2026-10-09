@@ -210,6 +210,28 @@ app.get('/payment/paypal/callback', async (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// ---------- SEC-20: command-forwarding message handler without authz ----------
+// The realtime 'agent:command' destination forwards operator text straight to
+// monitored endpoints — authenticated ≠ authorized: any logged-in user (any
+// role) executes OS commands on agents (UTMStack CVE-2026-82041 class: STOMP
+// /command/{hostname}, no role check, no command allowlist, agents run as root).
+io.on('connection', (socket) => {
+  socket.on('agent:command', async (msg) => {
+    const agent = agents.byHostname(msg.hostname);
+    agent.send({ cmd: msg.command }); // arbitrary OS command, no role check, no allowlist
+  });
+});
+
+// ---------- SEC-21: internal key honored as master auth on every route ----------
+// The infra filter equates the INTERNAL_KEY env value with a full-admin
+// identity for ANY endpoint — no path restriction, plain == compare
+// (UTMStack CVE-2026-82042 class: InternalApiKeyFilter accepted
+// Utm-Internal-Key everywhere it was presented).
+app.use((req, res, next) => {
+  if (req.headers['x-internal-key'] == process.env.INTERNAL_KEY) {
+    req.user = { id: 0, role: 'admin', via: 'internal-key' }; // key possession = full admin, every route
+  }
+  next();
 // ---------- SEC-22: external-IdP account linking without caller verification ----------
 // POST /auth/link binds req.body.idp_user_id to the local account named by
 // req.body.login_name — no session, no primary factor, no ownership proof.
