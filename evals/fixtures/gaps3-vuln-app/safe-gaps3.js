@@ -237,3 +237,16 @@ app.post('/admin/enroll-code', requireAuth, async (req, res) => {
   const code = codes.issue(target.id, 'passkey'); // same-org target only
   res.json({ code });
 });
+
+// SAFE (vs SEC-24): the public whitelist is an EXACT path set — the
+// namespace-scoped configs routes keep their token check (Kestra
+// CVE-2026-49869 safe shape: anchored/exact match, never endsWith)
+const PUBLIC_API_PATHS = new Set(['/configs']);
+app.use('/api', (req, res, next) => {
+  if (PUBLIC_API_PATHS.has(req.path)) return next(); // exact set membership
+  if (!req.headers['x-api-token']) return res.status(401).json({ error: 'token required' });
+  next();
+});
+app.get('/api/namespaces/:ns/configs', async (req, res) => {
+  res.json(await db.namespaceConfigs(req.params.ns)); // token enforced above
+});

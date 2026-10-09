@@ -34,6 +34,20 @@ Build a table `route → auth middleware → ownership check` and fill it by rea
 ```bash
 rg -n "req\.(url|originalUrl)\.(startsWith|endsWith|includes|match)|getRequestURI\(\)\.(startsWith|contains|equals)|RAW_URI" -g '*.js' -g '*.ts' -g '*.java' -g '*.py'
 ```
+- **suffix/contains path matching in auth whitelists** (third variant of
+  the path-matching family: case → encoding → MATCHER STRICTNESS): a
+  public-path exemption checked with `path.endsWith('/x')` or
+  `path.contains('/x')` instead of an exact/anchored match frees EVERY
+  colliding route, not just the intended public one (class incident:
+  Kestra CVE-2026-49869, KEV — `AuthenticationFilter` used
+  `request.getPath().endsWith("/configs")` to whitelist the public
+  configs endpoint; every namespace-scoped `.../configs` route bypassed
+  Basic Auth → unauthenticated API access → RCE). Safe shape: exact
+  match set (`new Set(['/configs']).has(path)`) or anchored regex
+  (`^/configs$`) — never suffix/substring tests on a path:
+```bash
+rg -n "endsWith\(\s*['\"]\/|\.contains\(\s*['\"]\/" src/ -g '*.java' -g '*.js' -g '*.ts' -g '*.py' | head
+```
 - **setup/install/first-run wizard routes**: `app.post('/setup/restore')`, `/install`, `/api/setup/*` are unauthenticated BY DESIGN during first boot — one that stays reachable after initialization is an auth-bypass front door (class incident: ground-station CVE-2026-103244 — `setup.restore` invoked over Socket.IO during setup mode planted admin users and forged session tokens; full takeover). Census them with the route table; every setup route must verify installation state server-side and refuse once installed:
 ```bash
 rg -n -i "['\"]/(setup|install|installer)[^'\"]*['\"]" -g '*.js' -g '*.ts' -g '*.py' -g '*.java' -g '*.rb' -g '*.php' | head -15
