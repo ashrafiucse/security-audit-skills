@@ -718,6 +718,13 @@ RULES = [
     ("gaps3-suffix-bypassed-route",
      r"app\.get\(\s*['\"]/api/namespaces/:ns/configs",
      "gaps3-vuln-app/app.js", "app.get('/api/namespaces/:ns/configs'"),
+    # --- triage round issue #77: PHP exec sinks are case-insensitive (semgrep exec-use went -i) ---
+    ("wp-php-sink-case-insensitive",
+     r"(?i)\b(system|exec|passthru|shell_exec|proc_open|popen)\s*\(",
+     "wp-vuln-app/vuln.php", "SyStem('ping -c 1 '"),
+    ("wp-php-sink-concat-request",
+     r"(?i)(system|passthru|shell_exec|proc_open|popen)\s*\(\s*['\"][^'\"]*['\"]\s*\.\s*\$_(GET|POST|REQUEST)",
+     "wp-vuln-app/vuln.php", "SyStem('ping -c 1 ' . $_GET['host']"),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
@@ -1108,6 +1115,10 @@ MUST_NOT_MATCH = [
     ("gaps3-suffix-auth-whitelist-safe",
      r"endsWith\(\s*['\"]\/|\.contains\(\s*['\"]\/",
      "gaps3-vuln-app/safe-gaps3.js"),
+    # --- triage round issue #77 ---
+    ("wp-php-sink-concat-request-safe",
+     r"(?i)(system|passthru|shell_exec|proc_open|popen)\s*\(\s*['\"][^'\"]*['\"]\s*\.\s*\$_(GET|POST|REQUEST)",
+     "wp-vuln-app/safe_wp.php"),
 ]
 
 # Multi-line rules: matched against the WHOLE FILE (python re, [\s\S] spans lines) —
