@@ -13,6 +13,10 @@ app = FastAPI()
 
 GLOBAL_DICT, LOCAL_DICT = {}, globals()  # full __builtins__ flow into exec
 
+# Archon-style amplifier (CVE-2026-111322 class): the agent runs with
+# permission checks DISABLED — any instruction reaching it executes
+AGENT_CONFIG = {"bypassPermissions": True, "bind": "0.0.0.0"}
+
 
 def extract_code(text: str) -> str:
     # first fence of the WHOLE model message — not only the parsed action

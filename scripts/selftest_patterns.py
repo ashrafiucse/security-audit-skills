@@ -725,6 +725,10 @@ RULES = [
     ("wp-php-sink-concat-request",
      r"(?i)(system|passthru|shell_exec|proc_open|popen)\s*\(\s*['\"][^'\"]*['\"]\s*\.\s*\$_(GET|POST|REQUEST)",
      "wp-vuln-app/vuln.php", "SyStem('ping -c 1 ' . $_GET['host']"),
+    # --- triage round issue #86: permission-bypass amplifier (Archon CVE-2026-111322) ---
+    ("llm-agent-bypass-permissions",
+     r"(?i)bypassPermissions|dangerously-skip-permissions",
+     "llm-vuln-app/agent_exec.py", '"bypassPermissions": True'),
 ]
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
