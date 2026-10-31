@@ -1,0 +1,10 @@
+# SAFE counterpart: pip invoked with --require-hashes — content integrity enforced.
+# (hashes below are FAKE fixture values, pattern-accurate shape only)
+flask==3.0.3 \
+    --hash=sha256:fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11
+requests==2.32.3 \
+    --hash=sha256:fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11
+sqlalchemy==2.0.36 \
+    --hash=sha256:fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11
+gunicorn==23.0.0 \
+    --hash=sha256:fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11
