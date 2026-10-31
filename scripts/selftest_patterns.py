@@ -295,6 +295,9 @@ RULES = [
     ("supply-typosquat",
      r"lodash2|reqeusts",
      "supply-chain-vuln/package.json", "lodash2"),
+    ("supply-pip-hash-integrity-safe",
+     r"--require-hashes",
+     "supply-chain-vuln/requirements-locked.txt", "--require-hashes"),
     ("infra-untagged-base",
      r"FROM\s+node:latest",
      "infra-vuln/Dockerfile", "FROM node:latest"),
@@ -733,6 +736,10 @@ RULES = [
 
 # Raw-vulnerable-form patterns that must have ZERO hits in the safe counter-example files.
 MUST_NOT_MATCH = [
+    # supply-chain: the no-hashes requirements file must STAY hash-free (row-5 ground truth)
+    ("supply-pip-hash-free-vuln",
+     r"--require-hashes|--hash=sha256",
+     "supply-chain-vuln/requirements.txt"),
     ("webhook-no-middleware-safe",
      r"app\.post\(\s*['\"][^'\"]*webhooks[^'\"]*['\"]\s*,\s*async",
      "gaps3-vuln-app/safe-gaps3.js"),
