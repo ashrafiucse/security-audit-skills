@@ -14,6 +14,7 @@ truth.
 | 4 | No lockfile — non-reproducible installs, transitive-swap risk | (absence of package-lock.json) | High |
 | 5 | pip integrity NOT enforced — `requirements.txt` has no `--require-hashes` (ToB matrix: pip verifies only with extra steps) | requirements.txt:- | Medium |
 | 6 | Composer content-integrity NOT verified even with lockfile present (ToB no-verify bucket; `dist` entries carry no shasum) — informational ecosystem note | composer.lock:- | Info (note) |
+| 7 | Caret-wide ranges in prod manifest with no lockfile (floating install surface; pin via lockfile at minimum) | package.json:5 | Medium |
 
 ## Must NOT trigger (near-misses)
 
