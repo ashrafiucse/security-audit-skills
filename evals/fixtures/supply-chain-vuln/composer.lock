@@ -1,0 +1,16 @@
+{
+    "_readme": ["This file is a FAKE fixture. Lockfile content hashes are intentionally absent — Composer does not verify content integrity even with this file present (Trail of Bits 25-PM test, 2026-10)."],
+    "content-hash": "fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11fa11",
+    "packages": [
+        {
+            "name": "monolog/monolog",
+            "version": "3.7.0",
+            "dist": { "type": "zip", "url": "https://api.github.com/repos/Seldaek/monolog/zipball/fa11" }
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "15.0.0",
+            "dist": { "type": "zip", "url": "https://api.github.com/repos/stripe/stripe-php/zipball/fa11" }
+        }
+    ]
+}

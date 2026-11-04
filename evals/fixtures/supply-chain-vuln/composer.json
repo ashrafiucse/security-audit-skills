@@ -1,0 +1,14 @@
+{
+    "name": "acme/reporting-widget",
+    "description": "Internal reporting widget (FAKE fixture data)",
+    "require": {
+        "php": ">=8.2",
+        "monolog/monolog": "3.7.0",
+        "stripe/stripe-php": "15.0.0"
+    },
+    "config": {
+        "platform": {
+            "php": "8.3.13"
+        }
+    }
+}
