@@ -24,7 +24,11 @@ jobs:
           bash -n skills/security-audit/scripts/probe_tools.sh
 
       - name: Python syntax
-        run: python3 -m py_compile scripts/validate.py scripts/selftest_patterns.py skills/dependency-vulns/scripts/osv_scan.py
+        run: python3 -m py_compile scripts/validate.py scripts/selftest_patterns.py skills/dependency-vulns/scripts/osv_scan.py skills/crypto-review/scripts/decode_blob.py
+
+      - name: Blob decoder self-test (vectors must decode with expected content)
+        run: |
+          python3 skills/crypto-review/scripts/decode_blob.py --selftest | tail -1 | grep -q 'decode_blob selftest: 8/8'
 
       - name: Secrets scanner self-test (planted fakes must be found)
         run: |
