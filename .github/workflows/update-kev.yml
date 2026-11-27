@@ -41,7 +41,16 @@ jobs:
           # live on there — without this, decided CVEs re-appear once their issue closes)
           log = "skills/cve-research/vuln-db/kev-triage-log.md"
           if os.path.exists(log):
-              triaged += open(log, encoding="utf-8", errors="replace").read()
+              import re as _re
+              log_text = open(log, encoding="utf-8", errors="replace").read()
+              triaged += log_text
+              # expand compact slash clusters ("CVE-2026-16720/16884/16918") so
+              # every rider CVE matches the substring check below
+              # (seen 2026-11-21: decided CVEs re-listed from compact rows)
+              for _m in _re.finditer(r"CVE-(\d{4})-(\d+)((?:/\d+)+)", log_text):
+                  _yr, _first, _rest = _m.group(1), _m.group(2), _m.group(3)
+                  for _tail in _rest.strip("/").split("/"):
+                      triaged += "\nCVE-%s-%s" % (_yr, _tail)
 
           # already reported = mentioned in an open kev-labeled issue
           reported = ""

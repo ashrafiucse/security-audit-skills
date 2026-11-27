@@ -1,0 +1,27 @@
+# decode-blobs fixture — encoded/encrypted blob plants (FAKE data only)
+# Ground truth: evals/fixtures/decode-blobs/expected-findings.md
+
+## config blobs found in the audit target
+
+1. db-credentials-blob (base64 of compressed json):
+eJyrVkpJii8tTi1SslIqLkuOTyxNySxR0gGJFiQWF5fnF6UAZQKKDFJ0XZx0A4BCukYGRmZKtQA7vxKr
+
+2. api-token-blob (double hex):
+36313730363935663734366636623635366533643431346234393431353835303463333434393465333335303463333434333333343833303463343433333532
+
+3. url-encoded credential (basic-auth style):
+admin%3AP%40ssw0rd-UrlEnc
+
+4. legacy auth token (JWT, signature never verified client-side):
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdmMtYmFja3VwIiwicm9sZSI6ImFkbWluIiwiaXNzIjoibGVnYWN5LWF1dGgifQ.S1GN4TUR3PL4C3H0LD3Rnotverified0000
+
+5. obfuscated session token (single-byte XOR, base64 wrapped):
+MScxMSstLB02LSknLH8achByICQ3MQF2NicmbxR2Ljcn
+
+6. ops note moved to plain-notes.txt (safe counterpart file)
+
+7. legacy vault passphrase note (classical cipher):
+Gur erpbirel cnffcuenfr sbe gur yrtnpl inhyg vf Uhagre2Oyhr naq vg zhfg or ebgngrq guvf dhnegre
+
+8. encrypted payload referenced by app-config.env (OpenSSL envelope):
+U2FsdGVkX18REREREREREavN7wEjRWeJ
